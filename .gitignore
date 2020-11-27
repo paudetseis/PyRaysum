@@ -1,0 +1,16 @@
+.DS_Store
+__pycache__
+
+*.ai
+*.pdf
+*.pyc
+*.cpython*
+*~
+.ipynb_checkpoints
+.coverage
+
+*.egg-info
+build
+dist
+
+_build
