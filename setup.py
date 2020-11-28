@@ -1,3 +1,4 @@
+import setuptools
 import os.path
 import re
 from numpy.distutils.core import setup, Extension
@@ -13,22 +14,13 @@ def find_version(*paths):
     raise RuntimeError("Unable to find version string.")
 
 
-# ext = [Extension(name='pyraysum.raysum_f',
-#                  sources=['src/raysum.f90', 'src/raysum_sub.f90'],
-#                  libraries=['lapack'],
-#                  library_dirs=get_info('lapack_opt', 1).get('library_dirs'))]
-
-ext = [Extension(name='pyraysum.raysum_f',
-                 sources=['src/raysum.f90'])]
-
 setup(
     name='pyraysum',
     version=find_version('pyraysum', '__init__.py'),
-    description='Python version of Fortran code Raysum',
+    description='Python wrapper around Fortran code Raysum',
     author='Andrew Frederiksen, Pascal Audet',
     maintainer='Pascal Audet',
     author_email='pascal.audet@uottawa.ca',
-    # url='https://github.com/paudetseis/Telewavesim',
     classifiers=[
         'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: MIT License',
@@ -37,13 +29,14 @@ setup(
         'Programming Language :: Python :: 3.8'],
     install_requires=['numpy>=1.15', 'obspy>=1.0.0', 'matplotlib'],
     python_requires='>=3.7',
-    tests_require=['pytest'],
-    ext_modules=ext,
-    packages=['pyraysum', 'pyraysum.tests'],
+    packages=setuptools.find_packages(),
+    include_package_data=True,
     package_data={
         'pyraysum': [
-            # 'examples/*.ipynb',
-            'examples/models/*.txt']
-            # 'examples/Notebooks/*.ipynb']
-    }
+            'examples/models/*.txt',
+            'examples/Notebooks/*.ipynb']},
+    entry_points={
+    'console_scripts':
+    ['install_raysum=pyraysum.scripts.install_raysum:main']}
+
 )

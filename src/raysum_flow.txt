@@ -1,9 +1,0 @@
-** Need to install FLIBS 'csv_file' module
-
-The program 'seis-spread' is the main program that runs all the sub routines. 
-
-1 - readmodel - in 'readwrite.f' (should be Python functions, similar to Telewavesim)
-2 - buildmodel -  in 'buildmodel.f' (should be Python functions, similar to Telewavesim)
-3 - readgeom - in 'readwrite.f'
-4 - readparams - in 'seis-spread.f' (reads in parameters of traces or writes them to file if not found - should be Python functions)
-5 - generate phse list (depends on )

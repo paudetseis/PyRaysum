@@ -27,14 +27,10 @@ Utility functions to interact with ``telewavesim`` modules.
 '''
 import numpy as np
 from numpy import sin, cos
-from numpy.fft import fft, fftshift, ifft
 from scipy.signal import hilbert
 from obspy.core import Trace, Stream
-from obspy.signal.rotate import rotate_ne_rt
-from pyraysum import elast as es
+from pyraysum import elast
 from pyraysum import tensor
-from pyraysum.raysum_f import conf as cf_f
-# from pyraysum.raysum_f import raysum
 
 class Model(object):
     """
@@ -287,148 +283,12 @@ def calc_ttime(model, slow, wvtype='P'):
     return t1
 
 
-def model2for(model):
-    """
-    Passes global model variables to Fortran ``conf`` module.
-
-    Returns:
-        None
-
-    Variables to pass are ``a``, ``rho``, ``thickn``, ``isoflg``
-    """
-
-    nlaymx = cf_f.nlaymx
-    cf_f.a = np.zeros((3, 3, 3, 3, nlaymx))
-    cf_f.rho = np.zeros((nlaymx))
-    cf_f.thickn = np.zeros((nlaymx))
-    cf_f.isoflg = np.zeros((nlaymx), dtype='int')
-
-    for i in range(model.nlay):
-        cf_f.a[:, :, :, :, i] = model.a[:, :, :, :, i]
-        cf_f.rho[i] = model.rho[i]
-        cf_f.thickn[i] = 1000. * model.thickn[i]
-        if model.isoflg[i] == 'iso':
-            cf_f.isoflg[i] = 1
-        else:
-            cf_f.isoflg[i] = 0
-
-
-def wave2for(dt, slow, baz):
-    """
-    Passes global wavefield variables to Fortran ``conf`` module.
-
-    Returns:
-        None
-
-    Variables to pass are ``dt``, ``slow``, ``baz``
-    """
-
-    cf_f.dt = dt
-    cf_f.slow = slow
-    cf_f.baz = baz
-
 
 def run_prs(model, baz, slow, npts, dt, wvtype='P'):
     """
-    Function to run the ``plane`` module and return 3-component seismograms as
-    an ``obspy.Stream`` object. This function builds the seismic response
-    spectrum by frequency using the matrix propagation approach.
-    Required arguments are the seismic model, slowness value, and the sampling
-    properties (maximum number of samples and
-    the sampling distance in seconds).
-
-    By default, the function uses a back-azimuth value of 0 degree,
-    which is suitable for events coming from the North pole or isotropic
-    seismic velocity models (i.e., those that do not vary with direction of
-    incoming waves).
-    For anisotropic velocity models, users need to specify the back-azimuth
-    value in degrees. Furthermore, the default type of the incoming
-    teleseismic body wave is ``'P'`` for compressional wave. Other options are
-    ``'SV'``, ``'SH'``, or ``'Si'`` for vertically-polarized shear wave,
-    horizontally-polarized shear wave or isotropic shear wave, respectively.
-    Wave modes cannot be mixed.
-
-    Finally, it is possible to simulate the seismic response for ocean-bottom
-    seismic (OBS) stations using the flag ``obs=True``. If the flag is set to
-    ``True``, the user can specify the water depth below sea level
-    (in meters, positive value) as well as the properties of the sea water
-    (defaults are acoustic wavespeed of 1.5 km/s and density of 1027 kg/m^3).
-
-    Args:
-        model (Model):
-            Instance of the ``Model`` class that contains the physical
-            properties of subsurface layers.
-        slow (float): Slowness (s/km)
-        baz (float): Back-azimuth (degree)
-        npts (int): Number of samples in time series
-        dt (float): Sampling distance (s)
-        baz (float, optional): Back-azimuth (degree)
-        wvtype (str, optional, default: ``'P'``):
-            Incident wavetype (``'P'``, ``'SV'``, ``'SH'``, ``'Si'``)
-        obs (bool, optional):
-            Whether or not the analysis is done for an OBS stations
-        dp (float, optional): Deployment depth below sea level (m)
-        c (float, optional):
-            P-wave velocity of salt water (default = ``1.5`` km/s)
-        rhof (float, optional):
-            Density of salt water (default = ``1027.0`` kg/m^3)
-
-
-    Returns:
-        (obspy.stream):
-            trxyz: Stream containing 3-component displacement seismograms
-
-
-    Example
-    -------
-
-    Basic example:
-
-    >>> from telewavesim import utils
-    >>> # Define three-layer model with isotropic crust and antigorite upper mantle layer over isotropic half-space
-    >>> model = utils.Model([20, 10, 0], [2800., None, 3300.], [4.6, 0, 6.0], [2.6, 0, 3.6], ['iso', 'atg', 'iso'], [0, 0, 0], [0, 0, 0], [0, 0, 0])
-    >>> slow = 0.06     # s/km
-    >>> npts = 1500
-    >>> dt = 0.025      # s
-    >>> st = utils.run_plane(model, slow, npts, dt)
-
-    >>> type(st)
-    <class 'obspy.core.stream.Stream'>
-    >>> print(st)
-    3 Trace(s) in Stream:
-    ...N | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples
-    ...E | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples
-    ...Z | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples
-    >>> st.plot(size=(600, 450))
-
-    .. figure:: ../telewavesim/examples/picture/Figure_land.png
-       :align: center
-
-    OBS station:
-
-    >>> from telewavesim import utils
-    >>> # Define two-layer model with foliated eclogitic crust over isotropic half-space
-    >>> model = utils.Model([20, 0], [None, 3300.], [0, 6.0], [0, 3.6], ['EC_f', 'iso'], [0, 0], [0, 0], [0, 0])
-    >>> slow = 0.06     # s/km
-    >>> npts = 3000
-    >>> dt = 0.01      # s
-    >>> wvtype = 'SV'
-    >>> baz = 45.
-    >>> dp = 1000.
-    >>> st = utils.run_plane(model, slow, npts, dt, baz=baz, wvtype=wvtype, obs=True, dp=dp)
-    >>> st.plot(size=(600, 450))
-
-    .. figure:: ../telewavesim/examples/picture/Figure_obs.png
-       :align: center
-
     """
 
-    # Pass  variables to Fortran conf
-    model2for(model)
-    wave2for(dt, slow, baz)
 
-
-#     # Get the Fourier transform of seismograms for ``land`` case
 #     yx, yy, yz = raysum.get_arrivals(
 #         npts, model.nlay, np.array(wvtype, dtype='c'))
 

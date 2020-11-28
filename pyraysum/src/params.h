@@ -7,7 +7,7 @@ c         multiples
 c maxph: maximum number of phases per trace
 c buffsize is the max. line length assumed for reading files.
       integer namelen, maxlay, maxtr, maxseg, maxph, buffsize
-      parameter (namelen=40,maxlay=15,maxtr=200,maxseg=45)
+      parameter (namelen=40,maxlay=15,maxtr=500,maxseg=45)
       parameter (maxph=40000,buffsize=120)
       
 c Units for reading and writing
@@ -20,4 +20,4 @@ c pi: duh. ztol: tolerance considered to be equiv. to zero.
       
 c nsamp is the number of samples per trace.
       integer maxsamp
-      parameter (maxsamp=2000)
+      parameter (maxsamp=10000)

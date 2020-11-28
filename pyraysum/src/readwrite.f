@@ -342,22 +342,24 @@ c        use csv_file
         integer unit,ntr,align,itr,isamp,nsamp
         real traces(3,maxsamp,maxtr),dt,shift
         
-        write(unit,'(A1,5A11)') '#','#traces','#samples',
-     &                          'dt (s)','align','shift'
-        write(unit,'(X,2I11,F11.3,I11,F11.3)') ntr,nsamp,dt,align,shift
-       
+c        write(unit,'(A1,5A11)') '#','#traces','#samples',
+c     &                          'dt (s)','align','shift'
+c        write(unit,'(X,2I11,F11.3,I11,F11.3)') ntr,nsamp,dt,align,shift
+        write(unit, '(7A)') 'itr',',','trace1',',','trace2',
+     &            ',','trace3'
+
         do itr=1,ntr
-          write(unit,'(A20)') '#-------------------'
-          write(unit,'(A14,1X,I5)') '# Trace number',itr
-          write(unit,'(A20)') '#-------------------'
+c          write(unit,'(A20)') '#-------------------'
+c          write(unit,'(A14,1X,I5)') '# Trace number',itr
+c          write(unit,'(A20)') '#-------------------'
           do isamp=1,nsamp
-            a = (traces(1, isamp, itr), traces(2, isamp, itr), traces(3, isamp, itr))
-c            call csv_write(1,a,.true.)
-c             write (unit,'(3(X,G15.7))') traces(1,isamp,itr),
-c     &              traces(2,isamp,itr),traces(3,isamp,itr)
+            write (unit,'(I5,A,G15.7,A,G15.7,A,G15.7)') itr-1,',',
+     &              traces(1,isamp,itr),
+     &              ',',traces(2,isamp,itr),',',traces(3,isamp,itr)
           end do
         end do
         
       end
+
 
       
