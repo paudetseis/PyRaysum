@@ -14,15 +14,16 @@ c Include constants:
         include 'params.h'
 
 c Scratch variables:
-        integer i,j,iargc
+        integer i,j,iargc,verb
         character modname*(namelen),geomname*(namelen),phname*(namelen)
         character arrname*(namelen),tracename*(namelen)
         character iphname*(namelen)
         real amp_in
+        logical verbose
 c Model parameters:
         integer nlay
         real thick(maxlay),rho(maxlay),alpha(maxlay),beta(maxlay)
-        real pct_a(maxlay),pct_b(maxlay),trend(maxlay),plunge(maxlay)
+        real pct(maxlay),trend(maxlay),plunge(maxlay)
         real strike(maxlay),dip(maxlay)
         logical isoflag(maxlay)
 c Geometry parameters
@@ -57,49 +58,59 @@ c Get filenames from command-line argument.
           write(*,*) '-- iphase is P by default; may also be SV or SH.'
           stop
         end if
+
+c Read in parameters from file 'raysum-params', if it exists
+        geomname='raysum-params'
+        call readparams(geomname,verb,iphname,mults,nsamp,dt,width,
+     &                  align,shift,out_rot)
+
+        verbose=.false.
+        if (verb .eq. 1) then
+          verbose=.true.
+        end if
+
         call getarg(1,modname)
-        write(*,*) 'Model is ',modname
+        if (verbose) then
+          write(*,*) 'Model is ',modname
+        end if
 
 c Determine initial phase
-        if (i .eq. 5) then
+        if (iphname .eq. 'P') then
           iphase=1
-          iphname='P'
+        else if (iphname .eq. 'SV') then
+          iphase=2
+        else if (iphname .eq. 'SH') then
+          iphase=3
         else
-          call getarg(6,iphname)
-          if (iphname .eq. 'P') then
-            iphase=1
-          else if (iphname .eq. 'SV') then
-            iphase=2
-          else if (iphname .eq. 'SH') then
-            iphase=3
-          else
-            write (*,*) iphname,' is not a valid phase type.'
-            write (*,*) 'Valid phases are P, SV and SH.'
-            stop
-          end if
+          write (*,*) iphname,' is not a valid phase type.'
+          write (*,*) 'Valid phases are P, SV and SH.'
+          stop
         end if
-        write (*,*) 'Initial phase is ',iphname
-      
+        if (verbose) then
+          write (*,*) 'Initial phase is ',iphname
+        end if
+
 c Read in model      
         call readmodel(modname,thick,rho,alpha,beta,isoflag,
-     &                 pct_a,pct_b,trend,plunge,strike,dip,nlay)
-        call writemodel(6,thick,rho,alpha,beta,isoflag,
-     &                  pct_a,pct_b,trend,plunge,strike,dip,nlay)
+     &                 pct,trend,plunge,strike,dip,nlay)
+        if (verbose) then
+          call writemodel(6,thick,rho,alpha,beta,isoflag,
+     &                  pct,trend,plunge,strike,dip,nlay)
+        end if
           
 c Set up model for calculation, make rotators
         call buildmodel(aa,ar_list,rot,thick,rho,alpha,beta,isoflag,
-     &                  pct_a,pct_b,trend,plunge,strike,dip,nlay)
+     &                  pct,trend,plunge,strike,dip,nlay)
      
 c Read in geometry (desired traces)
         call getarg(2,geomname)
-        write (*,*) 'Geometry is ',geomname
+        if (verbose) then
+          write (*,*) 'Geometry is ',geomname
+        end if
         call readgeom(geomname,baz,slow,sta_dx,sta_dy,ntr)
-c        call writegeom(6,baz,slow,sta_dx,sta_dy,ntr)
-        
-c Read in parameters from file 'raysum-params', if it exists
-        geomname='raysum-params'
-        call readparams(geomname,mults,nsamp,dt,width,align,
-     &                  shift,out_rot)
+        if (verbose) then
+          call writegeom(6,baz,slow,sta_dx,sta_dy,ntr)
+        end if
         
 c Generate phase list
         call getarg(3,phname)
@@ -116,23 +127,33 @@ c Generate phase list
           end do
         end if
         if (mults .eq. 3) then
-          write(*,*) 'Reading phases from file ',phname
+          if (verbose) then
+            write(*,*) 'Reading phases from file ',phname
+          end if
           call readphases(phname,phaselist,nseg,numph)
         end if
-c        call printphases(phaselist,nseg,numph)
+        if (verbose) then
+          call printphases(phaselist,nseg,numph)
+        end if
         if (mults .ne. 3) then
           open(unit=iounit1,file=phname,status='unknown')
           call writephases(iounit1,phaselist,nseg,numph)
           close(unit=iounit1)
-          write(*,*) 'Phases written to ',phname
+          if (verbose) then
+            write(*,*) 'Phases written to ',phname
+          end if
         end if
 
         call getarg(4,arrname)
-        write(*,*) 'Arrivals will be written to ',arrname
+        if (verbose) then
+          write(*,*) 'Arrivals will be written to ',arrname
+        end if
         open(unit=iounit1,file=arrname,status='unknown')
         
         call getarg(5,tracename)
-        write(*,*) 'Traces will be written to ',tracename
+        if (verbose) then
+          write(*,*) 'Traces will be written to ',tracename
+        end if
         open(unit=iounit2,file=tracename,status='unknown')
         
 c        Perform calculation                   
@@ -174,29 +195,37 @@ c          Write results
       end
       
       
-      subroutine readparams(filename,mults,nsamp,dt,width,align,shift,
-     &                      out_rot)
+      subroutine readparams(filename,verb,phase,mults,nsamp,dt,width,
+     &                      align,shift,out_rot)
       
         implicit none
         include 'params.h'
         
-        character filename*(namelen),buffer*(buffsize)
-        integer mults,nsamp,align,ios,eof,out_rot
+        character filename*(namelen),buffer*(buffsize),phase*(namelen)
+        integer mults,nsamp,align,ios,eof,out_rot,verb
         real dt,width,shift
         
 c          Default values
-        mults=1
-        nsamp=600
-        dt=0.05
+        verb=0
+        phase='P'
+        mults=2
+        nsamp=3000
+        dt=0.01
         width=1.
         align=1
         shift=5.
-        out_rot=2
+        out_rot=0
         
         open(unit=iounit1,status='old',file=filename,iostat=ios)
         
         if (ios .eq. 0) then
-          write(*,*) 'Reading parameters from ',filename
+c          if (verbose) then
+c            write(*,*) 'Reading parameters from ',filename
+c          end if
+          call getline(iounit1,buffer,eof)
+          read (buffer,*) verb
+          call getline(iounit1,buffer,eof)
+          read (buffer,*) phase
           call getline(iounit1,buffer,eof)
           read (buffer,*) mults
           call getline(iounit1,buffer,eof)
@@ -212,10 +241,14 @@ c          Default values
           call getline(iounit1,buffer,eof)
           read (buffer,*) out_rot
         else
-          write (*,*) 'Parameter file ',filename,' does not exist.'
-          write (*,*) 'Writing default values.'
+c          write (*,*) 'Parameter file ',filename,' does not exist.'
+c          write (*,*) 'Writing default values.'
           close(unit=iounit1)
           open(unit=iounit1,status='unknown',file=filename)
+          write(iounit1,*) '# Verbosity: 0 for none, 1 for verbose mode'
+          write(iounit1,*) verb
+          write(iounit1,*) '# Phase name: P, SV or SH'
+          write(iounit1,*) phase
           write(iounit1,*) '# Multiples: 0 for none, 1 for Moho, 2 ',
      &                      'for all first-order, 3 to read file'
           write(iounit1,*) mults

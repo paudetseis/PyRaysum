@@ -2,7 +2,7 @@ c####&
 
 
       subroutine readmodel(filename,thick,rho,alpha,beta,isoflag,
-     &                     pct_a,pct_b,trend,plunge,strike,dip,nlay)
+     &                     pct,trend,plunge,strike,dip,nlay)
      
 c Read in a model file from disk.
           
@@ -12,22 +12,21 @@ c Read in a model file from disk.
         character filename*(namelen), buffer*(buffsize)
         integer eof,nlay,i,isoint
         real thick(maxlay),rho(maxlay),alpha(maxlay),beta(maxlay)
-        real pct_a(maxlay),pct_b(maxlay),trend(maxlay),plunge(maxlay)
+        real pct(maxlay),trend(maxlay),plunge(maxlay)
         real strike(maxlay),dip(maxlay)
         logical isoflag(maxlay)
         
         open(unit=iounit1,file=filename,status='old')
         
 c Read in lines from file, skipping lines that start with '#' (comments)
-	eof=0
+	      eof=0
         nlay=0
         call getline(iounit1,buffer,eof)
         do while ((eof .eq. 0) .and. (nlay .lt. maxlay))
           nlay=nlay+1
-c          write(*,*) buffer
           read(buffer,*) thick(nlay),rho(nlay),alpha(nlay),beta(nlay),
-     &                   isoint,pct_a(nlay),pct_b(nlay),
-     &                   trend(nlay),plunge(nlay),strike(nlay),dip(nlay)
+     &                   isoint,pct(nlay),trend(nlay),plunge(nlay),
+     &                   strike(nlay),dip(nlay)
           if (isoint .eq. 0) then
             isoflag(nlay) = .false.
           else
@@ -35,7 +34,6 @@ c          write(*,*) buffer
           end if
           call getline(1,buffer,eof)
         end do 
-c        write(*,*) 'Got ',nlay,' layers.'   
                
         close(iounit1)
         
@@ -155,19 +153,19 @@ c -----------------------------------
       
 c Print out a model on the given unit:
       subroutine writemodel(unit,thick,rho,alpha,beta,isoflag,
-     &                      pct_a,pct_b,trend,plunge,strike,dip,nlay)
+     &                      pct,trend,plunge,strike,dip,nlay)
      
         implicit none
         include 'params.h'
         
         integer unit, nlay, i, isonum
         real thick(maxlay),rho(maxlay),alpha(maxlay),beta(maxlay)
-        real pct_a(maxlay),pct_b(maxlay),trend(maxlay),plunge(maxlay)
+        real pct(maxlay),trend(maxlay),plunge(maxlay)
         real strike(maxlay),dip(maxlay)
         logical isoflag(maxlay)
         
-        write(unit,'(A1,4A7,A4,6A7)') '#','thick','rho','alpha','beta',
-     &        'iso','%P','%S','trend','plunge','strike','dip'
+        write(unit,'(A1,4A7,A4,5A7)') '#','thick','rho','alpha','beta',
+     &        'iso','%','trend','plunge','strike','dip'
         
         do i=1,nlay
           if (isoflag(i)) then
@@ -175,9 +173,9 @@ c Print out a model on the given unit:
           else
             isonum=0
           end if
-          write(unit,'(1X,4F7.0,I4,2F7.1,4F7.0)')
+          write(unit,'(1X,4F7.0,I4,F7.1,4F7.0)')
      &          thick(i),rho(i),alpha(i),beta(i),isonum,
-     &          pct_a(i),pct_b(i),trend(i)*180/pi,plunge(i)*180/pi,
+     &          pct(i),trend(i)*180/pi,plunge(i)*180/pi,
      &          strike(i)*180./pi,dip(i)*180./pi
         end do
              

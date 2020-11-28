@@ -1,7 +1,7 @@
 c####&
 
       subroutine buildmodel(a,ar,rot,thick,rho,alpha,beta,isoflag,
-     &                      pct_a,pct_b,trend,plunge,strike,dip,nlay)
+     &                      pct,trend,plunge,strike,dip,nlay)
 c Set up model for use.
      
         implicit none
@@ -10,7 +10,7 @@ c Set up model for use.
 c Model variables:
         integer nlay        
         real thick(maxlay),rho(maxlay),alpha(maxlay),beta(maxlay)
-        real pct_a(maxlay),pct_b(maxlay),trend(maxlay),plunge(maxlay)
+        real pct(maxlay),trend(maxlay),plunge(maxlay)
         real strike(maxlay),dip(maxlay)
         logical isoflag(maxlay)
         
@@ -19,13 +19,13 @@ c Outputs:
         
 c Scratch variables:
         integer ilay
-        real rot_axis(3,3),d_a,d_b,AA,CC,LL,NN,FF,a_temp(3,3,3,3)
+        real rot_axis(3,3),d_a,d_b,AA,AC,CC,LL,NN,FF,a_temp(3,3,3,3)
         
 c Parameter eta, combined with percentages of P and S anisotropy,
 c is sufficient to obtain all coefficients for a hexagonally-symmetric
 c medium. Fixed from Farra et al., 1991
-        real eta
-        parameter (eta=1.03)
+c        real eta
+c        parameter (eta=1.03)
                 
         do ilay=1,nlay
         
@@ -36,13 +36,21 @@ c Store isotropic coefficients (only 2 are used)
           else
 c Build anisotropic coefficients for a hexagonally-symmetric medium,
 c after Farra et al, 1991
-            d_a=alpha(ilay)*pct_a(ilay)/100.
-            d_b=beta(ilay)*pct_b(ilay)/100.
+            d_a=alpha(ilay)*pct(ilay)/100.
+            d_b=beta(ilay)*pct(ilay)/100.
             AA=rho(ilay)*(alpha(ilay) - d_a/2.)**2.
             CC=rho(ilay)*(alpha(ilay) + d_a/2.)**2.
             LL=rho(ilay)*(beta(ilay) + d_b/2.)**2.
             NN=rho(ilay)*(beta(ilay) - d_b/2.)**2.
-            FF=eta*(AA-2.*LL)
+c ----------
+c PA
+c
+            AC = alpha(ilay)**2
+            FF=-LL+SQRT((2.*AC)**2-2.*AC*(AA+CC+2.*LL)+(AA+LL)*(CC+LL))
+c
+c PA
+c            FF=eta*(AA-2.*LL)
+c ----------
 c            write (*,*) 'Anis. params are:',AA,CC,FF,LL,NN
 c Get tensor with unrotated axes
             call tritensr(a_temp,AA,CC,FF,LL,NN,rho(ilay))

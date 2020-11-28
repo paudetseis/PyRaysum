@@ -22,19 +22,13 @@
 
 '''
 
-Utility functions to interact with ``telewavesim`` modules.
+Utility functions to interact with ``pyraysum`` module.
 
 '''
 import itertools
 import numpy as np
 from numpy import sin, cos
-from pyraysum import elast as es
-
-
-MINERALS = ['atg', 'bt', 'cpx', 'dol', 'ep', 'grt', 'gln', 'hbl', 'jade',
-            'lws', 'lz', 'ms', 'ol', 'opx', 'plag', 'qtz', 'zo']
-
-ROCKS = ['BS_f', 'BS_m', 'EC_f', 'EC_m', 'HB', 'LHZ', 'SP_37', 'SP_80']
+from pyraysum import elast
 
 
 def set_iso_tensor(a, b):
@@ -53,7 +47,7 @@ def set_iso_tensor(a, b):
 
     a = a*1.e3
     b = b*1.e3
-    C = es.iso_tensor(a, b)
+    C = elastiso_tensor(a, b)
 
     # Convert Voigt to full tensor
     cc = voigt2cc(C)
@@ -163,57 +157,57 @@ def set_aniso_tensor(tr, pl, typ='atg'):
 
     # Minerals
     if typ == 'atg':
-        C, rho = es.antigorite()
+        C, rho = elastantigorite()
     elif typ == 'bt':
-        C, rho = es.biotite()
+        C, rho = elastbiotite()
     elif typ == 'cpx':
-        C, rho = es.clinopyroxene_92()
+        C, rho = elastclinopyroxene_92()
     elif typ == 'dol':
-        C, rho = es.dolomite()
+        C, rho = elastdolomite()
     elif typ == 'ep':
-        C, rho = es.epidote()
+        C, rho = elastepidote()
     elif typ == 'grt':
-        C, rho = es.garnet()
+        C, rho = elastgarnet()
     elif typ == 'gln':
-        C, rho = es.glaucophane()
+        C, rho = elastglaucophane()
     elif typ == 'hbl':
-        C, rho = es.hornblende()
+        C, rho = elasthornblende()
     elif typ == 'jade':
-        C, rho = es.jadeite()
+        C, rho = elastjadeite()
     elif typ == 'lws':
-        C, rho = es.lawsonite()
+        C, rho = elastlawsonite()
     elif typ == 'lz':
-        C, rho = es.lizardite()
+        C, rho = elastlizardite()
     elif typ == 'ms':
-        C, rho = es.muscovite()
+        C, rho = elastmuscovite()
     elif typ == 'ol':
-        C, rho = es.olivine()
+        C, rho = elastolivine()
     elif typ == 'opx':
-        C, rho = es.orthopyroxene()
+        C, rho = elastorthopyroxene()
     elif typ == 'plag':
-        C, rho = es.plagioclase_06()
+        C, rho = elastplagioclase_06()
     elif typ == 'qtz':
-        C, rho = es.quartz()
+        C, rho = elastquartz()
     elif typ == 'zo':
-        C, rho = es.zoisite()
+        C, rho = elastzoisite()
 
     # Rocks
     elif typ == 'BS_f':
-        C, rho = es.blueschist_felsic()
+        C, rho = elastblueschist_felsic()
     elif typ == 'BS_m':
-        C, rho = es.blueschist_mafic()
+        C, rho = elastblueschist_mafic()
     elif typ == 'EC_f':
-        C, rho = es.eclogite_foliated()
+        C, rho = elasteclogite_foliated()
     elif typ == 'EC_m':
-        C, rho = es.eclogite_massive()
+        C, rho = elasteclogite_massive()
     elif typ == 'HB':
-        C, rho = es.harzburgite()
+        C, rho = elastharzburgite()
     elif typ == 'SP_37':
-        C, rho = es.serpentinite_37()
+        C, rho = elastserpentinite_37()
     elif typ == 'SP_80':
-        C, rho = es.serpentinite_80()
+        C, rho = elastserpentinite_80()
     elif typ == 'LHZ':
-        C, rho = es.lherzolite()
+        C, rho = elastlherzolite()
 
     else:
         print('type of mineral/rock not implemented')
@@ -357,7 +351,7 @@ def rot_tensor(a, alpha, beta, gam):
     .. note::
 
         The three angles (``alpha``, ``beta``, ``gam``) correspond to rotation
-        about the x_2, x_3, x_1 axes. Note that the sequence of the rotation
+        about the x_2, x_3, x_1 axelast Note that the sequence of the rotation
         is important: (AB ~= BA). In this case we rotate about x_2 first,
         x_3 second and x_1 third.
 
@@ -395,6 +389,7 @@ def rot_tensor(a, alpha, beta, gam):
 
     return aa
 
+
 def mod2vel(K, G, rho):
     """
 
@@ -426,5 +421,3 @@ def mod2vel(K, G, rho):
     Vs = np.sqrt(G/rho)
 
     return Vp, Vs
-
-

@@ -25,7 +25,7 @@ def main():
     # Compile Raysum using the Makefile: clean, compile, copy binaries, clean
     subprocess.call(["make", "clean"])
     subprocess.call(["make", "all"])
-    subprocess.call(["cp", "seis-spread", prs_path.name])
+    subprocess.call(["cp", "-f", "seis-spread", str(prs_path)])
     subprocess.call(["make", "clean"])
 
 

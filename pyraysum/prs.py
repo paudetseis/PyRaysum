@@ -31,44 +31,56 @@ from scipy.signal import hilbert
 from obspy.core import Trace, Stream
 from pyraysum import elast
 from pyraysum import tensor
+import subprocess
+
+MINERALS = ['atg', 'bt', 'cpx', 'dol', 'ep', 'grt', 'gln', 'hbl', 'jade',
+            'lws', 'lz', 'ms', 'ol', 'opx', 'plag', 'qtz', 'zo']
+
+ROCKS = ['BS_f', 'BS_m', 'EC_f', 'EC_m', 'HB', 'LHZ', 'SP_37', 'SP_80']
+
 
 class Model(object):
     """
     ``model parameters``:
-        - thickn (np.ndarray): Thickness of layers (km) (shape ``(nlay)``)
+        - thickn (np.ndarray): Thickness of layers (m) (shape ``(nlay)``)
         - rho (np.ndarray): Density (kg/m^3) (shape ``(nlay)``)
-        - vp (np.ndarray): P-wave velocity (km/s) (shape ``(nlay)``)
-        - vs (np.ndarray): S-wave velocity (km/s) (shape ``(nlay)``)
+        - vp (np.ndarray): P-wave velocity (m/s) (shape ``(nlay)``)
+        - vs (np.ndarray): S-wave velocity (m/s) (shape ``(nlay)``)
         - isoflg (list of str, optional, defaut: ``'iso'``):
             Flags for type of layer material (dimension ``nlay``)
         - ani (np.ndarray, optional): Anisotropy (percent) (shape ``(nlay)``)
-        - tr (np.ndarray, optional):
+        - trend (np.ndarray, optional):
             Trend of symmetry axis (degree) (shape ``(nlay)``)
-        - pl (np.ndarray, optional):
+        - plunge (np.ndarray, optional):
             Plunge of symmetry axis (degree) (shape ``(nlay)``)
+        - strike (np.ndarray, optional):
+            azimuth of interface in RHR (degree) (shape ``(nlay)``)
+        - dip (np.ndarray, optional):
+            dip of interface in RHR (degree) (shape ``(nlay)``)
 
         - nlay (int): Number of layers
         - a (np.ndarray): Elastic thickness (shape ``(3, 3, 3, 3, nlay)``)
     """
 
     def __init__(self, thickn, rho, vp, vs, isoflg='iso',
-                 ani=None, tr=None, pl=None, strike=None, dip=None):
+                 ani=None, trend=None, plunge=None, strike=None, dip=None):
         def _get_val(v):
             return (np.array([v] * self.nlay if isinstance(v, (int, float))
-                             else v) if v is not None else None)
+                             else v) if v is not None else [0.]*self.nlay)
         self.nlay = len(thickn)
         self.thickn = np.array(thickn)
         self.rho = np.array(rho) if rho is not None else [None] * self.nlay
         self.vp = np.array(vp)
         self.vs = np.array(vs)
-        self.isoflg = (list(isoflg) if not isinstance(isoflg, str)
+        self.isoflg = (list(isoflg) if not isinstance(isoflg, int)
                        else [isoflg] * self.nlay)
         self.ani = _get_val(ani)
-        self.tr = _get_val(tr)
-        self.pl = _get_val(pl)
+        self.trend = _get_val(trend)
+        self.plunge = _get_val(plunge)
         self.strike = _get_val(strike)
         self.dip = _get_val(dip)
-        self.update_tensor()
+        self.write_model()
+        # self.update_tensor()
 
     def update_tensor(self):
         """
@@ -80,22 +92,39 @@ class Model(object):
         self.a = np.zeros((3, 3, 3, 3, self.nlay))
 
         for j in range(self.nlay):
-            if self.isoflg[j] == 'iso':
+            if self.isoflg[j] == 1:
                 cc = tensor.set_iso_tensor(self.vp[j], self.vs[j])
                 self.a[:, :, :, :, j] = cc
-            elif self.isoflg[j] == 'tri':
+            elif self.isoflg[j] == 0:
                 cc = tensor.set_tri_tensor(self.vp[j], self.vs[j],
-                                    self.tr[j], self.pl[j], self.ani[j])
+                                           self.trend[j], self.plunge[j],
+                                           self.ani[j])
                 self.a[:, :, :, :, j] = cc
             elif self.isoflg[j] in MINERALS or self.isoflg[j] in ROCKS:
-                cc, rho = tensor.set_aniso_tensor(self.tr[j], self.pl[j],
-                                           typ=self.isoflg[j])
+                cc, rho = tensor.set_aniso_tensor(self.trend[j],
+                                                  self.plunge[j],
+                                                  typ=self.isoflg[j])
                 self.a[:, :, :, :, j] = cc
                 self.rho[j] = rho
             else:
                 msg = ('\nFlag not defined: use either "iso", "tri" or one '
                        'among\n%s\n%s\n')
                 raise ValueError(msg % (MINERALS, ROCKS))
+
+    def write_model(self):
+        """
+        Writes model parameters to file to be processed by raysum
+
+        """
+        file = open('sample.mod', 'w')
+        for i in range(self.nlay):
+            file.writelines([
+                str(self.thickn[i])+" "+str(self.rho[i])+" " +
+                str(self.vp[i])+" "+str(self.vs[i])+" " +
+                str(self.isoflg[i])+" "+str(self.ani[i])+" " +
+                str(self.trend[i])+" "+str(self.plunge[i])+" " +
+                str(self.strike[i])+" "+str(self.dip[i])+"\n"])
+        file.close()
 
 
 def read_model(modfile, encoding=None):
@@ -109,184 +138,53 @@ def read_model(modfile, encoding=None):
     return Model(*zip(*values))
 
 
+def write_params(verbose, wvtype, mults, npts, dt, gwidth, align, shift, rot):
+
+    file = open("raysum-params", "w")
+    file.writelines("# Verbosity\n" + str(int(verbose)) + "\n")
+    file.writelines("# Phase name\n" + wvtype + "\n")
+    file.writelines("# Multiples: 0 for none, 1 for Moho, " +
+                    "2 all first-order\n" + str(mults) + "\n")
+    file.writelines("# Number of samples per trace\n" + str(npts) + "\n")
+    file.writelines("# Sample rate (seconds)\n" + str(dt) + "\n")
+    file.writelines("# Gaussian pulse width (seconds)\n" + str(gwidth) + "\n")
+    file.writelines("# Alignment: 0 is none, 1 aligns on P\n" +
+                    str(align) + "\n")
+    file.writelines("# Shift or traces (seconds)\n" + str(shift) + "\n")
+    file.writelines("# Rotation to output: 0 is NEZ, 1 is RTZ, 2 is PVH\n" +
+                    str(rot) + "\n")
+    file.close()
+    return
 
 
-def rotate_zrt_pvh(trZ, trR, trT, slow, vp=None, vs=None):
-    """
-    Rotates traces from `Z-R-T` orientation to `P-SV-SH` wave mode.
+def write_geom(baz, slow):
 
-    Args:
-        trZ (obspy.trace): Vertical component
-        trR (obspy.trace): Radial component
-        trT (obspy.trace): Transverse component
-        slow (float): slowness of wave
-        vp (float, optional): P-wave velocity used for rotation
-        vs (float, optional): S-wave velocity used for rotation
+    if not hasattr(baz, "__len__"):
+        baz = [baz]
+    if not hasattr(slow, "__len__"):
+        slow = [slow]
 
-    Returns:
-        (tuple): tuple containing:
-
-            * trP (obspy.trace): Compressional (P) wave mode
-            * trV (obspy.trace): Vertically polarized shear (SV) wave mode
-            * trH (obspy.trace): Horizontally polarized shear (SH) wave mode
-
-    """
-    if vp is None:
-        vp = 6.0
-    if vs is None:
-        vs = 3.5
-    # Copy traces
-    trP = trZ.copy()
-    trV = trR.copy()
-    trH = trT.copy()
-
-    # Vertical slownesses
-    qp = np.sqrt(1/vp**2 - slow**2)
-    qs = np.sqrt(1/vs**2 - slow**2)
-
-    # Elements of rotation matrix
-    m11 = slow*vs*vs/vp
-    m12 = -(1 - 2*vs*vs*slow*slow)/(2*vp*qp)
-    m21 = (1 - 2*vs*vs*slow*slow)/(2*vs*qs)
-    m22 = slow*vs
-
-    # Rotation matrix
-    rot = np.array([[-m11, m12], [-m21, m22]])
-
-    # Vector of Radial and Vertical
-    r_z = np.array([trR.data, trZ.data])
-
-    # Rotation
-    vec = np.dot(rot, r_z)
-
-    # Extract P and SV components
-    trP.data = vec[0, :]
-    trV.data = vec[1, :]
-    trH.data = -trT.data/2.
-
-    return trP, trV, trH
+    file = open("sample.geom", "w")
+    dat = [(bb, ss) for ss in slow for bb in baz ]
+    for dd in dat:
+        file.writelines([str(dd[0]) + " " + str(dd[1]*1.e-3) + " 0. 0.\n"])
+    file.close()
+    return dat
 
 
-def stack_all(st1, st2, pws=False):
-    """
-    Stacks all traces in two ``Stream`` objects.
-
-    Args:
-        st1 (obspy.stream): Stream 1
-        st2 (obspy.stream,): Stream 2
-        pws (bool, optional): Enables Phase-Weighted Stacking
-
-    Returns:
-        (tuple): tuple containing:
-
-            * stack1 (obspy.trace): Stacked trace for Stream 1
-            * stack2 (obspy.trace): Stacked trace for Stream 2
-
-    """
-
-    print()
-    print('Stacking ALL traces in streams')
-
-    # Copy stats from stream
-    str_stats = st1[0].stats
-
-    # Initialize arrays
-    tmp1 = np.zeros(len(st1[0].data))
-    tmp2 = np.zeros(len(st2[0].data))
-    weight1 = np.zeros(len(st1[0].data), dtype=complex)
-    weight2 = np.zeros(len(st2[0].data), dtype=complex)
-
-    # Stack all traces
-    for tr in st1:
-        tmp1 += tr.data
-        hilb1 = hilbert(tr.data)
-        phase1 = np.arctan2(hilb1.imag, hilb1.real)
-        weight1 += np.exp(1j*phase1)
-
-    for tr in st2:
-        tmp2 += tr.data
-        hilb2 = hilbert(tr.data)
-        phase2 = np.arctan2(hilb2.imag, hilb2.real)
-        weight2 += np.exp(1j*phase2)
-
-    # Normalize
-    tmp1 = tmp1/np.float(len(st1))
-    tmp2 = tmp2/np.float(len(st2))
-
-    # Phase-weighting
-    if pws:
-        weight1 = weight1/np.float(len(st1))
-        weight2 = weight2/np.float(len(st2))
-        weight1 = np.real(abs(weight1))
-        weight2 = np.real(abs(weight2))
-    else:
-        weight1 = np.ones(len(st1[0].data))
-        weight2 = np.ones(len(st1[0].data))
-
-    # Put back into traces
-    stack1 = Trace(data=weight1*tmp1, header=str_stats)
-    stack2 = Trace(data=weight2*tmp2, header=str_stats)
-
-    return stack1, stack2
-
-
-def calc_ttime(model, slow, wvtype='P'):
-    """
-    Calculates total propagation time through model given the corresponding
-    ``'P'`` or ``'S'`` wave type. The bottom layer is irrelevant in this
-    calculation. All ``'S'`` wave types will return the same predicted time.
-    This function is useful mainly for plotting purposes. For example, to show
-    the first phase arrival at a time of 0, the traces can be shifted by the
-    total propagation time through the model.
-
-    Args:
-        model (Model): Model object
-        slow (float): Slowness value (s/km)
-        wvtype (str): Incident wavetype (``'P'``, ``'SV'``, ``'SH'``, ``'Si'``)
-
-    Returns:
-        (float): t1: Time in seconds
-
-    Example
-    -------
-    >>> from telewavesim import utils
-    >>> # Define two-layer model with identical material
-    >>> model = utils.Model([10, 0], None, 0, 0, 'atg', 0, 0, 0)
-    >>> # Only topmost layer is useful for travel time calculation
-    >>> wvtype = 'P'
-    >>> slow = 0.06     # s/km
-    >>> utils.calc_ttime(model, slow, wvtype)
-    1.3519981570791182
-
-    """
-
-    t1 = 0.
-
-    for i in range(model.nlay-1):
-        if model.isoflg[i] == 'iso':
-            a0 = model.a[2, 2, 2, 2, i]
-            b0 = model.a[1, 2, 1, 2, i]
-        else:
-            cc = tensor.cc2voigt(model.a[:, :, :, :, i])
-            rho = model.rho[i]
-            K1, G1, K2, G2, K, G = tensor.VRH_average(cc*rho)
-            a0, b0 = tensor.mod2vel(K, G, rho)
-            a0 = a0**2
-            b0 = b0**2
-        if wvtype == 'P':
-            t1 += 1000*model.thickn[i]*np.sqrt(1./a0 - (slow*1.e-3)**2)
-        elif wvtype == 'Si' or wvtype == 'SV' or wvtype == 'SH':
-            t1 += 1000*model.thickn[i]*np.sqrt(1./b0 - (slow*1.e-3)**2)
-        else:
-            raise ValueError('Invalid wave type')
-
-    return t1
-
-
-
-def run_prs(model, baz, slow, npts, dt, wvtype='P'):
+def run_prs(model, verbose=False, wvtype='P', mults=2,
+            npts=3000, dt=0.01, gwidth=1., align=1, shift=5., rot=0,
+            baz=[], slow=[]):
     """
     """
+
+    write_params(verbose, wvtype, mults, npts, dt, gwidth, align, shift, rot)
+    dat = write_geom(baz, slow)
+
+    subprocess.call(["seis-spread", "sample.mod",
+                     "sample.geom", "sample.ph",
+                     "sample.arr", "sample.tr"])
+
 
 
 #     yx, yy, yz = raysum.get_arrivals(
@@ -420,25 +318,88 @@ def run_prs(model, baz, slow, npts, dt, wvtype='P'):
 #     return tfs
 
 
-# def update_stats(tr, dt, slow, baz, wvtype, cha):
-#     """
-#     Updates the ``stats`` doctionary from an obspy ``Trace`` object.
+def update_stats(tr, dt, slow, baz, wvtype, cha):
+    """
+    Updates the ``stats`` doctionary from an obspy ``Trace`` object.
 
-#     Args:
-#         tr (obspy.trace): Trace object to update
-#         nt (int): Number of samples
-#         dt (float): Sampling rate
-#         slow (float): Slowness value (s/km)
-#         baz (float): Back-azimuth value (degree)
+    Args:
+        tr (obspy.trace): Trace object to update
+        nt (int): Number of samples
+        dt (float): Sampling rate
+        slow (float): Slowness value (s/km)
+        baz (float): Back-azimuth value (degree)
 
-#     Returns:
-#         (obspy.trace): tr: Trace with updated stats
-#     """
+    Returns:
+        (obspy.trace): tr: Trace with updated stats
+    """
 
-#     tr.stats.delta = dt
-#     tr.stats.slow = slow
-#     tr.stats.baz = baz
-#     tr.stats.wvtype = wvtype
-#     tr.stats.channel = cha
+    tr.stats.delta = dt
+    tr.stats.slow = slow
+    tr.stats.baz = baz
+    tr.stats.wvtype = wvtype
+    tr.stats.channel = cha
 
-#     return tr
+    return tr
+
+
+def stack_all(st1, st2, pws=False):
+    """
+    Stacks all traces in two ``Stream`` objects.
+
+    Args:
+        st1 (obspy.stream): Stream 1
+        st2 (obspy.stream,): Stream 2
+        pws (bool, optional): Enables Phase-Weighted Stacking
+
+    Returns:
+        (tuple): tuple containing:
+
+            * stack1 (obspy.trace): Stacked trace for Stream 1
+            * stack2 (obspy.trace): Stacked trace for Stream 2
+
+    """
+
+    print()
+    print('Stacking ALL traces in streams')
+
+    # Copy stats from stream
+    str_stats = st1[0].stats
+
+    # Initialize arrays
+    tmp1 = np.zeros(len(st1[0].data))
+    tmp2 = np.zeros(len(st2[0].data))
+    weight1 = np.zeros(len(st1[0].data), dtype=complex)
+    weight2 = np.zeros(len(st2[0].data), dtype=complex)
+
+    # Stack all traces
+    for tr in st1:
+        tmp1 += tr.data
+        hilb1 = hilbert(tr.data)
+        phase1 = np.arctan2(hilb1.imag, hilb1.real)
+        weight1 += np.exp(1j*phase1)
+
+    for tr in st2:
+        tmp2 += tr.data
+        hilb2 = hilbert(tr.data)
+        phase2 = np.arctan2(hilb2.imag, hilb2.real)
+        weight2 += np.exp(1j*phase2)
+
+    # Normalize
+    tmp1 = tmp1/np.float(len(st1))
+    tmp2 = tmp2/np.float(len(st2))
+
+    # Phase-weighting
+    if pws:
+        weight1 = weight1/np.float(len(st1))
+        weight2 = weight2/np.float(len(st2))
+        weight1 = np.real(abs(weight1))
+        weight2 = np.real(abs(weight2))
+    else:
+        weight1 = np.ones(len(st1[0].data))
+        weight2 = np.ones(len(st1[0].data))
+
+    # Put back into traces
+    stack1 = Trace(data=weight1*tmp1, header=str_stats)
+    stack2 = Trace(data=weight2*tmp2, header=str_stats)
+
+    return stack1, stack2
