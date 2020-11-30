@@ -1,3 +1,4 @@
+![](./pyraysum/examples/picture/PyRaysum_logo.png)
 ## Software for modeling ray-theoretical body-wave propagation
 
 This program generates sets of ray-theoretical seismograms for an
