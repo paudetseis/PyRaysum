@@ -44,7 +44,7 @@ c        Max. time that fits. The first sample is at t=0.
           do iph=1,nph
             tt_s=tt(iph,itr)-delta
             if ((tt_s .lt. 0.) .or. (tt_s .gt. max_t)) then
-c              write (*,*) 'Phase ',iph,' cropped out of trace ',itr
+              write (*,*) 'Phase ',iph,' cropped out of trace ',itr
             else
               do icomp=1,3
                 curamp(icomp)=amp(icomp,iph,itr)
@@ -55,8 +55,9 @@ c              write (*,*) 'Phase ',iph,' cropped out of trace ',itr
                   curamp(icomp)=0
                 end if
               end do
-              call putgauss(Tr_cart(1,1,itr),gwidth/(2.*dt),
-     &                      tt_s/dt,curamp,nsamp) 
+c              call putgauss(Tr_cart(1,1,itr),gwidth/(2.*dt),
+c     &                      tt_s/dt,curamp,nsamp) 
+              call putspike(Tr_cart(1,1,itr),tt_s/dt,curamp,nsamp) 
             end if
           end do
         end do
@@ -86,6 +87,29 @@ c        write (*,*) 'putgauss:',sigma,mu,amp
             traces(3,isamp)=traces(3,isamp)+gauss(isamp)*amp(3)
           end if
         end do
+        
+      end
+
+c -------------------------
+
+c Insert a spike (delta fct) into a trace      
+      subroutine putspike(traces,mu,amp,nsamp)
+      
+        implicit none
+        include 'params.h'
+        
+        real traces(3,maxsamp),mu,amp(3),gauss
+        integer nsamp
+        
+        integer isamp
+
+c        write (*,*) 'putgauss:',mu,amp
+				isamp = int(mu)
+        if ((isamp .gt. 0) .and. (isamp .le. nsamp)) then
+          traces(1,isamp)=traces(1,isamp)+1.*amp(1)
+          traces(2,isamp)=traces(2,isamp)+1.*amp(2)
+          traces(3,isamp)=traces(3,isamp)+1.*amp(3)
+        end if
         
       end
       
