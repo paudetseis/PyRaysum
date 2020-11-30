@@ -1,5 +1,5 @@
-.. figure:: ../telewavesim/examples/picture/tws_logo.png
+.. figure:: ../pyraysum/examples/picture/PYRaysum_logo.png
    :align: center
 
-.. automodule:: telewavesim
+.. automodule:: pyraysum
    :members:

@@ -302,6 +302,8 @@ def run_prs(model, verbose=False, wvtype='P', mults=2,
     # accurate RF amplitudes
     if rf:
         gwidth = dt*3.
+    if rf and shift == 0.:
+        shift = 5.
 
     # Write parameter file to be used by Raysum
     write_params(verbose, wvtype, mults, npts, dt, gwidth, align, shift, rot)
@@ -327,7 +329,7 @@ def run_prs(model, verbose=False, wvtype='P', mults=2,
     return outlist
 
 
-def rf_from_prs(streamlist, rot, wvtype):
+def rf_from_prs(streamlist, rot, wvtype='P'):
     """
     Function to generate receiver functions from displacement traces.
 
