@@ -22,13 +22,12 @@
 
 '''
 
-Utility functions to interact with ``telewavesim`` modules.
+Functions to interact with ``Raysum`` software
 
 '''
 import subprocess
 import numpy as np
 import pandas as pd
-from scipy.signal import hilbert
 from obspy import Trace, Stream, UTCDateTime
 from obspy.core import AttribDict
 
@@ -135,6 +134,10 @@ def read_model(modfile, encoding=None):
 
 
 def write_params(verbose, wvtype, mults, npts, dt, gwidth, align, shift, rot):
+    """
+    Write parameters to `raysum-params` used by Raysum
+
+    """
 
     file = open("raysum-params", "w")
     file.writelines("# Verbosity\n " + str(int(verbose)) + "\n")
@@ -150,21 +153,26 @@ def write_params(verbose, wvtype, mults, npts, dt, gwidth, align, shift, rot):
     file.writelines("# Rotation to output: 0 is NEZ, 1 is RTZ, 2 is PVH\n " +
                     str(rot) + "\n")
     file.close()
+
     return
 
 
 def write_geom(baz, slow):
 
+    # Check whether arguments are array-like; if not, store them in list
     if not hasattr(baz, "__len__"):
         baz = [baz]
     if not hasattr(slow, "__len__"):
         slow = [slow]
 
+    # Write array_like objects to file to be used as input to Raysum
     file = open("sample.geom", "w")
     dat = [(bb, ss) for ss in slow for bb in baz]
     for dd in dat:
         file.writelines([str(dd[0]) + " " + str(dd[1]*1.e-3) + " 0. 0.\n"])
     file.close()
+
+    # Return geometry to be used by `run_prs` to avoid too much i/o
     return dat
 
 
@@ -184,6 +192,33 @@ def read_traces(tracefile, dt, geom, rot):
 
     """
 
+    def _make_stats(net=None, sta=None, stime=None, dt=None,
+                    slow=None, baz=None, wvtype=None, channel=None):
+        """
+        Updates the ``stats`` doctionary from an obspy ``Trace`` object.
+
+        Args:
+            tr (obspy.trace): Trace object to update
+            dt (float): Sampling rate
+            slow (float): Slowness value (s/km)
+            baz (float): Back-azimuth value (degree)
+
+        Returns:
+            (obspy.trace): tr: Trace with updated stats
+        """
+
+        stats = AttribDict()
+        stats.baz = baz
+        stats.slow = slow
+        stats.station = sta
+        stats.network = net
+        stats.starttime = stime
+        stats.delta = dt
+        stats.channel = channel
+        stats.wvtype = wvtype
+
+        return stats
+
     # Read traces from file
     try:
         df = pd.read_csv(tracefile)
@@ -195,7 +230,7 @@ def read_traces(tracefile, dt, geom, rot):
         component = ['N', 'E', 'Z']
     elif rot == 1:
         component = ['R', 'T', 'Z']
-    elif rot ==2:
+    elif rot == 2:
         component = ['P', 'V', 'H']
     else:
         raise(Exception('invalid "rot" value: not in 0, 1, 2'))
@@ -209,21 +244,23 @@ def read_traces(tracefile, dt, geom, rot):
         # Split by trace ID
         ddf = df[df.itr == itr]
 
-        # Fill in stats information
-        stats = AttribDict()
-        stats.baz = geom[itr][0]
-        stats.slow = geom[itr][1]
-        stats.station = 'synt'
-        stats.network = ''
-        stats.starttime = UTCDateTime()
-        stats.delta = dt
-
-        # Store into trace by channel
-        stats.channel = 'BH' + component[0]
+        # Store into trace by channel with stats information
+        # Channel 1
+        stats = _make_stats(net='', sta='synt', stime=UTCDateTime(),
+            dt=dt, slow=geom[itr][1], baz=geom[itr][0],
+            channel='BH'+component[0])
         tr1 = Trace(data=ddf.trace1.values, header=stats)
-        stats.channel = 'BH' + component[1]
+
+        # Channel 2
+        stats = _make_stats(net='', sta='synt', stime=UTCDateTime(),
+            dt=dt, slow=geom[itr][1], baz=geom[itr][0],
+            channel='BH'+component[1])
         tr2 = Trace(data=ddf.trace2.values, header=stats)
-        stats.channel = 'BH' + component[2]
+
+        # Channel 3
+        stats = _make_stats(net='', sta='synt', stime=UTCDateTime(),
+            dt=dt, slow=geom[itr][1], baz=geom[itr][0],
+            channel='BH'+component[2])
         tr3 = Trace(data=ddf.trace3.values, header=stats)
 
         # Store into Stream object and append to list
@@ -241,70 +278,43 @@ def run_prs(model, verbose=False, wvtype='P', mults=2,
     of Stream objects
 
     Args:
-        travefile (str): Name of file containing traces
-        dt (float): Sample distance in seconds
-        geom (np.ndarray): Array of [baz, slow] values
+        model (:class:`~pyraysum.prs.Model`): Seismic velocity model
+        verbose (bool): Whether or not to increase verbosity of Raysum
+        wvtype (str): Wave type of incoming wavefield ('P', 'SV', or 'SH')
+        mults (int): ID for calculating free surface multiples
+                ('0': no multiples, '1': Moho only, '2': all first-order)
+        npts (int): Number of samples in time series
+        dt (float): Sampling distance in seconds
+        gwidth (float): Width of Gaussian pulse in seconds
+        align (int): ID for alignment of seismograms ('1': align at 'P',
+                '2': align at 'SV' or 'SH')
+        shift (float): Time shift in seconds (positive shift moves seismograms
+                to greater lags)
         rot (int): ID for rotation: 0 is NEZ, 1 is RTZ, 2 is PVH
+        baz (array_like): Array of input back-azimuth values in degrees
+        slow (array_like): Array of input slowness values to model in s/km
 
     Returns:
         (list): streamlist: List of Stream objects
 
     """
 
+    # Write parameter file to be used by Raysum
     write_params(verbose, wvtype, mults, npts, dt, gwidth, align, shift, rot)
+
+    # Write geometry (baz, slow) to be used by Raysum
     geom = write_geom(baz, slow)
 
+    # Call Raysum to produce the output 'sample.tr' containing synthetic traces
     subprocess.call(["seis-spread", "sample.mod",
                      "sample.geom", "sample.ph",
                      "sample.arr", "sample.tr"])
 
+    # Read all traces and store them into a list of :class:`~obspy.core.Stream`
+    # objects
     streamlist = read_traces('sample.tr', dt, geom, rot)
+
     return streamlist
-
-#     yx, yy, yz = raysum.get_arrivals(
-#         npts, model.nlay, np.array(wvtype, dtype='c'))
-
-#     # Transfer displacement seismograms to an ``obspy`` ``Stream`` object.
-#     trxyz = get_trxyz(yx, yy, yz, npts, dt, slow, baz, wvtype)
-
-#     return trxyz
-
-
-# def get_trxyz(yx, yy, yz, npts, dt, slow, baz, wvtype):
-#     """
-#     Function to store displacement seismograms into ``obspy.Trace`` objects
-#     and then an ``obspy`` ``Stream`` object.
-
-#     Args:
-#         ux (np.ndarray): x-component displacement seismogram
-#         uy (np.ndarray): y-component displacement seismogram
-#         uz (np.ndarray): z-component displacement seismogram
-
-#     Returns:
-#         (obspy.stream): trxyz: Stream containing 3-component displacement
-#           seismograms
-
-#     """
-
-#     # Get displacements in time domain
-#     ux = np.real(fft(yx))
-#     uy = np.real(fft(yy))
-#     uz = -np.real(fft(yz))
-
-#     # Store in traces
-#     tux = Trace(data=ux)
-#     tuy = Trace(data=uy)
-#     tuz = Trace(data=uz)
-
-#     # Update trace header
-#     tux = update_stats(tux, dt, slow, baz, wvtype, 'N')
-#     tuy = update_stats(tuy, dt, slow, baz, wvtype, 'E')
-#     tuz = update_stats(tuz, dt, slow, baz, wvtype, 'Z')
-
-#     # Append to stream
-#     trxyz = Stream(traces=[tux, tuy, tuz])
-
-#     return trxyz
 
 
 # def tf_from_xyz(trxyz, pvh=False, vp=None, vs=None):
@@ -391,90 +401,3 @@ def run_prs(model, verbose=False, wvtype='P', mults=2,
 
 #     # Return stream
 #     return tfs
-
-
-def update_stats(tr, dt, slow, baz, wvtype, cha):
-    """
-    Updates the ``stats`` doctionary from an obspy ``Trace`` object.
-
-    Args:
-        tr (obspy.trace): Trace object to update
-        nt (int): Number of samples
-        dt (float): Sampling rate
-        slow (float): Slowness value (s/km)
-        baz (float): Back-azimuth value (degree)
-
-    Returns:
-        (obspy.trace): tr: Trace with updated stats
-    """
-
-    tr.stats.delta = dt
-    tr.stats.slow = slow
-    tr.stats.baz = baz
-    tr.stats.wvtype = wvtype
-    tr.stats.channel = cha
-
-    return tr
-
-
-def stack_all(st1, st2, pws=False):
-    """
-    Stacks all traces in two ``Stream`` objects.
-
-    Args:
-        st1 (obspy.stream): Stream 1
-        st2 (obspy.stream,): Stream 2
-        pws (bool, optional): Enables Phase-Weighted Stacking
-
-    Returns:
-        (tuple): tuple containing:
-
-            * stack1 (obspy.trace): Stacked trace for Stream 1
-            * stack2 (obspy.trace): Stacked trace for Stream 2
-
-    """
-
-    print()
-    print('Stacking ALL traces in streams')
-
-    # Copy stats from stream
-    str_stats = st1[0].stats
-
-    # Initialize arrays
-    tmp1 = np.zeros(len(st1[0].data))
-    tmp2 = np.zeros(len(st2[0].data))
-    weight1 = np.zeros(len(st1[0].data), dtype=complex)
-    weight2 = np.zeros(len(st2[0].data), dtype=complex)
-
-    # Stack all traces
-    for tr in st1:
-        tmp1 += tr.data
-        hilb1 = hilbert(tr.data)
-        phase1 = np.arctan2(hilb1.imag, hilb1.real)
-        weight1 += np.exp(1j*phase1)
-
-    for tr in st2:
-        tmp2 += tr.data
-        hilb2 = hilbert(tr.data)
-        phase2 = np.arctan2(hilb2.imag, hilb2.real)
-        weight2 += np.exp(1j*phase2)
-
-    # Normalize
-    tmp1 = tmp1/np.float(len(st1))
-    tmp2 = tmp2/np.float(len(st2))
-
-    # Phase-weighting
-    if pws:
-        weight1 = weight1/np.float(len(st1))
-        weight2 = weight2/np.float(len(st2))
-        weight1 = np.real(abs(weight1))
-        weight2 = np.real(abs(weight2))
-    else:
-        weight1 = np.ones(len(st1[0].data))
-        weight2 = np.ones(len(st1[0].data))
-
-    # Put back into traces
-    stack1 = Trace(data=weight1*tmp1, header=str_stats)
-    stack2 = Trace(data=weight2*tmp2, header=str_stats)
-
-    return stack1, stack2
