@@ -30,6 +30,12 @@ constants are included in the paper by
 
 import numpy as np
 
+MINERALS = ['atg', 'bt', 'cpx', 'dol', 'ep', 'grt', 'gln', 'hbl', 'jade',
+            'lws', 'lz', 'ms', 'ol', 'opx', 'plag', 'qtz', 'zo']
+
+ROCKS = ['BS_f', 'BS_m', 'EC_f', 'EC_m', 'HB', 'LHZ', 'SP_37', 'SP_80']
+
+
 def iso_tensor(a, b):
     """
     Elastic constants (GPa /density) of isotropic material in Voigt notation

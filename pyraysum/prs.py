@@ -1,6 +1,6 @@
 # Copyright 2020 Pascal Audet
 
-# This file is part of Telewavesim.
+# This file is part of PyRaysum.
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -25,18 +25,12 @@
 Utility functions to interact with ``telewavesim`` modules.
 
 '''
-import numpy as np
-from numpy import sin, cos
-from scipy.signal import hilbert
-from obspy.core import Trace, Stream
-from pyraysum import elast
-from pyraysum import tensor
 import subprocess
-
-MINERALS = ['atg', 'bt', 'cpx', 'dol', 'ep', 'grt', 'gln', 'hbl', 'jade',
-            'lws', 'lz', 'ms', 'ol', 'opx', 'plag', 'qtz', 'zo']
-
-ROCKS = ['BS_f', 'BS_m', 'EC_f', 'EC_m', 'HB', 'LHZ', 'SP_37', 'SP_80']
+import numpy as np
+import pandas as pd
+from scipy.signal import hilbert
+from obspy import Trace, Stream, UTCDateTime
+from obspy.core import AttribDict
 
 
 class Model(object):
@@ -62,8 +56,10 @@ class Model(object):
         - a (np.ndarray): Elastic thickness (shape ``(3, 3, 3, 3, nlay)``)
     """
 
-    def __init__(self, thickn, rho, vp, vs, isoflg='iso',
-                 ani=None, trend=None, plunge=None, strike=None, dip=None):
+    def __init__(self, thickn, rho, vp, vs, isoflg=1,
+                 ani=None, trend=None, plunge=None,
+                 strike=None, dip=None):
+
         def _get_val(v):
             return (np.array([v] * self.nlay if isinstance(v, (int, float))
                              else v) if v is not None else [0.]*self.nlay)
@@ -82,34 +78,34 @@ class Model(object):
         self.write_model()
         # self.update_tensor()
 
-    def update_tensor(self):
-        """
-        Update the elastic thickness tensor ``a``.
+    # def update_tensor(self):
+    #     """
+    #     Update the elastic thickness tensor ``a``.
 
-        Needs to be called when model parameters change.
-        """
-        self.nlay = len(self.thickn)
-        self.a = np.zeros((3, 3, 3, 3, self.nlay))
+    #     Needs to be called when model parameters change.
+    #     """
+    #     self.nlay = len(self.thickn)
+    #     self.a = np.zeros((3, 3, 3, 3, self.nlay))
 
-        for j in range(self.nlay):
-            if self.isoflg[j] == 1:
-                cc = tensor.set_iso_tensor(self.vp[j], self.vs[j])
-                self.a[:, :, :, :, j] = cc
-            elif self.isoflg[j] == 0:
-                cc = tensor.set_tri_tensor(self.vp[j], self.vs[j],
-                                           self.trend[j], self.plunge[j],
-                                           self.ani[j])
-                self.a[:, :, :, :, j] = cc
-            elif self.isoflg[j] in MINERALS or self.isoflg[j] in ROCKS:
-                cc, rho = tensor.set_aniso_tensor(self.trend[j],
-                                                  self.plunge[j],
-                                                  typ=self.isoflg[j])
-                self.a[:, :, :, :, j] = cc
-                self.rho[j] = rho
-            else:
-                msg = ('\nFlag not defined: use either "iso", "tri" or one '
-                       'among\n%s\n%s\n')
-                raise ValueError(msg % (MINERALS, ROCKS))
+    #     for j in range(self.nlay):
+    #         if self.isoflg[j] == 1:
+    #             cc = tensor.set_iso_tensor(self.vp[j], self.vs[j])
+    #             self.a[:, :, :, :, j] = cc
+    #         elif self.isoflg[j] == 0:
+    #             cc = tensor.set_tri_tensor(self.vp[j], self.vs[j],
+    #                                        self.trend[j], self.plunge[j],
+    #                                        self.ani[j])
+    #             self.a[:, :, :, :, j] = cc
+    #         elif self.isoflg[j] in MINERALS or self.isoflg[j] in ROCKS:
+    #             cc, rho = tensor.set_aniso_tensor(self.trend[j],
+    #                                               self.plunge[j],
+    #                                               typ=self.isoflg[j])
+    #             self.a[:, :, :, :, j] = cc
+    #             self.rho[j] = rho
+    #         else:
+    #             msg = ('\nFlag not defined: use either "iso", "tri" or one '
+    #                    'among\n%s\n%s\n')
+    #             raise ValueError(msg % (MINERALS, ROCKS))
 
     def write_model(self):
         """
@@ -141,17 +137,17 @@ def read_model(modfile, encoding=None):
 def write_params(verbose, wvtype, mults, npts, dt, gwidth, align, shift, rot):
 
     file = open("raysum-params", "w")
-    file.writelines("# Verbosity\n" + str(int(verbose)) + "\n")
-    file.writelines("# Phase name\n" + wvtype + "\n")
+    file.writelines("# Verbosity\n " + str(int(verbose)) + "\n")
+    file.writelines("# Phase name\n " + wvtype + "\n")
     file.writelines("# Multiples: 0 for none, 1 for Moho, " +
-                    "2 all first-order\n" + str(mults) + "\n")
-    file.writelines("# Number of samples per trace\n" + str(npts) + "\n")
-    file.writelines("# Sample rate (seconds)\n" + str(dt) + "\n")
-    file.writelines("# Gaussian pulse width (seconds)\n" + str(gwidth) + "\n")
-    file.writelines("# Alignment: 0 is none, 1 aligns on P\n" +
+                    "2 all first-order\n " + str(mults) + "\n")
+    file.writelines("# Number of samples per trace\n " + str(npts) + "\n")
+    file.writelines("# Sample rate (seconds)\n " + str(dt) + "\n")
+    file.writelines("# Gaussian pulse width (seconds)\n " + str(gwidth) + "\n")
+    file.writelines("# Alignment: 0 is none, 1 aligns on P\n " +
                     str(align) + "\n")
-    file.writelines("# Shift or traces (seconds)\n" + str(shift) + "\n")
-    file.writelines("# Rotation to output: 0 is NEZ, 1 is RTZ, 2 is PVH\n" +
+    file.writelines("# Shift or traces (seconds)\n " + str(shift) + "\n")
+    file.writelines("# Rotation to output: 0 is NEZ, 1 is RTZ, 2 is PVH\n " +
                     str(rot) + "\n")
     file.close()
     return
@@ -165,27 +161,105 @@ def write_geom(baz, slow):
         slow = [slow]
 
     file = open("sample.geom", "w")
-    dat = [(bb, ss) for ss in slow for bb in baz ]
+    dat = [(bb, ss) for ss in slow for bb in baz]
     for dd in dat:
         file.writelines([str(dd[0]) + " " + str(dd[1]*1.e-3) + " 0. 0.\n"])
     file.close()
     return dat
 
 
+def read_traces(tracefile, dt, geom, rot):
+    """
+    Reads the traces produced by Raysum and stores them into a list
+    of Stream objects
+
+    Args:
+        travefile (str): Name of file containing traces
+        dt (float): Sample distance in seconds
+        geom (np.ndarray): Array of [baz, slow] values
+        rot (int): ID for rotation: 0 is NEZ, 1 is RTZ, 2 is PVH
+
+    Returns:
+        (list): streamlist: List of Stream objects
+
+    """
+
+    # Read traces from file
+    try:
+        df = pd.read_csv(tracefile)
+    except:
+        raise(Exception("Can't read "+str(tracefile)))
+
+    # Component names
+    if rot == 0:
+        component = ['N', 'E', 'Z']
+    elif rot == 1:
+        component = ['R', 'T', 'Z']
+    elif rot ==2:
+        component = ['P', 'V', 'H']
+    else:
+        raise(Exception('invalid "rot" value: not in 0, 1, 2'))
+
+    ntr = np.max(df.itr) + 1
+
+    streamlist = []
+
+    for itr in range(ntr):
+
+        # Split by trace ID
+        ddf = df[df.itr == itr]
+
+        # Fill in stats information
+        stats = AttribDict()
+        stats.baz = geom[itr][0]
+        stats.slow = geom[itr][1]
+        stats.station = 'synt'
+        stats.network = ''
+        stats.starttime = UTCDateTime()
+        stats.delta = dt
+
+        # Store into trace by channel
+        stats.channel = 'BH' + component[0]
+        tr1 = Trace(data=ddf.trace1.values, header=stats)
+        stats.channel = 'BH' + component[1]
+        tr2 = Trace(data=ddf.trace2.values, header=stats)
+        stats.channel = 'BH' + component[2]
+        tr3 = Trace(data=ddf.trace3.values, header=stats)
+
+        # Store into Stream object and append to list
+        stream = Stream(traces=[tr1, tr2, tr3])
+        streamlist.append(stream)
+
+    return streamlist
+
+
 def run_prs(model, verbose=False, wvtype='P', mults=2,
-            npts=3000, dt=0.01, gwidth=1., align=1, shift=5., rot=0,
+            npts=300, dt=0.1, gwidth=0.5, align=1, shift=0., rot=0,
             baz=[], slow=[]):
     """
+    Reads the traces produced by Raysum and stores them into a list
+    of Stream objects
+
+    Args:
+        travefile (str): Name of file containing traces
+        dt (float): Sample distance in seconds
+        geom (np.ndarray): Array of [baz, slow] values
+        rot (int): ID for rotation: 0 is NEZ, 1 is RTZ, 2 is PVH
+
+    Returns:
+        (list): streamlist: List of Stream objects
+
     """
 
     write_params(verbose, wvtype, mults, npts, dt, gwidth, align, shift, rot)
-    dat = write_geom(baz, slow)
+    geom = write_geom(baz, slow)
 
     subprocess.call(["seis-spread", "sample.mod",
                      "sample.geom", "sample.ph",
                      "sample.arr", "sample.tr"])
 
-
+    streamlist = read_traces('sample.tr', dt, geom, rot)
+    return streamlist
 
 #     yx, yy, yz = raysum.get_arrivals(
 #         npts, model.nlay, np.array(wvtype, dtype='c'))
@@ -241,7 +315,8 @@ def run_prs(model, verbose=False, wvtype='P', mults=2,
 #         trxyz (obspy.stream):
 #             Obspy ``Stream`` object in cartesian coordinate system
 #         pvh (bool, optional):
-#             Whether to rotate from Z-R-T coordinate system to P-SV-SH wave mode
+#             Whether to rotate from Z-R-T coordinate system to
+#             P-SV-SH wave mode
 #         vp (float, optional):
 #             Vp velocity at surface for rotation to P-SV-SH system
 #         vs (float, optional):
