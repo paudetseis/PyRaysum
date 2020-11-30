@@ -12,11 +12,8 @@ def main():
 
     # Check out where binaries will be located
     if conda_exists:
-
         prs_path = Path(os.getenv("CONDA_PREFIX")) / "bin"
-
     else:
-
         prs_path = Path(os.getenv("PATH").split(":")[0])
 
     # Print message to screen where binaries are installed
