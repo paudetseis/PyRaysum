@@ -74,7 +74,7 @@ where ``pyraysum`` can be installed along with its dependencies:
 
 .. sourcecode:: bash
 
-   conda create -n prs python=3.7 fortran-compiler obspy -c conda-forge
+   conda create -n prs python=3.7 fortran-compiler obspy pandas -c conda-forge
 
 Activate the newly created environment:
 
@@ -122,7 +122,7 @@ environment), the executables will likely be copied to some root binary
 folder present in the $PATH environment. If that is so, you will need
 to use root privileges to install the software:
 
-.. sourcecode: bash
+.. sourcecode :: bash
 
    sudo install_raysum
 
@@ -143,7 +143,7 @@ After ``pyraysum`` is installed, these notebooks can be locally installed
 (i.e., in a local folder ``Notebooks``) from the package
 by typing in a ``python`` window:
 
-.. sourcecode:: python
+.. sourcecode :: python
 
    from pyraysum import doc
    doc.install_doc(path='Notebooks')
@@ -151,13 +151,13 @@ by typing in a ``python`` window:
 To run the notebooks you will have to further install ``jupyter``.
 From the terminal, type:
 
-.. sourcecode:: bash
+.. sourcecode :: bash
 
    conda install jupyter
 
 Followed by:
 
-.. sourcecode:: bash
+.. sourcecode :: bash
 
    cd Notebooks
    jupyter notebook

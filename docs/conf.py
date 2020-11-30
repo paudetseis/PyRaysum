@@ -22,7 +22,7 @@ copyright = '2020, Pascal Audet'
 author = 'Andrew Frederiksen, Pascal Audet'
 
 # The full version, including alpha/beta/rc tags
-from telewavesim import __version__ as release
+from pyraysum import __version__ as release
 
 # -- General configuration ---------------------------------------------------
 
