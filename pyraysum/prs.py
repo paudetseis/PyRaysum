@@ -30,6 +30,7 @@ import numpy as np
 import pandas as pd
 from obspy import Trace, Stream, UTCDateTime
 from obspy.core import AttribDict
+from numpy.fft import fft, ifft, fftshift
 
 
 class Model(object):
@@ -75,36 +76,6 @@ class Model(object):
         self.strike = _get_val(strike)
         self.dip = _get_val(dip)
         self.write_model()
-        # self.update_tensor()
-
-    # def update_tensor(self):
-    #     """
-    #     Update the elastic thickness tensor ``a``.
-
-    #     Needs to be called when model parameters change.
-    #     """
-    #     self.nlay = len(self.thickn)
-    #     self.a = np.zeros((3, 3, 3, 3, self.nlay))
-
-    #     for j in range(self.nlay):
-    #         if self.isoflg[j] == 1:
-    #             cc = tensor.set_iso_tensor(self.vp[j], self.vs[j])
-    #             self.a[:, :, :, :, j] = cc
-    #         elif self.isoflg[j] == 0:
-    #             cc = tensor.set_tri_tensor(self.vp[j], self.vs[j],
-    #                                        self.trend[j], self.plunge[j],
-    #                                        self.ani[j])
-    #             self.a[:, :, :, :, j] = cc
-    #         elif self.isoflg[j] in MINERALS or self.isoflg[j] in ROCKS:
-    #             cc, rho = tensor.set_aniso_tensor(self.trend[j],
-    #                                               self.plunge[j],
-    #                                               typ=self.isoflg[j])
-    #             self.a[:, :, :, :, j] = cc
-    #             self.rho[j] = rho
-    #         else:
-    #             msg = ('\nFlag not defined: use either "iso", "tri" or one '
-    #                    'among\n%s\n%s\n')
-    #             raise ValueError(msg % (MINERALS, ROCKS))
 
     def write_model(self):
         """
@@ -176,7 +147,7 @@ def write_geom(baz, slow):
     return dat
 
 
-def read_traces(tracefile, dt, geom, rot):
+def read_traces(tracefile, dt, geom, rot, shift):
     """
     Reads the traces produced by Raysum and stores them into a list
     of Stream objects
@@ -193,7 +164,8 @@ def read_traces(tracefile, dt, geom, rot):
     """
 
     def _make_stats(net=None, sta=None, stime=None, dt=None,
-                    slow=None, baz=None, wvtype=None, channel=None):
+                    slow=None, baz=None, wvtype=None, channel=None,
+                    taxis=None):
         """
         Updates the ``stats`` doctionary from an obspy ``Trace`` object.
 
@@ -216,6 +188,7 @@ def read_traces(tracefile, dt, geom, rot):
         stats.delta = dt
         stats.channel = channel
         stats.wvtype = wvtype
+        stats.taxis = taxis
 
         return stats
 
@@ -235,7 +208,12 @@ def read_traces(tracefile, dt, geom, rot):
     else:
         raise(Exception('invalid "rot" value: not in 0, 1, 2'))
 
+    # Number of "event" traces produced
     ntr = np.max(df.itr) + 1
+
+    # Time axis
+    npts = len(df[df.itr==0].trace1.values)
+    taxis = np.arange(npts)*dt - shift
 
     streamlist = []
 
@@ -246,21 +224,22 @@ def read_traces(tracefile, dt, geom, rot):
 
         # Store into trace by channel with stats information
         # Channel 1
+
         stats = _make_stats(net='', sta='synt', stime=UTCDateTime(),
-            dt=dt, slow=geom[itr][1], baz=geom[itr][0],
-            channel='BH'+component[0])
+                            dt=dt, slow=geom[itr][1], baz=geom[itr][0],
+                            channel='BH'+component[0], taxis=taxis)
         tr1 = Trace(data=ddf.trace1.values, header=stats)
 
         # Channel 2
         stats = _make_stats(net='', sta='synt', stime=UTCDateTime(),
-            dt=dt, slow=geom[itr][1], baz=geom[itr][0],
-            channel='BH'+component[1])
+                            dt=dt, slow=geom[itr][1], baz=geom[itr][0],
+                            channel='BH'+component[1], taxis=taxis)
         tr2 = Trace(data=ddf.trace2.values, header=stats)
 
         # Channel 3
         stats = _make_stats(net='', sta='synt', stime=UTCDateTime(),
-            dt=dt, slow=geom[itr][1], baz=geom[itr][0],
-            channel='BH'+component[2])
+                            dt=dt, slow=geom[itr][1], baz=geom[itr][0],
+                            channel='BH'+component[2], taxis=taxis)
         tr3 = Trace(data=ddf.trace3.values, header=stats)
 
         # Store into Stream object and append to list
@@ -271,33 +250,58 @@ def read_traces(tracefile, dt, geom, rot):
 
 
 def run_prs(model, verbose=False, wvtype='P', mults=2,
-            npts=300, dt=0.1, gwidth=0.5, align=1, shift=0., rot=0,
-            baz=[], slow=[]):
+            npts=300, dt=0.025, gwidth=0.5, align=1, shift=0., rot=0,
+            baz=[], slow=[], rf=False):
     """
     Reads the traces produced by Raysum and stores them into a list
     of Stream objects
 
     Args:
-        model (:class:`~pyraysum.prs.Model`): Seismic velocity model
-        verbose (bool): Whether or not to increase verbosity of Raysum
-        wvtype (str): Wave type of incoming wavefield ('P', 'SV', or 'SH')
-        mults (int): ID for calculating free surface multiples
-                ('0': no multiples, '1': Moho only, '2': all first-order)
-        npts (int): Number of samples in time series
-        dt (float): Sampling distance in seconds
-        gwidth (float): Width of Gaussian pulse in seconds
-        align (int): ID for alignment of seismograms ('1': align at 'P',
-                '2': align at 'SV' or 'SH')
-        shift (float): Time shift in seconds (positive shift moves seismograms
-                to greater lags)
-        rot (int): ID for rotation: 0 is NEZ, 1 is RTZ, 2 is PVH
-        baz (array_like): Array of input back-azimuth values in degrees
-        slow (array_like): Array of input slowness values to model in s/km
+        model (:class:`~pyraysum.prs.Model`):
+            Seismic velocity model
+        verbose (bool):
+            Whether or not to increase verbosity of Raysum
+        wvtype (str):
+            Wave type of incoming wavefield ('P', 'SV', or 'SH')
+        mults (int):
+            ID for calculating free surface multiples
+            ('0': no multiples, '1': Moho only, '2': all first-order)
+        npts (int):
+            Number of samples in time series
+        dt (float):
+            Sampling distance in seconds
+        gwidth (float):
+            Width of Gaussian pulse in seconds
+        align (int):
+            ID for alignment of seismograms ('1': align at 'P',
+            '2': align at 'SV' or 'SH')
+        shift (float):
+            Time shift in seconds (positive shift moves seismograms
+            to greater lags)
+        rot (int):
+            ID for rotation: 0 is NEZ, 1 is RTZ, 2 is PVH
+        baz (array_like):
+            Array of input back-azimuth values in degrees
+        slow (array_like):
+            Array of input slowness values to model in s/km
+        rf (bool):
+            Whether or not to calculate and return receiver functions
+            (instead of displacement seismograms)
 
     Returns:
         (list): streamlist: List of Stream objects
 
     """
+
+    if rf and rot == 0:
+        msg = "Receiver functions cannot be calculated with 'rot == 0'\n"
+        raise(Exception(msg))
+        rf = False
+
+    # Set pusle width to be three times the sampling distance for
+    # accurate RF amplitudes
+    if rf:
+        gwidth = dt*3.
 
     # Write parameter file to be used by Raysum
     write_params(verbose, wvtype, mults, npts, dt, gwidth, align, shift, rot)
@@ -312,92 +316,85 @@ def run_prs(model, verbose=False, wvtype='P', mults=2,
 
     # Read all traces and store them into a list of :class:`~obspy.core.Stream`
     # objects
-    streamlist = read_traces('sample.tr', dt, geom, rot)
+    streamlist = read_traces('sample.tr', dt, geom, rot, shift)
+    outlist = streamlist
 
-    return streamlist
+    # If rf flag is set to True, calculate and return receiver functions
+    if rf:
+        rflist = rf_from_prs(streamlist, rot, wvtype)
+        outlist = rflist
+
+    return outlist
 
 
-# def tf_from_xyz(trxyz, pvh=False, vp=None, vs=None):
-#     """
-#     Function to generate transfer functions from displacement traces.
+def rf_from_prs(streamlist, rot, wvtype):
+    """
+    Function to generate receiver functions from displacement traces.
 
-#     Args:
-#         trxyz (obspy.stream):
-#             Obspy ``Stream`` object in cartesian coordinate system
-#         pvh (bool, optional):
-#             Whether to rotate from Z-R-T coordinate system to
-#             P-SV-SH wave mode
-#         vp (float, optional):
-#             Vp velocity at surface for rotation to P-SV-SH system
-#         vs (float, optional):
-#             Vs velocity at surface for rotation to P-SV-SH system
+    Args:
+        streamlist (list):
+            List of :class:`~obspy.core.Stream` objects containing 'event' traces
+        rot (int):
+            ID for rotation: 0 is NEZ, 1 is RTZ, 2 is PVH (only 1 or 2 is valid here)
 
-#     Returns:
-#         (obspy.stream):
-#             tfs: Stream containing Radial and Transverse transfer functions
+    Returns:
+        (list):
+            rflist: Stream containing Radial and Transverse receiver functions
 
-#     """
+    """
 
-#     # Extract East, North and Vertical
-#     ntr = trxyz[0]
-#     etr = trxyz[1]
-#     ztr = trxyz[2]
-#     baz = ntr.stats.baz
-#     slow = ntr.stats.slow
-#     wvtype = ntr.stats.wvtype
+    if rot == 1:
+        cmpts = ['R', 'T', 'Z']
+    elif rot == 2:
+        cmpts = ['V', 'H', 'P']
+    else:
+        raise(Exception('rotation ID invalid: '+str(rot)))
 
-#     # Copy to radial and transverse
-#     rtr = ntr.copy()
-#     ttr = etr.copy()
+    rflist = []
 
-#     # Rotate to radial and transverse
-#     rtr.data, ttr.data = rotate_ne_rt(ntr.data, etr.data, baz)
+    # Cycle through list of displacement streams
+    for stream in streamlist:
 
-#     if pvh:
-#         trP, trV, trH = rotate_zrt_pvh(ztr, rtr, ttr, slow, vp=vp, vs=vs)
+        # Calculate time axis
+        npts = stream[0].stats.npts
+        taxis = np.arange(-npts/2., npts/2.)*stream[0].stats.delta
 
-#         tfr = trV.copy()
-#         tfr.data = np.zeros(len(tfr.data))
-#         tft = trH.copy()
-#         tft.data = np.zeros(len(tft.data))
-#         ftfv = fft(trV.data)
-#         ftfh = fft(trH.data)
-#         ftfp = fft(trP.data)
+        # Extract 3-component traces from stream
+        rtr = stream.select(component=cmpts[0])[0]
+        ttr = stream.select(component=cmpts[1])[0]
+        ztr = stream.select(component=cmpts[2])[0]
 
-#         if wvtype == 'P':
-#             # Transfer function
-#             tfr.data = fftshift(np.real(ifft(np.divide(ftfv, ftfp))))
-#             tft.data = fftshift(np.real(ifft(np.divide(ftfh, ftfp))))
-#         elif wvtype == 'Si':
-#             tfr.data = fftshift(np.real(ifft(np.divide(-ftfp, ftfv))))
-#             tft.data = fftshift(np.real(ifft(np.divide(-ftfp, ftfh))))
-#         elif wvtype == 'SV':
-#             tfr.data = fftshift(np.real(ifft(np.divide(-ftfp, ftfv))))
-#         elif wvtype == 'SH':
-#             tft.data = fftshift(np.real(ifft(np.divide(-ftfp, ftfh))))
-#     else:
-#         tfr = rtr.copy()
-#         tfr.data = np.zeros(len(tfr.data))
-#         tft = ttr.copy()
-#         tft.data = np.zeros(len(tft.data))
-#         ftfr = fft(rtr.data)
-#         ftft = fft(ttr.data)
-#         ftfz = fft(ztr.data)
+        # Deep copy and re-initialize data to 0.
+        rfr = rtr.copy()
+        rfr.data = np.zeros(len(rfr.data))
+        rft = ttr.copy()
+        rft.data = np.zeros(len(rft.data))
 
-#         if wvtype == 'P':
-#             # Transfer function
-#             tfr.data = fftshift(np.real(ifft(np.divide(ftfr, ftfz))))
-#             tft.data = fftshift(np.real(ifft(np.divide(ftft, ftfz))))
-#         elif wvtype == 'Si':
-#             tfr.data = fftshift(np.real(ifft(np.divide(-ftfz, ftfr))))
-#             tft.data = fftshift(np.real(ifft(np.divide(-ftfz, ftft))))
-#         elif wvtype == 'SV':
-#             tfr.data = fftshift(np.real(ifft(np.divide(-ftfz, ftfr))))
-#         elif wvtype == 'SH':
-#             tft.data = fftshift(np.real(ifft(np.divide(-ftfz, ftft))))
+        # Fourier transform
+        ft_rfr = fft(rtr.data)
+        ft_rft = fft(ttr.data)
+        ft_ztr = fft(ztr.data)
 
-#     # Store in stream
-#     tfs = Stream(traces=[tfr, tft])
+        # Spectral division to calculate receiver functions
+        if wvtype == 'P':
+            rfr.data = fftshift(np.real(ifft(np.divide(ft_rfr, ft_ztr))))
+            rft.data = fftshift(np.real(ifft(np.divide(ft_rft, ft_ztr))))
+        elif wvtype == 'SV':
+            rfr.data = fftshift(np.real(ifft(np.divide(-ft_ztr, ft_rfr))))
+        elif wvtype == 'SH':
+            rft.data = fftshift(np.real(ifft(np.divide(-ft_ztr, ft_rft))))
 
-#     # Return stream
-#     return tfs
+        # Update stats
+        rfr.stats.channel = 'RF'+cmpts[0]
+        rft.stats.channel = 'RF'+cmpts[1]
+        rfr.stats.taxis = taxis
+        rft.stats.taxis = taxis
+
+        # Store in Stream
+        rfstream = Stream(traces=[rfr, rft])
+
+        # Append to list
+        rflist.append(rfstream)
+
+    # Return rflist
+    return rflist
