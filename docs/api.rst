@@ -1,5 +1,14 @@
-.. figure:: ../pyraysum/examples/picture/PYRaysum_logo.png
+.. figure:: ../pyraysum/examples/picture/PyRaysum_logo.png
    :align: center
 
-.. automodule:: pyraysum
+Module ``prs``
+--------------
+
+.. automodule:: pyraysum.prs
    :members:
+
+Module ``wiggle``
+-----------------
+
+.. automodule:: pyraysum.wiggle
+	:members:

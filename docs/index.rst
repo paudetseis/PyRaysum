@@ -17,13 +17,13 @@ Documentation
    :maxdepth: 1
    :caption: Getting Started
 
-   api
+   init
 
 .. toctree::
    :maxdepth: 1
-   :caption: Module
+   :caption: API
 
-   prs
+   api
 
 .. toctree::
    :maxdepth: 1
