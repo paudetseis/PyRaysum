@@ -50,16 +50,15 @@ c   above (last index=2) and below (1) each respective layer.
         
 c Get filenames from command-line argument.
         i = iargc()
-        if (i .lt. 5) then
+        if (i .lt. 3) then
           write(*,*) 'Usage: seis-spread modelfile geometryfile ',
-     &               'phasefile arrivalfile tracefile [iphase]'
+     &               'tracefile'
           write(*,*) '-- Modelfile and geometryfile must already exist.'
-          write(*,*) '-- Other files will be overwritten.'
-          write(*,*) '-- iphase is P by default; may also be SV or SH.'
+          write(*,*) '-- Tracefile will be overwritten.'
           stop
         end if
 
-c Read in parameters from file 'raysum-params', if it exists
+c Read in parameters from file 'raysum-params'
         geomname='raysum-params'
         call readparams(geomname,verb,iphname,mults,nsamp,dt,width,
      &                  align,shift,out_rot)
@@ -113,7 +112,6 @@ c Read in geometry (desired traces)
         end if
         
 c Generate phase list
-        call getarg(3,phname)
         numph=0
         if (mults .ne. 3) then
           call ph_direct(phaselist,nseg,numph,nlay,iphase)
@@ -126,53 +124,29 @@ c Generate phase list
             call ph_fsmults(phaselist,nseg,numph,nlay,j,iphase)
           end do
         end if
-        if (mults .eq. 3) then
-          if (verbose) then
-            write(*,*) 'Reading phases from file ',phname
-          end if
-          call readphases(phname,phaselist,nseg,numph)
-        end if
         if (verbose) then
           call printphases(phaselist,nseg,numph)
         end if
-        if (mults .ne. 3) then
-          open(unit=iounit1,file=phname,status='unknown')
-          call writephases(iounit1,phaselist,nseg,numph)
-          close(unit=iounit1)
-          if (verbose) then
-            write(*,*) 'Phases written to ',phname
-          end if
-        end if
-
-        call getarg(4,arrname)
-        if (verbose) then
-          write(*,*) 'Arrivals will be written to ',arrname
-        end if
-        open(unit=iounit1,file=arrname,status='unknown')
         
-        call getarg(5,tracename)
+        call getarg(3,tracename)
         if (verbose) then
           write(*,*) 'Traces will be written to ',tracename
         end if
         open(unit=iounit2,file=tracename,status='unknown')
         
-c        Perform calculation                   
+c Perform calculation                   
         amp_in=1.
         call get_arrivals(travel_time,amplitude,thick,rho,isoflag,
      &       strike,dip,aa,ar_list,rot,baz,slow,sta_dx,sta_dy,
      &       phaselist,ntr,nseg,numph,nlay,amp_in)
      
-c        Normalize arrivals
+c Normalize arrivals
         if (iphase .eq. 1) then 
           call norm_arrivals(amplitude,baz,slow,alpha(1),beta(1),
      &                       rho(1),ntr,numph,1,1)
         end if
-         
-c        Write out arrivals
-        call writearrivals(iounit1,travel_time,amplitude,ntr,numph)
-        close(unit=iounit1)
-        
-c        Assemble traces
+                 
+c Assemble traces
         call make_traces(travel_time,amplitude,ntr,numph,nsamp,
      &                   dt,width,align,shift,Tr_cart)
      
@@ -180,14 +154,14 @@ c        Assemble traces
           call writetraces(iounit2,Tr_cart,ntr,nsamp,dt,align,shift)
         else
           if (out_rot .eq. 1) then
-c            Rotate to RTZ
+c Rotate to RTZ
             call rot_traces(Tr_cart,baz,ntr,nsamp,Tr_ph)
           else
-c            Rotate to wavevector coordinates
+c Rotate to wavevector coordinates
             call fs_traces(Tr_cart,baz,slow,alpha(1),beta(1),
      &                     rho(1),ntr,nsamp,Tr_ph)
           end if
-c          Write results
+c Write results
           call writetraces(iounit2,Tr_ph,ntr,nsamp,dt,align,shift)
         end if
         close(unit=iounit2)
@@ -205,7 +179,7 @@ c          Write results
         integer mults,nsamp,align,ios,eof,out_rot,verb
         real dt,width,shift
         
-c          Default values
+c Default values
         verb=0
         phase='P'
         mults=2
@@ -219,9 +193,6 @@ c          Default values
         open(unit=iounit1,status='old',file=filename,iostat=ios)
         
         if (ios .eq. 0) then
-c          if (verbose) then
-c            write(*,*) 'Reading parameters from ',filename
-c          end if
           call getline(iounit1,buffer,eof)
           read (buffer,*) verb
           call getline(iounit1,buffer,eof)
@@ -241,8 +212,6 @@ c          end if
           call getline(iounit1,buffer,eof)
           read (buffer,*) out_rot
         else
-c          write (*,*) 'Parameter file ',filename,' does not exist.'
-c          write (*,*) 'Writing default values.'
           close(unit=iounit1)
           open(unit=iounit1,status='unknown',file=filename)
           write(iounit1,*) '# Verbosity: 0 for none, 1 for verbose mode'
@@ -250,7 +219,7 @@ c          write (*,*) 'Writing default values.'
           write(iounit1,*) '# Phase name: P, SV or SH'
           write(iounit1,*) phase
           write(iounit1,*) '# Multiples: 0 for none, 1 for Moho, 2 ',
-     &                      'for all first-order, 3 to read file'
+     &                      'for all first-order'
           write(iounit1,*) mults
           write(iounit1,*) '# Number of samples per trace'
           write(iounit1,*) nsamp

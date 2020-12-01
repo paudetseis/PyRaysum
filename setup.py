@@ -37,6 +37,6 @@ setup(
             'examples/Notebooks/*.ipynb']},
     entry_points={
     'console_scripts':
-    ['install_raysum=pyraysum.scripts.install_raysum:main']}
+    ['install-raysum=pyraysum.scripts.install_raysum:main']}
 
 )

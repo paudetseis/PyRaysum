@@ -111,7 +111,7 @@ and installed locally. Using conda this is done by typing:
 
 .. sourcecode:: bash
 
-   install_raysum
+   install-raysum
 
 The executable file is copied to the $CONDA_PREFIX/bin directory.
 
@@ -124,7 +124,7 @@ to use root privileges to install the software:
 
 .. sourcecode :: bash
 
-   sudo install_raysum
+   sudo install-raysum
 
 Usage
 -----

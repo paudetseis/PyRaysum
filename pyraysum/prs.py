@@ -313,8 +313,7 @@ def run_prs(model, verbose=False, wvtype='P', mults=2,
 
     # Call Raysum to produce the output 'sample.tr' containing synthetic traces
     subprocess.call(["seis-spread", "sample.mod",
-                     "sample.geom", "sample.ph",
-                     "sample.arr", "sample.tr"])
+                     "sample.geom", "sample.tr"])
 
     # Read all traces and store them into a list of :class:`~obspy.core.Stream`
     # objects
