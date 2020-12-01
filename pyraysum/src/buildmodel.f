@@ -45,7 +45,7 @@ c after Farra et al, 1991
 c ----------
 c PA
 c
-            AC = alpha(ilay)**2
+            AC = rho(ilay)*alpha(ilay)**2
             FF=-LL+SQRT((2.*AC)**2-2.*AC*(AA+CC+2.*LL)+(AA+LL)*(CC+LL))
 c
 c PA
