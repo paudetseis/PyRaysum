@@ -34,7 +34,7 @@ c Phase parameters
 c Arrivals
         real travel_time(maxph,maxtr),amplitude(3,maxph,maxtr)
 c Traces
-        real Tr_cart(3,maxsamp,maxtr),dt,width,shift
+        real Tr_cart(3,maxsamp,maxtr),dt,shift
         real Tr_ph(3,maxsamp,maxtr)
         integer align,nsamp,mults,out_rot
         
@@ -60,7 +60,7 @@ c Get filenames from command-line argument.
 
 c Read in parameters from file 'raysum-params'
         geomname='raysum-params'
-        call readparams(geomname,verb,iphname,mults,nsamp,dt,width,
+        call readparams(geomname,verb,iphname,mults,nsamp,dt,
      &                  align,shift,out_rot)
 
         verbose=.false.
@@ -148,7 +148,7 @@ c Normalize arrivals
                  
 c Assemble traces
         call make_traces(travel_time,amplitude,ntr,numph,nsamp,
-     &                   dt,width,align,shift,Tr_cart)
+     &                   dt,align,shift,Tr_cart)
      
         if (out_rot .eq. 0) then
           call writetraces(iounit2,Tr_cart,ntr,nsamp,dt,align,shift)
@@ -169,7 +169,7 @@ c Write results
       end
       
       
-      subroutine readparams(filename,verb,phase,mults,nsamp,dt,width,
+      subroutine readparams(filename,verb,phase,mults,nsamp,dt,
      &                      align,shift,out_rot)
       
         implicit none
@@ -177,7 +177,7 @@ c Write results
         
         character filename*(namelen),buffer*(buffsize),phase*(namelen)
         integer mults,nsamp,align,ios,eof,out_rot,verb
-        real dt,width,shift
+        real dt,shift
         
 c Default values
         verb=0
@@ -185,7 +185,6 @@ c Default values
         mults=2
         nsamp=3000
         dt=0.01
-        width=1.
         align=1
         shift=5.
         out_rot=0
@@ -203,8 +202,6 @@ c Default values
           read (buffer,*) nsamp
           call getline(iounit1,buffer,eof)
           read (buffer,*) dt
-          call getline(iounit1,buffer,eof)
-          read (buffer,*) width
           call getline(iounit1,buffer,eof)
           read (buffer,*) align
           call getline(iounit1,buffer,eof)
@@ -225,8 +222,6 @@ c Default values
           write(iounit1,*) nsamp
           write(iounit1,*) '# Sample rate (seconds)'
           write(iounit1,*) dt
-          write(iounit1,*) '# Gaussian pulse width (seconds)'
-          write(iounit1,*) width
           write(iounit1,*) '# Alignment: 0 is none, 1 aligns on P'
           write(iounit1,*) align
           write(iounit1,*) '# Shift of traces -- t=0 at this time (sec)'

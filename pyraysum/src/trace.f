@@ -2,20 +2,19 @@ c####&
 
 c Build traces from arrivals. tt and amp are the travel-time and
 c amplitude lists, ntr is the number of traces, nph is the number
-c of phases, dt is the sample spacing (in seconds), gwidth is the
-c width of the Gaussian used at the pulse (seconds), align is the
+c of phases, dt is the sample spacing (in seconds), align is the
 c index of the phase to align on (0 for no alignment), shift is the
 c trace time for tt=0 (seconds), and Tr_cart is the resulting
 c traces in Cartesian coodinates, Tr_cart(:,1) being N-S, 2 E-W, and
 c 3 vertical.
-      subroutine make_traces(tt,amp,ntr,nph,nsamp,dt,gwidth,align,shift,
+      subroutine make_traces(tt,amp,ntr,nph,nsamp,dt,align,shift,
      &                       Tr_cart)
         
         implicit none
         include 'params.h'
         
 c        Interface variables
-        real tt(maxph,maxtr),amp(3,maxph,maxtr),dt,gwidth,shift
+        real tt(maxph,maxtr),amp(3,maxph,maxtr),dt,shift
         real Tr_cart(3,maxsamp,maxtr)
         integer ntr,nph,align,nsamp
         
@@ -55,8 +54,6 @@ c        Max. time that fits. The first sample is at t=0.
                   curamp(icomp)=0
                 end if
               end do
-c              call putgauss(Tr_cart(1,1,itr),gwidth/(2.*dt),
-c     &                      tt_s/dt,curamp,nsamp) 
               call putspike(Tr_cart(1,1,itr),tt_s/dt,curamp,nsamp) 
             end if
           end do
@@ -64,31 +61,6 @@ c     &                      tt_s/dt,curamp,nsamp)
         
       end
       
-
-c -------------------------
-
-c Insert a Gaussian pulse into a trace      
-      subroutine putgauss(traces,sigma,mu,amp,nsamp)
-      
-        implicit none
-        include 'params.h'
-        
-        real traces(3,maxsamp),sigma,mu,amp(3),gauss
-        integer nsamp
-        
-        integer isamp,nx
-        gauss(nx) = exp(-0.5*((real(nx)-mu)/sigma)**2)
-
-c        write (*,*) 'putgauss:',sigma,mu,amp
-        do isamp=int(mu-5*sigma),int(mu+5*sigma)
-          if ((isamp .gt. 0) .and. (isamp .le. nsamp)) then
-            traces(1,isamp)=traces(1,isamp)+gauss(isamp)*amp(1)
-            traces(2,isamp)=traces(2,isamp)+gauss(isamp)*amp(2)
-            traces(3,isamp)=traces(3,isamp)+gauss(isamp)*amp(3)
-          end if
-        end do
-        
-      end
 
 c -------------------------
 
