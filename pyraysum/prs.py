@@ -104,7 +104,7 @@ def read_model(modfile, encoding=None):
     return Model(*zip(*values))
 
 
-def write_params(verbose, wvtype, mults, npts, dt, gwidth, align, shift, rot):
+def write_params(verbose, wvtype, mults, npts, dt, align, shift, rot):
     """
     Write parameters to `raysum-params` used by Raysum
 
@@ -117,7 +117,6 @@ def write_params(verbose, wvtype, mults, npts, dt, gwidth, align, shift, rot):
                     "2 all first-order\n " + str(mults) + "\n")
     file.writelines("# Number of samples per trace\n " + str(npts) + "\n")
     file.writelines("# Sample rate (seconds)\n " + str(dt) + "\n")
-    file.writelines("# Gaussian pulse width (seconds)\n " + str(gwidth) + "\n")
     file.writelines("# Alignment: 0 is none, 1 aligns on P\n " +
                     str(align) + "\n")
     file.writelines("# Shift or traces (seconds)\n " + str(shift) + "\n")
@@ -153,10 +152,16 @@ def read_traces(tracefile, dt, geom, rot, shift):
     of Stream objects
 
     Args:
-        travefile (str): Name of file containing traces
-        dt (float): Sample distance in seconds
-        geom (np.ndarray): Array of [baz, slow] values
-        rot (int): ID for rotation: 0 is NEZ, 1 is RTZ, 2 is PVH
+        tracefile (str):
+            Name of file containing traces
+        dt (float):
+            Sample distance in seconds
+        geom (array):
+            Array of [baz, slow] values
+        rot (int):
+            ID for rotation: 0 is NEZ, 1 is RTZ, 2 is PVH
+        rot (int):
+            ID for rotation: 0 is NEZ, 1 is RTZ, 2 is PVH
 
     Returns:
         (list): streamlist: List of Stream objects
@@ -209,7 +214,7 @@ def read_traces(tracefile, dt, geom, rot, shift):
         raise(Exception('invalid "rot" value: not in 0, 1, 2'))
 
     # Number of "event" traces produced
-    ntr = np.max(df.itr) + 1
+    ntr = np.max(df.itr)
 
     # Time axis
     npts = len(df[df.itr==0].trace1.values)
@@ -250,7 +255,7 @@ def read_traces(tracefile, dt, geom, rot, shift):
 
 
 def run_prs(model, verbose=False, wvtype='P', mults=2,
-            npts=300, dt=0.025, gwidth=0.5, align=1, shift=0., rot=0,
+            npts=300, dt=0.025, align=1, shift=0., rot=0,
             baz=[], slow=[], rf=False):
     """
     Reads the traces produced by Raysum and stores them into a list
@@ -270,8 +275,6 @@ def run_prs(model, verbose=False, wvtype='P', mults=2,
             Number of samples in time series
         dt (float):
             Sampling distance in seconds
-        gwidth (float):
-            Width of Gaussian pulse in seconds
         align (int):
             ID for alignment of seismograms ('1': align at 'P',
             '2': align at 'SV' or 'SH')
@@ -298,15 +301,12 @@ def run_prs(model, verbose=False, wvtype='P', mults=2,
         raise(Exception(msg))
         rf = False
 
-    # Set pusle width to be three times the sampling distance for
-    # accurate RF amplitudes
-    if rf:
-        gwidth = dt*3.
+    # Shift seismograms for RF calculations to avoid Fourier artifacts
     if rf and shift == 0.:
         shift = 5.
 
     # Write parameter file to be used by Raysum
-    write_params(verbose, wvtype, mults, npts, dt, gwidth, align, shift, rot)
+    write_params(verbose, wvtype, mults, npts, dt, align, shift, rot)
 
     # Write geometry (baz, slow) to be used by Raysum
     geom = write_geom(baz, slow)
@@ -336,7 +336,7 @@ def rf_from_prs(streamlist, rot, wvtype='P'):
         streamlist (list):
             List of :class:`~obspy.core.Stream` objects containing 'event' traces
         rot (int):
-            ID for rotation: 0 is NEZ, 1 is RTZ, 2 is PVH (only 1 or 2 is valid here)
+            ID for rotation: 0 is NEZ, 1 is RTZ, 2 is PVH (only 1 or 2 are valid here)
 
     Returns:
         (list):

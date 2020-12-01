@@ -203,7 +203,7 @@ c ---------------------------------
 
         do itr=1,ntr
           do isamp=1,nsamp
-            write (unit,'(I5,A,G15.7,A,G15.7,A,G15.7)') itr,',',
+            write (unit,'(I5,A,G15.7,A,G15.7,A,G15.7)') itr-1,',',
      &              traces(1,isamp,itr),
      &              ',',traces(2,isamp,itr),',',traces(3,isamp,itr)
           end do
