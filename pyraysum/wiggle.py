@@ -39,7 +39,7 @@ def stack_all(stream, pws=False):
     Args:
         stream (:class:`~obspy.core.Stream`)
             Contains traces to stack
-        pws (bool, optional):
+        pws (bool):
             Enables Phase-Weighted Stacking
 
     Returns:
@@ -49,9 +49,6 @@ def stack_all(stream, pws=False):
                 Stacked trace
 
     """
-
-    print()
-    print('Stacking ALL traces in streams')
 
     # Copy stats from stream
     str_stats = stream[0].stats
@@ -83,9 +80,9 @@ def stack_all(stream, pws=False):
     return stack
 
 
-def rf_wiggles(rflist, btyp='baz', pws=False, tmin=-10., tmax=30,
+def rf_wiggles(rflist, btyp='baz', wvtype='P', pws=False, tmin=-5., tmax=20,
                scale=None, save=False, ftitle='Figure_rf_wiggle',
-               wvtype='P', fmt='png'):
+               fmt='png'):
     """
     Plots receiver function seismograms sorted by back-azimuth or slowness.
 
@@ -93,21 +90,23 @@ def rf_wiggles(rflist, btyp='baz', pws=False, tmin=-10., tmax=30,
         rflist (list):
             list of :class:`~obspy.core.Stream` objects containing receiver
             functions
-        btyp (str, optional):
+        btyp (str):
             Type of sorting for panel
-        pws (bool, optional):
+        wvtype (str):
+            Wavet type ('P', 'SV', or 'SH')
+        pws (bool):
             Enables Phase-Weighted Stacking
-        tmin (float, optional):
+        tmin (float):
             Lower bound of time axis (s)
-        tmax (float, optional):
+        tmax (float):
             Upper bound of time axis (s)
-        scale (float, optional):
+        scale (float):
             Scaling factor
-        save (bool, optional):
+        save (bool):
             Whether or not to save the figure
-        ftitle (str, optional):
+        ftitle (str):
             Title of figure to be saved
-        wvtype (str, optional):
+        wvtype (str):
             Wave type ('P', 'SV', or 'SH')
 
     Returns:
@@ -119,9 +118,6 @@ def rf_wiggles(rflist, btyp='baz', pws=False, tmin=-10., tmax=30,
 
     if not fmt in ['png', 'PNG', 'jpg', 'JPG', 'eps', 'EPS', 'pdf', 'PDF']:
         raise ValueError("'fmt' has to be one of 'png', 'jpg', 'eps', 'pdf'")
-
-    print()
-    print('Plotting Wiggles by '+btyp)
 
     # Re-order streams in list
     str1 = Stream(traces=[st[0] for st in rflist])
@@ -241,9 +237,9 @@ def rf_wiggles(rflist, btyp='baz', pws=False, tmin=-10., tmax=30,
     return
 
 
-def stream_wiggles(streamlist, btyp='baz', tmin=0., tmax=30,
+def stream_wiggles(streamlist, btyp='baz', wvtype='P', tmin=-5., tmax=20.,
                    scale=None, save=False, ftitle='Figure_pw_wiggles',
-                   wvtype='P', fmt='png'):
+                   fmt='png'):
     """
     Plots displacement seismograms sorted by back-azimuth or slowness.
 
@@ -251,20 +247,20 @@ def stream_wiggles(streamlist, btyp='baz', tmin=0., tmax=30,
         streamlist (list):
             list of :class:`~obspy.core.Stream` objects containing displacement
             seismograms
-        btyp (str, optional):
+        btyp (str):
             Type of sorting for panel
-        tmin (float, optional):
-            Lower bound of time axis (s)
-        tmax (float, optional):
-            Upper bound of time axis (s)
-        scale (float, optional):
-            Scaling factor
-        save (bool, optional):
-            Whether or not to save the figure
-        ftitle (str, optional):
-            Title of figure to be saved
-        wvtype (str, optional):
+        wvtype (str):
             Wave type ('P', 'SV', or 'SH')
+        tmin (float):
+            Lower bound of time axis (s)
+        tmax (float):
+            Upper bound of time axis (s)
+        scale (float):
+            Scaling factor
+        save (bool):
+            Whether or not to save the figure
+        ftitle (str):
+            Title of figure to be saved
 
     Returns:
         None
@@ -273,9 +269,6 @@ def stream_wiggles(streamlist, btyp='baz', tmin=0., tmax=30,
     if not (btyp == 'baz' or btyp == 'slow' or btyp == 'dist'):
         print('type has to be "baz" or "slow" or "dist"')
         return
-
-    print()
-    print('Plotting Wiggles by '+btyp)
 
     # Re-order streams in list
     str1 = Stream(traces=[st[0] for st in streamlist])

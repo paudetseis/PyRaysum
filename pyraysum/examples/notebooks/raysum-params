@@ -3,16 +3,14 @@
 # Phase name
  P
 # Multiples: 0 for none, 1 for Moho, 2 all first-order
- 2
+ 0
 # Number of samples per trace
- 3000
+ 6000
 # Sample rate (seconds)
  0.01
-# Gaussian pulse width (seconds)
- 0.03
 # Alignment: 0 is none, 1 aligns on P
  1
 # Shift or traces (seconds)
- 5.0
+ 1.0
 # Rotation to output: 0 is NEZ, 1 is RTZ, 2 is PVH
  1

@@ -26,11 +26,13 @@ Functions to interact with ``Raysum`` software
 
 '''
 import subprocess
+import types
 import numpy as np
 import pandas as pd
 from obspy import Trace, Stream, UTCDateTime
 from obspy.core import AttribDict
 from numpy.fft import fft, ifft, fftshift
+from pyraysum import wiggle
 
 
 class Model(object):
@@ -146,7 +148,134 @@ def write_geom(baz, slow):
     return dat
 
 
-def read_traces(tracefile, dt, geom, rot, shift):
+class StreamList(object):
+
+    def __init__(self, model=None, geom=None, streams=None,
+                 args=None):
+
+        self.model = model
+        self.geom = geom
+        self.streams = streams
+        self.args = AttribDict(args)
+
+    def calculate_rfs(self):
+        """
+        Method to generate receiver functions from displacement traces.
+
+        Returns:
+            (list):
+                rflist: Stream containing Radial and Transverse receiver functions
+
+        """
+
+        if self.args.rot == 0:
+            msg = "Receiver functions cannot be calculated with 'rot == 0'\n"
+            raise(Exception(msg))
+            return
+
+        if self.args.rot == 1:
+            cmpts = ['R', 'T', 'Z']
+        elif self.args.rot == 2:
+            cmpts = ['V', 'H', 'P']
+        else:
+            raise(Exception('rotation ID invalid: '+str(self.args.rot)))
+
+        rflist = []
+
+        # Cycle through list of displacement streams
+        for stream in self.streams:
+
+            # Calculate time axis
+            npts = stream[0].stats.npts
+            taxis = np.arange(-npts/2., npts/2.)*stream[0].stats.delta
+
+            # Extract 3-component traces from stream
+            rtr = stream.select(component=cmpts[0])[0]
+            ttr = stream.select(component=cmpts[1])[0]
+            ztr = stream.select(component=cmpts[2])[0]
+
+            # Deep copy and re-initialize data to 0.
+            rfr = rtr.copy()
+            rfr.data = np.zeros(len(rfr.data))
+            rft = ttr.copy()
+            rft.data = np.zeros(len(rft.data))
+
+            # Fourier transform
+            ft_rfr = fft(rtr.data)
+            ft_rft = fft(ttr.data)
+            ft_ztr = fft(ztr.data)
+
+            # Spectral division to calculate receiver functions
+            if self.args.wvtype == 'P':
+                rfr.data = fftshift(np.real(ifft(np.divide(ft_rfr, ft_ztr))))
+                rft.data = fftshift(np.real(ifft(np.divide(ft_rft, ft_ztr))))
+            elif self.args.wvtype == 'SV':
+                rfr.data = fftshift(np.real(ifft(np.divide(-ft_ztr, ft_rfr))))
+            elif self.args.wvtype == 'SH':
+                rft.data = fftshift(np.real(ifft(np.divide(-ft_ztr, ft_rft))))
+
+            # Update stats
+            rfr.stats.channel = 'RF'+cmpts[0]
+            rft.stats.channel = 'RF'+cmpts[1]
+            rfr.stats.taxis = taxis
+            rft.stats.taxis = taxis
+
+            # Store in Stream
+            rfstream = Stream(traces=[rfr, rft])
+
+            # Append to list
+            rflist.append(rfstream)
+
+        self.rfs = rflist
+
+        return
+
+    def plot(self, typ, **kwargs):
+        if typ == 'streams':
+            self.plot_streams(**kwargs)
+        elif typ == 'rfs':
+            try:
+                self.plot_rfs(**kwargs)
+            except:
+                raise(Exception("Cannot plot 'rfs'"))
+        else:
+            msg = "'typ' has to be either 'streams' or 'rfs'"
+            raise(TypeError(msg))
+
+    def filter(self, typ, ftype, **kwargs):
+        if typ == 'streams':
+            self.filter_streams(ftype, **kwargs)
+        elif typ == 'rfs':
+            try:
+                self.filter_rfs(ftype, **kwargs)
+            except:
+                raise(Exception("Cannot filter 'rfs'"))
+        elif typ == 'all':
+            self.filter_streams(**kwargs)
+            try:
+                self.filter_rfs(**kwargs)
+            except:
+                print("Cannot filter 'rfs'")
+        else:
+            msg = "'typ' has to be either 'streams', 'rfs' or 'all'"
+            raise(TypeError(msg))
+
+    def plot_streams(self, scale=1.e3, tmin=-5., tmax=20.):
+        wiggle.stream_wiggles(self.streams, scale=scale, tmin=tmin, tmax=tmax)
+
+    def plot_rfs(self, scale=1.e3, tmin=-5., tmax=20.):
+        wiggle.rf_wiggles(self.rfs, scale=scale, tmin=tmin, tmax=tmax)
+
+    def filter_streams(self, ftype, **kwargs):
+        for stream in self.streams:
+            stream.filter(ftype, **kwargs)
+
+    def filter_rfs(self, ftype, **kwargs):
+        for rf in self.rfs:
+            rf.filter(ftype, **kwargs)
+
+
+def read_traces(tracefile, **kwargs):
     """
     Reads the traces produced by Raysum and stores them into a list
     of Stream objects
@@ -160,13 +289,22 @@ def read_traces(tracefile, dt, geom, rot, shift):
             Array of [baz, slow] values
         rot (int):
             ID for rotation: 0 is NEZ, 1 is RTZ, 2 is PVH
-        rot (int):
-            ID for rotation: 0 is NEZ, 1 is RTZ, 2 is PVH
+        shift (float):
+            Time shift in seconds
 
     Returns:
         (list): streamlist: List of Stream objects
 
     """
+
+    # Unpack the arguments
+    args = AttribDict({**kwargs})
+
+    kwlist = ['tracefile', 'dt', 'geom', 'rot', 'shift']
+
+    for k in args:
+        if k not in kwlist:
+            raise(Exception('Incorrect kwarg: ', k))
 
     def _make_stats(net=None, sta=None, stime=None, dt=None,
                     slow=None, baz=None, wvtype=None, channel=None,
@@ -175,13 +313,19 @@ def read_traces(tracefile, dt, geom, rot, shift):
         Updates the ``stats`` doctionary from an obspy ``Trace`` object.
 
         Args:
-            tr (obspy.trace): Trace object to update
-            dt (float): Sampling rate
+            net (str): Network name
+            sta (str): Station name
+            stime (:class:`~obspy.core.UTCDateTime`): Start time of trace
+            dt (float): Sampling distance in seconds
             slow (float): Slowness value (s/km)
-            baz (float): Back-azimuth value (degree)
+            baz (float): Back-azimuth value (degrees)
+            wvtype (str): Wave type ('P', 'SV', or 'SH')
+            channel (str): Channel name
+            taxis (:class:`~numpy.ndarray`): Time axis in seconds
 
         Returns:
-            (obspy.trace): tr: Trace with updated stats
+            (:class:`~obspy.core.Trace`):
+                tr: Trace with updated stats
         """
 
         stats = AttribDict()
@@ -204,11 +348,11 @@ def read_traces(tracefile, dt, geom, rot, shift):
         raise(Exception("Can't read "+str(tracefile)))
 
     # Component names
-    if rot == 0:
+    if args.rot == 0:
         component = ['N', 'E', 'Z']
-    elif rot == 1:
+    elif args.rot == 1:
         component = ['R', 'T', 'Z']
-    elif rot == 2:
+    elif args.rot == 2:
         component = ['P', 'V', 'H']
     else:
         raise(Exception('invalid "rot" value: not in 0, 1, 2'))
@@ -217,10 +361,10 @@ def read_traces(tracefile, dt, geom, rot, shift):
     ntr = np.max(df.itr)
 
     # Time axis
-    npts = len(df[df.itr==0].trace1.values)
-    taxis = np.arange(npts)*dt - shift
+    npts = len(df[df.itr == 0].trace1.values)
+    taxis = np.arange(npts)*args.dt - args.shift
 
-    streamlist = []
+    streams = []
 
     for itr in range(ntr):
 
@@ -231,32 +375,34 @@ def read_traces(tracefile, dt, geom, rot, shift):
         # Channel 1
 
         stats = _make_stats(net='', sta='synt', stime=UTCDateTime(),
-                            dt=dt, slow=geom[itr][1], baz=geom[itr][0],
+                            dt=args.dt, slow=args.geom[itr][1],
+                            baz=args.geom[itr][0],
                             channel='BH'+component[0], taxis=taxis)
         tr1 = Trace(data=ddf.trace1.values, header=stats)
 
         # Channel 2
         stats = _make_stats(net='', sta='synt', stime=UTCDateTime(),
-                            dt=dt, slow=geom[itr][1], baz=geom[itr][0],
+                            dt=args.dt, slow=args.geom[itr][1],
+                            baz=args.geom[itr][0],
                             channel='BH'+component[1], taxis=taxis)
         tr2 = Trace(data=ddf.trace2.values, header=stats)
 
         # Channel 3
         stats = _make_stats(net='', sta='synt', stime=UTCDateTime(),
-                            dt=dt, slow=geom[itr][1], baz=geom[itr][0],
+                            dt=args.dt, slow=args.geom[itr][1],
+                            baz=args.geom[itr][0],
                             channel='BH'+component[2], taxis=taxis)
         tr3 = Trace(data=ddf.trace3.values, header=stats)
 
         # Store into Stream object and append to list
         stream = Stream(traces=[tr1, tr2, tr3])
-        streamlist.append(stream)
+        streams.append(stream)
 
-    return streamlist
+    return streams
 
 
-def run_prs(model, verbose=False, wvtype='P', mults=2,
-            npts=300, dt=0.025, align=1, shift=0., rot=0,
-            baz=[], slow=[], rf=False):
+def run_prs(model, baz, slow, verbose=False, wvtype='P', mults=2,
+            npts=300, dt=0.025, align=1, shift=1., rot=0):
     """
     Reads the traces produced by Raysum and stores them into a list
     of Stream objects
@@ -264,6 +410,10 @@ def run_prs(model, verbose=False, wvtype='P', mults=2,
     Args:
         model (:class:`~pyraysum.prs.Model`):
             Seismic velocity model
+        baz (array_like):
+            Array of input back-azimuth values in degrees
+        slow (array_like):
+            Array of input slowness values to model in s/km
         verbose (bool):
             Whether or not to increase verbosity of Raysum
         wvtype (str):
@@ -283,27 +433,24 @@ def run_prs(model, verbose=False, wvtype='P', mults=2,
             to greater lags)
         rot (int):
             ID for rotation: 0 is NEZ, 1 is RTZ, 2 is PVH
-        baz (array_like):
-            Array of input back-azimuth values in degrees
-        slow (array_like):
-            Array of input slowness values to model in s/km
-        rf (bool):
-            Whether or not to calculate and return receiver functions
-            (instead of displacement seismograms)
 
     Returns:
         (list): streamlist: List of Stream objects
 
     """
 
-    if rf and rot == 0:
-        msg = "Receiver functions cannot be calculated with 'rot == 0'\n"
-        raise(Exception(msg))
-        rf = False
+    args = AttribDict(**locals())
 
-    # Shift seismograms for RF calculations to avoid Fourier artifacts
-    if rf and shift == 0.:
-        shift = 5.
+    kwlist = ['model', 'baz', 'slow', 'verbose', 'wvtype', 'mults',
+              'npts', 'dt', 'align', 'shift', 'rot']
+
+    for k in args:
+        if k not in kwlist:
+            raise(Exception('Incorrect kwarg: ', k))
+
+    if shift < 1.:
+        print('WARNING: shift should be greater than expected pulse ' +
+              'width in seconds - otherwise you loose the zero lag arrival')
 
     # Write parameter file to be used by Raysum
     write_params(verbose, wvtype, mults, npts, dt, align, shift, rot)
@@ -317,85 +464,9 @@ def run_prs(model, verbose=False, wvtype='P', mults=2,
 
     # Read all traces and store them into a list of :class:`~obspy.core.Stream`
     # objects
-    streamlist = read_traces('sample.tr', dt, geom, rot, shift)
-    outlist = streamlist
+    streams = read_traces('sample.tr', geom=geom, dt=dt, rot=rot, shift=shift)
 
-    # If rf flag is set to True, calculate and return receiver functions
-    if rf:
-        rflist = rf_from_prs(streamlist, rot, wvtype)
-        outlist = rflist
+    # Store everything into StreamList object
+    streamlist = StreamList(model=model, geom=geom, streams=streams, args=args)
 
-    return outlist
-
-
-def rf_from_prs(streamlist, rot, wvtype='P'):
-    """
-    Function to generate receiver functions from displacement traces.
-
-    Args:
-        streamlist (list):
-            List of :class:`~obspy.core.Stream` objects containing 'event' traces
-        rot (int):
-            ID for rotation: 0 is NEZ, 1 is RTZ, 2 is PVH (only 1 or 2 are valid here)
-
-    Returns:
-        (list):
-            rflist: Stream containing Radial and Transverse receiver functions
-
-    """
-
-    if rot == 1:
-        cmpts = ['R', 'T', 'Z']
-    elif rot == 2:
-        cmpts = ['V', 'H', 'P']
-    else:
-        raise(Exception('rotation ID invalid: '+str(rot)))
-
-    rflist = []
-
-    # Cycle through list of displacement streams
-    for stream in streamlist:
-
-        # Calculate time axis
-        npts = stream[0].stats.npts
-        taxis = np.arange(-npts/2., npts/2.)*stream[0].stats.delta
-
-        # Extract 3-component traces from stream
-        rtr = stream.select(component=cmpts[0])[0]
-        ttr = stream.select(component=cmpts[1])[0]
-        ztr = stream.select(component=cmpts[2])[0]
-
-        # Deep copy and re-initialize data to 0.
-        rfr = rtr.copy()
-        rfr.data = np.zeros(len(rfr.data))
-        rft = ttr.copy()
-        rft.data = np.zeros(len(rft.data))
-
-        # Fourier transform
-        ft_rfr = fft(rtr.data)
-        ft_rft = fft(ttr.data)
-        ft_ztr = fft(ztr.data)
-
-        # Spectral division to calculate receiver functions
-        if wvtype == 'P':
-            rfr.data = fftshift(np.real(ifft(np.divide(ft_rfr, ft_ztr))))
-            rft.data = fftshift(np.real(ifft(np.divide(ft_rft, ft_ztr))))
-        elif wvtype == 'SV':
-            rfr.data = fftshift(np.real(ifft(np.divide(-ft_ztr, ft_rfr))))
-        elif wvtype == 'SH':
-            rft.data = fftshift(np.real(ifft(np.divide(-ft_ztr, ft_rft))))
-
-        # Update stats
-        rfr.stats.channel = 'RF'+cmpts[0]
-        rft.stats.channel = 'RF'+cmpts[1]
-        rfr.stats.taxis = taxis
-        rft.stats.taxis = taxis
-
-        # Store in Stream
-        rfstream = Stream(traces=[rfr, rft])
-
-        # Append to list
-        rflist.append(rfstream)
-
-    # Return rflist
-    return rflist
+    return streamlist
