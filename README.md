@@ -7,7 +7,7 @@ of a stack of layers with planar but nonparallel (dipping) interfaces,
 allowing the possibility of anisotropy in the layers. Incident P and S
 waves are supported.
 
-Although a trimmed down version of the original Fortran code is supplied with `PyRaysum`, you can find the original version [here](https://home.cc.umanitoba.ca/~frederik/Software/).
+`PyRaysum` is a Python wrapper around the Fortran software `Raysum`, originally developed by [Andrew Frederiksen](https://umanitoba.ca/faculties/environment/departments/geo_sciences/research_facilities/AndrewFrederiksen.html). Although a trimmed down version of the Fortran code is supplied with `PyRaysum`, you can find the original version [here](https://home.cc.umanitoba.ca/~frederik/Software/).
 
 ### Dependencies
 
