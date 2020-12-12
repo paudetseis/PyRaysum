@@ -2,7 +2,7 @@ GitHub Repository
 -----------------
 
 * `PyRaysum <https://github.com/paudetseis/PyRaysum>`_
-
+* `Raysum <https://home.cc.umanitoba.ca/~frederik/Software/>`_ 
 
 References
 ----------

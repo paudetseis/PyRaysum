@@ -5,7 +5,9 @@
 Documentation
 =============
 
-``PyRaysum`` is a Python wrapper around the Fortran code Raysum, developed by Andrew Frederiksen in collaboration with Michael Bostock. Raysum is a software to model teleseismic body-wave scattering in the presence of layer dip and/or anisotropy. ``PyRaysum`` includes the original Fortran software and provides a script to compile and install Raysum, and functions to interact with the software. Common computational workflows are covered in the ``Jupyter`` notebooks bundled with this package.
+``PyRaysum`` is a Python wrapper around the Fortran software ``Raysum``, originally developed by `Andrew Frederiksen <https://umanitoba.ca/faculties/environment/departments/geo_sciences/research_facilities/AndrewFrederiksen.html>`_ in collaboration with `Michael Bostock <https://www.eoas.ubc.ca/people/michaelbostock>`_. This program generates sets of ray-theoretical seismograms for an incident plane wave (teleseismic approximation) for models consisting of a stack of layers with planar but nonparallel (dipping) interfaces, allowing the possibility of anisotropy in the layers. Incident P and S waves are supported.
+
+``PyRaysum`` is bundled with a trimmed version of the original Fortran software and provides a script to compile and install Raysum, as well as functions to interact with the software and generate plots of models and seismograms. Common computational workflows are covered in the ``Jupyter`` notebooks bundled with this package.
 
 .. toctree::
    :maxdepth: 1

@@ -39,7 +39,7 @@ After `PyRaysum` is installed, you need to compile and install the Raysum binari
 install-raysum -h
 ```
 
-Running the script without arguments will attempt to install Raysum to default paths and fortran compiler (these are contained in the $PATH and $FC environment variables). If you installed `PyRaysum` using `conda` (and the `fortran-compiler` package), you can safely ignore the options and run the script without any options. To call the script with options (which take precedence over any default `conda` environment variables), you would specify:
+Running the script without arguments will attempt to install Raysum to default paths and fortran compiler (these are contained in the $PATH and $FC environment variables). If you installed `PyRaysum` using `conda` (and the `fortran-compiler` package), you can safely ignore the options and type `install-raysum` in the terminal. To call the script with options (which take precedence over any default `conda` environment variables), you would specify:
 
 ```
 install-raysum --path=/path/to/binaries/bin --fcompiler=gfortran
