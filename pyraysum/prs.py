@@ -363,7 +363,7 @@ class StreamList(object):
 
         self.rfs = rflist
 
-        return
+        return rflist
 
     def plot(self, typ, **kwargs):
         if typ == 'streams':
@@ -386,9 +386,9 @@ class StreamList(object):
             except:
                 raise(Exception("Cannot filter 'rfs'"))
         elif typ == 'all':
-            self.filter_streams(**kwargs)
+            self.filter_streams(ftype, **kwargs)
             try:
-                self.filter_rfs(**kwargs)
+                self.filter_rfs(ftype, **kwargs)
             except:
                 print("Cannot filter 'rfs'")
         else:
@@ -418,10 +418,10 @@ def read_traces(tracefile, **kwargs):
     Args:
         tracefile (str):
             Name of file containing traces
-        dt (float):
-            Sample distance in seconds
         geom (array):
             Array of [baz, slow] values
+        dt (float):
+            Sample distance in seconds
         rot (int):
             ID for rotation: 0 is NEZ, 1 is RTZ, 2 is PVH
         shift (float):
@@ -493,7 +493,7 @@ def read_traces(tracefile, **kwargs):
         raise(Exception('invalid "rot" value: not in 0, 1, 2'))
 
     # Number of "event" traces produced
-    ntr = np.max(df.itr)
+    ntr = np.max(df.itr) + 1
 
     # Time axis
     npts = len(df[df.itr == 0].trace1.values)
@@ -537,7 +537,7 @@ def read_traces(tracefile, **kwargs):
 
 
 def run_prs(model, baz, slow, verbose=False, wvtype='P', mults=2,
-            npts=300, dt=0.025, align=1, shift=1., rot=0):
+            npts=300, dt=0.025, align=1, shift=None, rot=0, rf=False):
     """
     Reads the traces produced by Raysum and stores them into a list
     of Stream objects
@@ -568,6 +568,8 @@ def run_prs(model, baz, slow, verbose=False, wvtype='P', mults=2,
             to greater lags)
         rot (int):
             ID for rotation: 0 is NEZ, 1 is RTZ, 2 is PVH
+        rf (bool):
+            Whether or not to calculate RFs
 
     Returns:
         (list): streamlist: List of Stream objects
@@ -577,15 +579,14 @@ def run_prs(model, baz, slow, verbose=False, wvtype='P', mults=2,
     args = AttribDict(**locals())
 
     kwlist = ['model', 'baz', 'slow', 'verbose', 'wvtype', 'mults',
-              'npts', 'dt', 'align', 'shift', 'rot']
+              'npts', 'dt', 'align', 'shift', 'rot', 'rf']
 
     for k in args:
         if k not in kwlist:
             raise(Exception('Incorrect kwarg: ', k))
 
-    if shift < 1.:
-        print('WARNING: shift should be greater than expected pulse ' +
-              'width in seconds - otherwise you loose the zero lag arrival')
+    if shift is None:
+        shift = dt
 
     # Write parameter file to be used by Raysum
     write_params(verbose, wvtype, mults, npts, dt, align, shift, rot)
@@ -603,5 +604,8 @@ def run_prs(model, baz, slow, verbose=False, wvtype='P', mults=2,
 
     # Store everything into StreamList object
     streamlist = StreamList(model=model, geom=geom, streams=streams, args=args)
+
+    if rf:
+        streamlist.calculate_rfs()
 
     return streamlist
