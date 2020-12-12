@@ -29,6 +29,7 @@ import subprocess
 import types
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 from obspy import Trace, Stream, UTCDateTime
 from obspy.core import AttribDict
 from numpy.fft import fft, ifft, fftshift
@@ -42,7 +43,7 @@ class Model(object):
         - rho (np.ndarray): Density (kg/m^3) (shape ``(nlay)``)
         - vp (np.ndarray): P-wave velocity (m/s) (shape ``(nlay)``)
         - vs (np.ndarray): S-wave velocity (m/s) (shape ``(nlay)``)
-        - isoflg (list of str, optional, defaut: ``'iso'``):
+        - isoflg (list of str, optional, defaut: ``1`` or isotropic):
             Flags for type of layer material (dimension ``nlay``)
         - ani (np.ndarray, optional): Anisotropy (percent) (shape ``(nlay)``)
         - trend (np.ndarray, optional):
@@ -70,8 +71,8 @@ class Model(object):
         self.rho = np.array(rho) if rho is not None else [None] * self.nlay
         self.vp = np.array(vp)
         self.vs = np.array(vs)
-        self.isoflg = (list(isoflg) if not isinstance(isoflg, int)
-                       else [isoflg] * self.nlay)
+        self.isoflg = ([isoflg] * self.nlay if isinstance(isoflg, int)
+                       else list(isoflg))
         self.ani = _get_val(ani)
         self.trend = _get_val(trend)
         self.plunge = _get_val(plunge)
@@ -79,9 +80,12 @@ class Model(object):
         self.dip = _get_val(dip)
         self.write_model()
 
+    def __len__(self):
+        return self.nlay
+
     def write_model(self):
         """
-        Writes model parameters to file to be processed by raysum
+        Write model parameters to file to be processed by raysum
 
         """
         file = open('sample.mod', 'w')
@@ -93,6 +97,137 @@ class Model(object):
                 str(self.trend[i])+" "+str(self.plunge[i])+" " +
                 str(self.strike[i])+" "+str(self.dip[i])+"\n"])
         file.close()
+
+
+    def plot(self, zmax=75.):
+        """
+        Plot model as both stair case and layers - show it
+
+        """
+
+        # Initialize new figure
+        fig = plt.figure(figsize=(5,5))
+
+        # Add subplot for profile
+        ax1 = fig.add_subplot(121)
+        self.plot_profile(zmax=zmax, ax=ax1)
+
+        # Add subplot for layers
+        ax2 = fig.add_subplot(122)
+        self.plot_layers(zmax=zmax, ax=ax2)
+
+        # Tighten the plot and show it
+        plt.tight_layout()
+        plt.show()
+
+
+    def plot_profile(self, zmax=75., ax=None):
+        """
+        Plot model as stair case and show it
+
+        """
+
+        # Defaults to not show the plot
+        show = False
+
+        # Find depths of all interfaces
+        thickn = self.thickn.copy()
+        if thickn[-1] == 0.:
+            thickn[-1] = 50000.
+        depths = np.concatenate(([0.], np.cumsum(thickn)))/1000.
+
+        # Get corner coordinates of staircase representation of model
+        depth = np.array(list(zip(depths[:-1], depths[1:]))).flatten()
+        vs = np.array(list(zip(self.vs, self.vs))).flatten()
+        vp = np.array(list(zip(self.vp, self.vp))).flatten()
+        rho = np.array(list(zip(self.rho, self.rho))).flatten()
+        ani = np.array(list(zip(self.ani, self.ani))).flatten()
+
+        # Generate new plot if an Axis is not passed
+        if ax is None:
+            fig = plt.figure(figsize=(5,5))
+            ax = fig.add_subplot(111)
+            show = True
+
+        # Plot background model
+        ax.plot(vs, depth, color="C0", label=r'Vs (m s$^{-1}$)')
+        ax.plot(vp, depth, color="C1", label=r'Vp (m s$^{-1}$)')
+        ax.plot(rho, depth, color="C2", label=r'Density (kg m$^{-3}$)')
+
+        # If there is anisotropy, show variability
+        if np.any([flag == 0 for flag in self.isoflg]):
+            ax.plot(vs*(1. - ani/100.), depth, '--', color="C0")
+            ax.plot(vs*(1. + ani/100.), depth, '--', color="C0")
+            ax.plot(vp*(1. - ani/100.), depth, '--', color="C1")
+            ax.plot(vp*(1. + ani/100.), depth, '--', color="C1")
+
+        # Fix axes and add labels
+        ax.legend(fontsize=8)
+        ax.set_xlabel('Velocity or Density')
+        ax.set_ylabel('Depth (km)')
+        ax.set_ylim(0., zmax)
+        ax.invert_yaxis()
+        ax.grid(ls=':')
+
+        if show:
+            plt.show()
+
+        return ax
+
+
+    def plot_layers(self, zmax=75., ax=None):
+        """
+        Plot model as horizontal layers and show it
+
+        TODO: Change current routine to painting approach
+        - [ ] paint background with top layer
+        - [ ] paint layer 1 from top to bottom (incl. dip layer)
+        - [ ] continue until bottom of model
+        """
+
+        # Defaults to not show the plot
+        show = False
+
+        # Find depths of all interfaces
+        thickn = self.thickn.copy()
+        if thickn[-1] == 0.:
+            thickn[-1] = 50000.
+        depths = np.concatenate(([0.], np.cumsum(thickn)))/1000.
+
+        # Generate new plot if an Axis is not passed
+        if ax is None:
+            fig = plt.figure(figsize=(2,5))
+            ax = fig.add_subplot(111)
+            show = True
+
+        # Define color palette
+        norm = plt.Normalize()
+        colors = plt.cm.GnBu(norm(self.vs))
+
+        # Cycle through layers
+        for i in range(len(depths) - 1):
+
+            # If anisotropic, add texture - still broken hatch
+            if not self.isoflg[i] == 1:
+                cax = ax.axhspan(depths[i], depths[i+1],
+                    color=colors[i])
+                cax.set_hatch('o')
+            # Else isotropic
+            else:
+                cax = ax.axhspan(depths[i], depths[i+1],
+                    color=colors[i])
+
+        # Fix axes and labelts
+        ax.set_ylim(0., zmax)
+        ax.set_xticks(())
+        ax.invert_yaxis()
+
+        if show:
+            ax.set_ylabel('Depth (km)')
+            plt.tight_layout()
+            plt.show()
+
+        return ax
 
 
 def read_model(modfile, encoding=None):
