@@ -29,5 +29,5 @@ Documentation
    :maxdepth: 1
    :caption: Jupyter Notebooks
 
-   Example 1: A simple example for OBS <https://nbviewer.jupyter.org/github/paudetseis/Telewavesim/blob/master/telewavesim/examples/Notebooks/sim_obs_Audet2016.ipynb>
+   Example 1: A simple example for OBS <https://nbviewer.jupyter.org/github/paudetseis/PyRaysum/blob/main/pyraysum/examples/notebooks/sim_Porter2011.ipynb>
 
