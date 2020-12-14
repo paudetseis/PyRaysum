@@ -40,8 +40,11 @@ def test_single_event():
     baz = 0.
     npts = 1500
     dt = 0.025      # s
-    streamlist = prs.run_prs(model, baz, slow, npts=npts, dt=dt)
-    streamlist.filter('streams', 'lowpass', freq=1., corners=2, zerophase=True)
+    streamlist = prs.run_prs(model, baz, slow, npts=npts, dt=dt, rot=2)
+    with pytest.raises(Exception):
+        assert prs.run_prs(model, baz, slow, npts=npts, dt=dt, rot=3)
+    streamlist = prs.run_prs(model, baz, slow, npts=npts, dt=dt, rot=1, wvtype='SV')
+    streamlist = prs.run_prs(model, baz, slow, npts=npts, dt=dt, rot=1, wvtype='SH')
 
 
 def test_rfs():
@@ -53,6 +56,8 @@ def test_rfs():
     dt = 0.025      # s
 
     # test 1
+    with pytest.raises(Exception):
+        assert prs.run_prs(model, baz, slow, npts=npts, dt=dt, rot=0, rf=True)
     streamlist1 = prs.run_prs(model, baz, slow, npts=npts, dt=dt, rot=1, rf=True)
     streamlist1.filter('rfs', 'lowpass', freq=1., corners=2, zerophase=True)
     streamlist1.filter('streams', 'lowpass', freq=1., corners=2, zerophase=True)

@@ -306,7 +306,6 @@ class StreamList(object):
         if self.args.rot == 0:
             msg = "Receiver functions cannot be calculated with 'rot == 0'\n"
             raise(Exception(msg))
-            return
 
         if self.args.rot == 1:
             cmpts = ['R', 'T', 'Z']
@@ -348,6 +347,8 @@ class StreamList(object):
                 rfr.data = fftshift(np.real(ifft(np.divide(-ft_ztr, ft_rfr))))
             elif self.args.wvtype == 'SH':
                 rft.data = fftshift(np.real(ifft(np.divide(-ft_ztr, ft_rft))))
+            else:
+                raise(Exception("wave typye invalid: "+self.args.wvtype))
 
             # Update stats
             rfr.stats.channel = 'RF'+cmpts[0]
@@ -598,7 +599,7 @@ def run_prs(model, baz, slow, verbose=False, wvtype='P', mults=2,
         shift = dt
 
     if args.rf and (args.rot == 0):
-        args.rot = 1
+        raise(Exception("The argument 'rot' cannot be '0'"))
 
     # Write parameter file to be used by Raysum
     write_params(verbose, wvtype, mults, npts, dt, align, shift, rot)
