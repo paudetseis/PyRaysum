@@ -59,6 +59,7 @@ def test_rfs():
     with pytest.raises(Exception):
         assert prs.run_prs(model, baz, slow, npts=npts, dt=dt, rot=0, rf=True)
     streamlist1 = prs.run_prs(model, baz, slow, npts=npts, dt=dt, rot=1, rf=True)
+    streamlist1 = prs.run_prs(model, baz, slow, npts=npts, dt=dt, rot=2, rf=True)
     streamlist1.filter('rfs', 'lowpass', freq=1., corners=2, zerophase=True)
     streamlist1.filter('streams', 'lowpass', freq=1., corners=2, zerophase=True)
 
