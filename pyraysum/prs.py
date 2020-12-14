@@ -43,7 +43,7 @@ class Model(object):
         - rho (np.ndarray): Density (kg/m^3) (shape ``(nlay)``)
         - vp (np.ndarray): P-wave velocity (m/s) (shape ``(nlay)``)
         - vs (np.ndarray): S-wave velocity (m/s) (shape ``(nlay)``)
-        - isoflg (list of str, optional, defaut: ``1`` or isotropic):
+        - flag (list of str, optional, defaut: ``1`` or isotropic):
             Flags for type of layer material (dimension ``nlay``)
         - ani (np.ndarray, optional): Anisotropy (percent) (shape ``(nlay)``)
         - trend (np.ndarray, optional):
@@ -59,7 +59,7 @@ class Model(object):
         - a (np.ndarray): Elastic thickness (shape ``(3, 3, 3, 3, nlay)``)
     """
 
-    def __init__(self, thickn, rho, vp, vs, isoflg=1,
+    def __init__(self, thickn, rho, vp, vs, flag=1,
                  ani=None, trend=None, plunge=None,
                  strike=None, dip=None):
 
@@ -71,8 +71,8 @@ class Model(object):
         self.rho = np.array(rho) if rho is not None else [None] * self.nlay
         self.vp = np.array(vp)
         self.vs = np.array(vs)
-        self.isoflg = ([isoflg] * self.nlay if isinstance(isoflg, int)
-                       else list(isoflg))
+        self.flag = ([flag] * self.nlay if isinstance(flag, int)
+                       else list(flag))
         self.ani = _get_val(ani)
         self.trend = _get_val(trend)
         self.plunge = _get_val(plunge)
@@ -93,7 +93,7 @@ class Model(object):
             file.writelines([
                 str(self.thickn[i])+" "+str(self.rho[i])+" " +
                 str(self.vp[i])+" "+str(self.vs[i])+" " +
-                str(self.isoflg[i])+" "+str(self.ani[i])+" " +
+                str(self.flag[i])+" "+str(self.ani[i])+" " +
                 str(self.trend[i])+" "+str(self.plunge[i])+" " +
                 str(self.strike[i])+" "+str(self.dip[i])+"\n"])
         file.close()
@@ -155,7 +155,7 @@ class Model(object):
         ax.plot(rho, depth, color="C2", label=r'Density (kg m$^{-3}$)')
 
         # If there is anisotropy, show variability
-        if np.any([flag == 0 for flag in self.isoflg]):
+        if np.any([flag == 0 for flag in self.flag]):
             ax.plot(vs*(1. - ani/100.), depth, '--', color="C0")
             ax.plot(vs*(1. + ani/100.), depth, '--', color="C0")
             ax.plot(vp*(1. - ani/100.), depth, '--', color="C1")
@@ -208,7 +208,7 @@ class Model(object):
         for i in range(len(depths) - 1):
 
             # If anisotropic, add texture - still broken hatch
-            if not self.isoflg[i] == 1:
+            if not self.flag[i] == 1:
                 cax = ax.axhspan(depths[i], depths[i+1],
                     color=colors[i])
                 cax.set_hatch('o')
@@ -373,6 +373,15 @@ class StreamList(object):
                 self.plot_rfs(**kwargs)
             except:
                 raise(Exception("Cannot plot 'rfs'"))
+        elif typ == 'all':
+            try:
+                self.plot_streams(**kwargs)
+                try:
+                    self.plot_rfs(**kwargs)
+                except:
+                    raise(Exception("Cannot plot 'rfs'"))
+            except:
+                raise(Exception("Cannot plot 'all'"))
         else:
             msg = "'typ' has to be either 'streams' or 'rfs'"
             raise(TypeError(msg))
@@ -587,6 +596,9 @@ def run_prs(model, baz, slow, verbose=False, wvtype='P', mults=2,
 
     if shift is None:
         shift = dt
+
+    if args.rf and (args.rot == 0):
+        args.rot = 1
 
     # Write parameter file to be used by Raysum
     write_params(verbose, wvtype, mults, npts, dt, align, shift, rot)
