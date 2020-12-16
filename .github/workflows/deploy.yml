@@ -31,9 +31,12 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: before install
         run: |
+          $CONDA/bin/conda info
+          $CONDA/bin/conda list
           $CONDA/bin/conda config --add channels conda-forge
-          $CONDA/bin/conda create -q -n testenv python=3.8 obspy fortran-compiler pandas pytest-cov sphinx sphinx-rtd-theme
+          $CONDA/bin/conda create -q -n testenv python=3.8 obspy fortran-compiler pandas pytest-cov sphinx
           $CONDA/bin/conda activate testenv
+          pip install sphinx_rtd_theme
           $CONDA/bin/conda list
 
       - name: install
