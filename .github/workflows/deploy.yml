@@ -39,7 +39,7 @@ jobs:
           $CONDA/bin/conda list
 
       - name: install
-        run: pip install -v --no-deps .
+        run: pip install -e .
 
       - name: docs
         run: |
