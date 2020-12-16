@@ -22,7 +22,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: [3.7, 3.8]
+        python-version: [3.8]
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -31,12 +31,10 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: before install
         run: |
-          wget https://raw.githubusercontent.com/trichter/conda4travis/latest/conda4travis.sh -O conda4travis.sh
-          source conda4travis.sh
-          conda config --add channels conda-forge
-          conda create -q -n testenv python=3.8 obspy fortran-compiler pandas pytest-cov sphinx sphinx-rtd-theme
-          conda activate testenv
-          conda list
+          $CONDA/bin/conda config --add channels conda-forge
+          $CONDA/bin/conda create -q -n testenv python=3.8 obspy fortran-compiler pandas pytest-cov sphinx sphinx-rtd-theme
+          $CONDA/bin/conda activate testenv
+          $CONDA/bin/conda list
 
       - name: install
         run: pip install -v --no-deps .
@@ -54,7 +52,6 @@ jobs:
           cd empty
           pytest -v --cov=pyraysum ../pyraysum/tests/
           bash <(curl -s https://codecov.io/bash)
-
 
       - name: deploy
         uses: JamesIves/github-pages-deploy-action@3.7.1
