@@ -39,7 +39,6 @@ jobs:
           conda info
           conda config --add channels conda-forge
           conda install obspy fortran-compiler pandas
-          conda list
           pip install -e .
 
       - name: make docs
