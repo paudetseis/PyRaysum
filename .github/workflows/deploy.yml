@@ -34,8 +34,7 @@ jobs:
           $CONDA/bin/conda info
           $CONDA/bin/conda list
           $CONDA/bin/conda config --add channels conda-forge
-          $CONDA/bin/conda create -q -n testenv python=3.8 obspy fortran-compiler pandas pytest-cov sphinx
-          $CONDA/bin/conda activate testenv
+          $CONDA/bin/conda install obspy fortran-compiler pandas pytest-cov sphinx
           pip install sphinx_rtd_theme
           $CONDA/bin/conda list
 
