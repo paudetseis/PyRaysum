@@ -32,12 +32,8 @@ jobs:
           activate-environment: test
           python-version: 3.8
           auto-activate-base: false
-      # Runs a set of commands using the runners shell
-      - shell: bash -l {0}
-        run: |
-          conda info
-          conda list
-      - name: install
+
+      - name: Build
         shell: bash -l {0}
         run: |
           conda info
