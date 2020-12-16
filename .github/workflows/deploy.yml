@@ -22,7 +22,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-version: [3.7, 3.8, 3.9]
+        python-version: [3.7]
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -32,12 +32,14 @@ jobs:
           activate-environment: test
           auto-activate-base: false
 
-      - name: Install
+      - name: Dependencies
         shell: bash -l {0}
         run: |
           conda info
           conda config --add channels conda-forge
           conda install obspy fortran-compiler pandas
+
+      - name: Install
           pip install -e .
 
       - name: Tests
@@ -51,17 +53,18 @@ jobs:
           bash <(curl -s https://codecov.io/bash)
 
   docs:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.8]
+    needs: build
+    # runs-on: ubuntu-latest
+    # strategy:
+    #   matrix:
+    #     python-version: [3.8]
 
-    steps:
-      - uses: actions/checkout@v2
-      - uses: conda-incubator/setup-miniconda@v2
-        with:
-          activate-environment: test
-          auto-activate-base: false
+    # steps:
+    #   - uses: actions/checkout@v2
+    #   - uses: conda-incubator/setup-miniconda@v2
+    #     with:
+    #       activate-environment: test
+    #       auto-activate-base: false
 
       - name: Make docs
         shell: bash -l {0}
