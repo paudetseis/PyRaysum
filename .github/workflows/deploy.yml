@@ -27,19 +27,26 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: test
+          python-version: 3.8
+          auto-activate-base: false
       # Runs a set of commands using the runners shell
-      - name: before install
+      - shell: bash -l {0}
         run: |
-          $CONDA/bin/conda info
-          $CONDA/bin/conda list
-          $CONDA/bin/conda config --add channels conda-forge
-          $CONDA/bin/conda install obspy fortran-compiler pandas pytest-cov sphinx
-          pip install sphinx_rtd_theme
-          $CONDA/bin/conda list
-
+          conda info
+          conda list
       - name: install
-        run: pip install -e .
+        shell: bash -l {0}
+        run: |
+          conda info
+          conda list
+          conda config --add channels conda-forge
+          conda install obspy fortran-compiler pandas sphinx
+          pip install sphinx_rtd_theme
+          conda list
+          pip install -e .
 
       - name: docs
         run: |
@@ -49,9 +56,11 @@ jobs:
           cd ..
 
       - name: tests
+        shell: bash -l {0}
         run: |
           mkdir empty
           cd empty
+          conda install pytest-cov
           pytest -v --cov=pyraysum ../pyraysum/tests/
           bash <(curl -s https://codecov.io/bash)
 
