@@ -41,19 +41,10 @@ jobs:
         shell: bash -l {0}
         run: |
           conda info
-          conda list
           conda config --add channels conda-forge
-          conda install obspy fortran-compiler pandas sphinx
-          pip install sphinx_rtd_theme
+          conda install obspy fortran-compiler pandas
           conda list
           pip install -e .
-
-      - name: docs
-        run: |
-          cd docs
-          make html
-          touch _build/html/.nojekyll
-          cd ..
 
       - name: tests
         shell: bash -l {0}
@@ -71,3 +62,10 @@ jobs:
           BRANCH: gh-pages # The branch the action should deploy to.
           FOLDER: docs/_build/html # The folder the action should deploy.
           CLEAN: true # Automatically remove deleted files from the deploy branch
+        run: |
+          cd docs
+          conda install sphinx
+          pip install sphinx_rtd_theme
+          make html
+          touch _build/html/.nojekyll
+          cd ..
