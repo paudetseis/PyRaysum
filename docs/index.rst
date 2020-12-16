@@ -9,6 +9,10 @@ Documentation
 
 ``PyRaysum`` is bundled with a trimmed version of the original Fortran software and provides a script to compile and install Raysum, as well as functions to interact with the software and generate plots of models and seismograms. Common computational workflows are covered in the ``Jupyter`` notebooks bundled with this package.
 
+.. image:: https://github.com/paudetseis/PyRaysum/workflows/Build/badge.svg
+.. image:: https://codecov.io/gh/paudetseis/PyRaysum/branch/main/graph/badge.svg
+    :target: https://codecov.io/gh/paudetseis/PyRaysum
+
 .. toctree::
    :maxdepth: 1
    :caption: Quick Links
@@ -31,5 +35,5 @@ Documentation
    :maxdepth: 1
    :caption: Jupyter Notebooks
 
-   Example 1: A simple example for OBS <https://nbviewer.jupyter.org/github/paudetseis/PyRaysum/blob/main/pyraysum/examples/notebooks/sim_Porter2011.ipynb>
+   Example 1: Reproducing Figure 2 in Porter et al. (2011) <https://nbviewer.jupyter.org/github/paudetseis/PyRaysum/blob/main/pyraysum/examples/notebooks/sim_Porter2011.ipynb>
 

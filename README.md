@@ -12,7 +12,23 @@ waves are supported.
 ![build](https://github.com/paudetseis/PyRaysum/workflows/Build/badge.svg)
 [![codecov](https://codecov.io/gh/paudetseis/PyRaysum/branch/main/graph/badge.svg?token=59F1SWLM9Q)](https://codecov.io/gh/paudetseis/PyRaysum)
 
-### Dependencies
+Installation, API documentation, scripts and tutorials are described at https://paudetseis.github.io/PyRaysum/
+
+Authors: [`Pascal Audet`](https://www.uogeophysics.com/authors/admin/) (Developer and Maintainer of `PyRaysum`) & [`Andrew Frederiksen`](https://umanitoba.ca/faculties/environment/departments/geo_sciences/research_facilities/AndrewFrederiksen.html) & (Developer of original `Fortran` version)
+
+#### Contributing
+
+All constructive contributions are welcome, e.g. bug reports, discussions or suggestions for new features. You can either [open an issue on GitHub](https://github.com/paudetseis/PyRaysum/issues) or make a pull request with your proposed changes. Before making a pull request, check if there is a corresponding issue opened and reference it in the pull request. If there isn't one, it is recommended to open one with your rationale for the change. New functionality or significant changes to the code that alter its behavior should come with corresponding tests and documentation. If you are new to contributing, you can open a work-in-progress pull request and have it iteratively reviewed. 
+
+Examples of contributions include notebooks that describe published examples of `PyRaysum` usage and processing. Suggestions for improvements (speed, accuracy, plotting, etc.) are also welcome.
+
+#### Citing
+
+If you use `PyRaysum` in your work, please cite the Zenodo DOI (not yet available) and the following paper:
+
+- Frederiksen, A.W., and Bostock, M.G. (1999) Modelling teleseismic waves in dipping anisotropic structures. Geophysical Journal International 141: 401-412.
+
+<!-- ### Dependencies
 
 `PyRaysum` requires a modern Fortran compiler (e.g., gfortran, ifort). In addition, the following packages are required:
 
@@ -70,11 +86,6 @@ doc.install_doc(path='Notebooks')
 ```
 
 which will install the notebook locally in the folder `'Notebooks'`. Then you simply open a `jupyter notebook` and navigate to the `Notebook` folder and open the corresponding file. 
-
-#### Citing
-
-If you use `PyRaysum` in your work, please cite the Zenodo DOI (not yet available) and the following paper:
-
-- Frederiksen, A.W., and Bostock, M.G. (1999) Modelling teleseismic waves in dipping anisotropic structures. Geophysical Journal International 141: 401-412.
+ -->
   
 
