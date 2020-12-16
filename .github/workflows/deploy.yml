@@ -22,7 +22,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-version: [3.7]
+        python-version: [3.7, 3.8, 3.9]
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -51,20 +51,6 @@ jobs:
           conda install pytest-cov
           pytest -v --cov=pyraysum ../pyraysum/tests/
           bash <(curl -s https://codecov.io/bash)
-
-  docs:
-    needs: build
-    # runs-on: ubuntu-latest
-    # strategy:
-    #   matrix:
-    #     python-version: [3.8]
-
-    steps:
-    #   - uses: actions/checkout@v2
-    #   - uses: conda-incubator/setup-miniconda@v2
-    #     with:
-    #       activate-environment: test
-    #       auto-activate-base: false
 
       - name: Make docs
         shell: bash -l {0}
