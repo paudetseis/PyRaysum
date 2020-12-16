@@ -9,7 +9,7 @@ waves are supported.
 
 `PyRaysum` is a Python wrapper around the Fortran software `Raysum`, originally developed by [Andrew Frederiksen](https://umanitoba.ca/faculties/environment/departments/geo_sciences/research_facilities/AndrewFrederiksen.html). Although a trimmed down version of the Fortran code is supplied with `PyRaysum`, you can find the original version [here](https://home.cc.umanitoba.ca/~frederik/Software/).
 
-![build](https://github.com/actions/PyRaysum/workflows/Build/badge.svg)
+![build](https://github.com/paudetseis/PyRaysum/workflows/Build/badge.svg)
 [![codecov](https://codecov.io/gh/paudetseis/PyRaysum/branch/main/graph/badge.svg?token=59F1SWLM9Q)](https://codecov.io/gh/paudetseis/PyRaysum)
 
 ### Dependencies
