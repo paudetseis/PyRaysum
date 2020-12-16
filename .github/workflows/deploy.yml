@@ -21,7 +21,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest]
         python-version: [3.7, 3.8, 3.9]
 
     steps:
@@ -49,6 +49,12 @@ jobs:
           conda install pytest-cov
           pytest -v --cov=pyraysum ../pyraysum/tests/
           bash <(curl -s https://codecov.io/bash)
+
+  docs:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8]
 
       - name: Make docs
         shell: bash -l {0}
