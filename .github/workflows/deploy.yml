@@ -46,7 +46,7 @@ jobs:
           conda list
           pip install -e .
 
-      - name: docs
+      - name: make docs
         run: |
           cd docs
           conda install sphinx
@@ -71,10 +71,3 @@ jobs:
           BRANCH: gh-pages # The branch the action should deploy to.
           FOLDER: docs/_build/html # The folder the action should deploy.
           CLEAN: true # Automatically remove deleted files from the deploy branch
-        run: |
-          cd docs
-          conda install sphinx
-          pip install sphinx_rtd_theme
-          make html
-          touch _build/html/.nojekyll
-          cd ..
