@@ -1,4 +1,4 @@
-.. figure:: ../pyraysum/examples/picture/PYRaysum_logo.png
+.. figure:: ../pyraysum/examples/picture/PyRaysum_logo.png
    :align: center
 
 Licence
