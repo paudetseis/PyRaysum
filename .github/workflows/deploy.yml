@@ -46,6 +46,15 @@ jobs:
           conda list
           pip install -e .
 
+      - name: docs
+        run: |
+          cd docs
+          conda install sphinx
+          pip install sphinx_rtd_theme
+          make html
+          touch _build/html/.nojekyll
+          cd ..
+
       - name: tests
         shell: bash -l {0}
         run: |
