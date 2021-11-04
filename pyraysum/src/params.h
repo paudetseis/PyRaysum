@@ -20,4 +20,4 @@ c pi: duh. ztol: tolerance considered to be equiv. to zero.
       
 c nsamp is the number of samples per trace.
       integer maxsamp
-      parameter (maxsamp=10000)
+      parameter (maxsamp=100000)

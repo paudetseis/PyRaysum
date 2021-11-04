@@ -274,7 +274,15 @@ def write_geom(baz, slow):
 
     # Write array_like objects to file to be used as input to Raysum
     file = open("sample.geom", "w")
-    dat = [(bb, ss) for ss in slow for bb in baz]
+
+    # This means we use pre-defined (baz, slow) pairs 
+    if len(baz) == len(slow):
+        dat = np.array(list(zip(baz, slow)))
+    # Otherwise expand the arrays
+    else:
+        dat = [(bb, ss) for ss in slow for bb in baz]
+
+    # Write to file
     for dd in dat:
         file.writelines([str(dd[0]) + " " + str(dd[1]*1.e-3) + " 0. 0.\n"])
     file.close()
