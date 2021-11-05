@@ -317,10 +317,10 @@ def stream_wiggles(streamlist, btyp='baz', wvtype='P', tmin=-5., tmax=20.,
             # Fill positive in red, negative in blue
             ax.fill_between(
                 time, y, y+tr.data*maxval, where=tr.data+1e-6 <= 0.,
-                facecolor='blue', linewidth=0)
+                facecolor='blue', linewidth=0, interpolate=True)
             ax.fill_between(
                 time, y, y+tr.data*maxval, where=tr.data+1e-6 >= 0.,
-                facecolor='red', linewidth=0)
+                facecolor='red', linewidth=0, interpolate=True)
 
         ax.set_xlim(tmin, tmax)
 
