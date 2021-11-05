@@ -264,7 +264,7 @@ def write_params(verbose, wvtype, mults, npts, dt, align, shift, rot):
     return
 
 
-def write_geom(baz, slow):
+def write_geom(baz, slow, zipped=False):
 
     # Check whether arguments are array-like; if not, store them in list
     if not hasattr(baz, "__len__"):
@@ -272,9 +272,17 @@ def write_geom(baz, slow):
     if not hasattr(slow, "__len__"):
         slow = [slow]
 
+    if zipped and len(baz) != len(slow):
+        msg = 'baz and slow must have the same length '
+        msg += 'if they should be zipped together.'
+        raise IndexError(msg)
+
     # Write array_like objects to file to be used as input to Raysum
     file = open("sample.geom", "w")
-    dat = [(bb, ss) for ss in slow for bb in baz]
+    if zipped:
+        dat = [(bb, ss) for ss, bb in zip(slow, baz)]
+    else:
+        dat = [(bb, ss) for ss in slow for bb in baz]
     for dd in dat:
         file.writelines([str(dd[0]) + " " + str(dd[1]*1.e-3) + " 0. 0.\n"])
     file.close()
@@ -547,7 +555,8 @@ def read_traces(tracefile, **kwargs):
 
 
 def run_prs(model, baz, slow, verbose=False, wvtype='P', mults=2,
-            npts=300, dt=0.025, align=1, shift=None, rot=0, rf=False):
+            npts=300, dt=0.025, align=1, shift=None, rot=0, rf=False,
+            zipped=False):
     """
     Reads the traces produced by Raysum and stores them into a list
     of Stream objects
@@ -580,6 +589,11 @@ def run_prs(model, baz, slow, verbose=False, wvtype='P', mults=2,
             ID for rotation: 0 is NEZ, 1 is RTZ, 2 is PVH
         rf (bool):
             Whether or not to calculate RFs
+        zipped (bool):
+            Whether or not baz and slow should be zipped together. If False
+            (default), slow and baz are itereated individually, yielding
+            len(baz)*len(slow) geometries. If True, baz and slow are iterated
+            jointly and must have the same length.
 
     Returns:
         (list): streamlist: List of Stream objects
@@ -589,7 +603,7 @@ def run_prs(model, baz, slow, verbose=False, wvtype='P', mults=2,
     args = AttribDict(**locals())
 
     kwlist = ['model', 'baz', 'slow', 'verbose', 'wvtype', 'mults',
-              'npts', 'dt', 'align', 'shift', 'rot', 'rf']
+              'npts', 'dt', 'align', 'shift', 'rot', 'rf', 'zipped']
 
     for k in args:
         if k not in kwlist:
@@ -605,7 +619,7 @@ def run_prs(model, baz, slow, verbose=False, wvtype='P', mults=2,
     write_params(verbose, wvtype, mults, npts, dt, align, shift, rot)
 
     # Write geometry (baz, slow) to be used by Raysum
-    geom = write_geom(baz, slow)
+    geom = write_geom(baz, slow, zipped)
 
     # Call Raysum to produce the output 'sample.tr' containing synthetic traces
     subprocess.call(["seis-spread", "sample.mod",
