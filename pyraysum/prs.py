@@ -264,7 +264,7 @@ def write_params(verbose, wvtype, mults, npts, dt, align, shift, rot):
     return
 
 
-def write_geom(baz, slow, zipped=False):
+def write_geom(baz, slow):
 
     # Check whether arguments are array-like; if not, store them in list
     if not hasattr(baz, "__len__"):
@@ -272,17 +272,17 @@ def write_geom(baz, slow, zipped=False):
     if not hasattr(slow, "__len__"):
         slow = [slow]
 
-    if zipped and len(baz) != len(slow):
-        msg = 'baz and slow must have the same length '
-        msg += 'if they should be zipped together.'
-        raise IndexError(msg)
-
     # Write array_like objects to file to be used as input to Raysum
     file = open("sample.geom", "w")
-    if zipped:
-        dat = [(bb, ss) for ss, bb in zip(slow, baz)]
+
+    # This means we use pre-defined (baz, slow) pairs 
+    if len(baz) == len(slow):
+        dat = np.array(list(zip(baz, slow)))
+    # Otherwise expand the arrays
     else:
         dat = [(bb, ss) for ss in slow for bb in baz]
+
+    # Write to file
     for dd in dat:
         file.writelines([str(dd[0]) + " " + str(dd[1]*1.e-3) + " 0. 0.\n"])
     file.close()
@@ -555,8 +555,7 @@ def read_traces(tracefile, **kwargs):
 
 
 def run_prs(model, baz, slow, verbose=False, wvtype='P', mults=2,
-            npts=300, dt=0.025, align=1, shift=None, rot=0, rf=False,
-            zipped=False):
+            npts=300, dt=0.025, align=1, shift=None, rot=0, rf=False):
     """
     Reads the traces produced by Raysum and stores them into a list
     of Stream objects
@@ -565,9 +564,14 @@ def run_prs(model, baz, slow, verbose=False, wvtype='P', mults=2,
         model (:class:`~pyraysum.prs.Model`):
             Seismic velocity model
         baz (array_like):
-            Array of input back-azimuth values in degrees
+            Array of input back-azimuth values in degrees. If same length as
+            slow, arrays will be zipped and itereated jointly else, elements of
+            arrays will be combined.
         slow (array_like):
-            Array of input slowness values to model in s/km
+            Array of input slowness values to model in s/km. If same length as
+            slow, arrays will be zipped and itereated jointly else, elements of
+            arrays will be combined.
+
         verbose (bool):
             Whether or not to increase verbosity of Raysum
         wvtype (str):
@@ -589,11 +593,6 @@ def run_prs(model, baz, slow, verbose=False, wvtype='P', mults=2,
             ID for rotation: 0 is NEZ, 1 is RTZ, 2 is PVH
         rf (bool):
             Whether or not to calculate RFs
-        zipped (bool):
-            Whether or not baz and slow should be zipped together. If False
-            (default), slow and baz are itereated individually, yielding
-            len(baz)*len(slow) geometries. If True, baz and slow are iterated
-            jointly and must have the same length.
 
     Returns:
         (list): streamlist: List of Stream objects
@@ -603,7 +602,7 @@ def run_prs(model, baz, slow, verbose=False, wvtype='P', mults=2,
     args = AttribDict(**locals())
 
     kwlist = ['model', 'baz', 'slow', 'verbose', 'wvtype', 'mults',
-              'npts', 'dt', 'align', 'shift', 'rot', 'rf', 'zipped']
+              'npts', 'dt', 'align', 'shift', 'rot', 'rf']
 
     for k in args:
         if k not in kwlist:
@@ -619,7 +618,7 @@ def run_prs(model, baz, slow, verbose=False, wvtype='P', mults=2,
     write_params(verbose, wvtype, mults, npts, dt, align, shift, rot)
 
     # Write geometry (baz, slow) to be used by Raysum
-    geom = write_geom(baz, slow, zipped)
+    geom = write_geom(baz, slow)
 
     # Call Raysum to produce the output 'sample.tr' containing synthetic traces
     subprocess.call(["seis-spread", "sample.mod",
