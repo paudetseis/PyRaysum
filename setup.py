@@ -4,6 +4,18 @@ import re
 from numpy.distutils.core import setup, Extension
 from numpy.distutils.system_info import get_info
 
+ext = Extension(name='fraysum',
+                sources = ['pyraysum/src/buildmodel.f',
+                           'pyraysum/src/eigenvec.f',
+                           'pyraysum/src/eispack-cg.f',
+                           'pyraysum/src/matrixops.f',
+                           'pyraysum/src/phaselist.f',
+                           'pyraysum/src/raysum.f',
+                           'pyraysum/src/readwrite.f',
+                           'pyraysum/src/seis-spread.f',
+                           'pyraysum/src/call-seis-spread.f',
+                           'pyraysum/src/trace.f'])
+
 def find_version(*paths):
     fname = os.path.join(os.path.dirname(__file__), *paths)
     with open(fname, encoding='utf-8') as fp:
@@ -29,6 +41,7 @@ setup(
         'Programming Language :: Python :: 3.8'],
     install_requires=['numpy>=1.15', 'obspy>=1.0.0', 'matplotlib', 'pandas'],
     python_requires='>=3.7',
+    ext_modules = [ext],
     packages=setuptools.find_packages(),
     include_package_data=True,
     package_data={

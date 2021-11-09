@@ -415,7 +415,7 @@ c     Adapted from Thompson's routine; based on cofactors.
             
 
 c --- Generic real matrix transpose, B=transpose of A. A: mxn,B:nxm
-      subroutine rtransp(A,B,m,n)
+      subroutine rtransp(a,b,m,n)
       
         implicit none
         integer m,n,i,j
@@ -430,7 +430,7 @@ c --- Generic real matrix transpose, B=transpose of A. A: mxn,B:nxm
       end
       
 c --- Generic complex matrix transpose, B=transpose of A. A: mxn,B:nxm
-      subroutine ctransp(A,B,m,n)
+      subroutine ctransp(a,b,m,n)
       
         implicit none
         integer m,n,i,j
@@ -445,7 +445,7 @@ c --- Generic complex matrix transpose, B=transpose of A. A: mxn,B:nxm
       end
       
 c --- 3x3 real matrix transpose, B=transpose of A.
-      subroutine rtransp3(A,B)
+      subroutine rtransp3(a,b)
       
         implicit none
         integer i,j
@@ -460,7 +460,7 @@ c --- 3x3 real matrix transpose, B=transpose of A.
       end      
    
 c --- 3x3 complex matrix transpose, B=transpose of A.
-      subroutine ctransp3(A,B)
+      subroutine ctransp3(a,b)
       
         implicit none
         integer i,j
