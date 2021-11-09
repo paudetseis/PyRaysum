@@ -1,7 +1,13 @@
-from pyraysum import prs, Model
-from . import test_1_model as mod
+from pyraysum import prs, Model, Geometry
 import numpy as np
 import pytest
+
+try:
+    #  pytest
+    from . import test_1_model as mod
+except ImportError:
+    #  ipython
+    import test_1_model as mod
 
 def test_Porter2011():
     # Define range of slowness and back-azimuths
@@ -32,6 +38,35 @@ def test_Porter2011():
     streamlist.calculate_rfs()
     streamlist.filter('all', 'lowpass', freq=1., zerophase=True, corners=2)
     streamlist.plot('all', tmin=-0.5, tmax=8.)
+
+def test_frs():
+    # Define range of slowness and back-azimuths
+    baz = np.arange(0., 360., 10.)
+    slow = 0.06
+
+    # Read first model with dipping lower crustal layer
+    model = mod.test_read_model_dip()
+    geom = Geometry(baz, slow)
+
+    # Run Raysum with most default values and `rot=1` and `mults=0`
+    # to reproduce the results of Porter et al., 2011
+    fstreamlist = prs.run_frs(model, geom, rot=1, mults=0)
+    pstreamlist = prs.run_prs(model, baz, slow, rot=1, mults=0)
+
+    for fstr, pstr in zip(fstreamlist.streams, pstreamlist.streams):
+        for fcomp, pcomp in zip(fstr, pstr):
+            assert all(np.abs(fcomp.data - pcomp.data) < 1e-6)
+
+    # Now load a different model and repeat (lower crustal anisotropic layer)
+    model = mod.test_read_model_aniso()
+
+    fstreamlist = prs.run_frs(model, geom, rot=1, mults=0)
+    pstreamlist = prs.run_prs(model, baz, slow, rot=1, mults=0)
+
+    for fstr, pstr in zip(fstreamlist.streams, pstreamlist.streams):
+        for fcomp, pcomp in zip(fstr, pstr):
+            assert all(np.abs(fcomp.data - pcomp.data) < 2e-5)
+
 
 def test_single_event():
 
