@@ -22,4 +22,4 @@
 
 __version__ = '0.0.1'
 
-from .prs import Model, StreamList
+from .prs import Model, Geometry, StreamList
