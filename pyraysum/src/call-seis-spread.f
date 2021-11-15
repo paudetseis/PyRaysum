@@ -89,6 +89,8 @@ c Read in parameters from file 'raysum-params'
         verbose=.false.
         if (verb .eq. 1) then
           verbose=.true.
+          print *, 'This is call-seis-spread.'
+          print *, 'Running verbose.'
         end if
 
 c Determine initial phase
@@ -114,6 +116,9 @@ c Write out model for testing
         end if
           
 c Set up model for calculation, make rotators
+        if (verbose) then
+          print *, 'Calling buildmodel...'
+        end if
         call buildmodel(aa,ar_list,rot,thick,rho,alpha,beta,isoflag,
      &                  pct,trend,plunge,strike,dip,nlay)
      
@@ -123,6 +128,9 @@ c Return geometry for testing
         end if
         
 c Generate phase list
+        if (verbose) then
+          print *, 'Generating phaselist...'
+        end if
         numph=0
         if (mults .ne. 3) then
           call ph_direct(phaselist,nseg,numph,nlay,iphase)
@@ -140,6 +148,9 @@ c Generate phase list
         end if
         
 c Perform calculation                   
+        if (verbose) then
+          print *, 'Calling get_arrivals...'
+        end if
         amp_in=1.
         call get_arrivals(travel_time,amplitude,thick,rho,isoflag,
      &       strike,dip,aa,ar_list,rot,baz,slow,sta_dx,sta_dy,
@@ -147,27 +158,33 @@ c Perform calculation
      
 c Normalize arrivals
         if (iphase .eq. 1) then 
+          if (verbose) then
+            print *, 'Calling norm_arrivals...'
+          end if
           call norm_arrivals(amplitude,baz,slow,alpha(1),beta(1),
      &                       rho(1),ntr,numph,1,1)
         end if
                  
 c Assemble traces
+        if (verbose) then
+          print *, 'Calling make_traces...'
+        end if
         call make_traces(travel_time,amplitude,ntr,numph,nsamp,
      &                   dt,align,shift,Tr_cart)
      
-        if (out_rot .eq. 0) then
-c          call writetraces(iounit2,Tr_cart,ntr,nsamp,dt,align,shift)
-        else
-          if (out_rot .eq. 1) then
+        if (out_rot .eq. 1) then
 c Rotate to RTZ
-            call rot_traces(Tr_cart,baz,ntr,nsamp,Tr_ph)
-          else
-c Rotate to wavevector coordinates
-            call fs_traces(Tr_cart,baz,slow,alpha(1),beta(1),
-     &                     rho(1),ntr,nsamp,Tr_ph)
+          if (verbose) then
+            print *, 'Calling rot_traces...'
           end if
-c Write results
-c          call writetraces(iounit2,Tr_ph,ntr,nsamp,dt,align,shift)
+          call rot_traces(Tr_cart,baz,ntr,nsamp,Tr_ph)
+        else
+c Rotate to wavevector coordinates
+          if (verbose) then
+            print *, 'Calling fs_traces...'
+          end if
+          call fs_traces(Tr_cart,baz,slow,alpha(1),beta(1),
+     &                   rho(1),ntr,nsamp,Tr_ph)
         end if
                 
       end
