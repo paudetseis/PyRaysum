@@ -141,15 +141,18 @@ class Model(object):
         """
 
         # Initialize new figure
-        fig = plt.figure(figsize=(5,5))
+        fig = plt.figure(figsize=(10, 5))
 
         # Add subplot for profile
-        ax1 = fig.add_subplot(121)
+        ax1 = fig.add_subplot(1, 4, 1)
         self.plot_profile(zmax=zmax, ax=ax1)
 
         # Add subplot for layers
-        ax2 = fig.add_subplot(122)
+        ax2 = fig.add_subplot(1, 4, 2)
         self.plot_layers(zmax=zmax, ax=ax2)
+
+        ax3 = fig.add_subplot(1, 4, (3, 4))
+        self.plot_interfaces(zmax=zmax, ax=ax3)
 
         # Tighten the plot and show it
         plt.tight_layout()
@@ -255,6 +258,70 @@ class Model(object):
         # Fix axes and labelts
         ax.set_ylim(0., zmax)
         ax.set_xticks(())
+        ax.invert_yaxis()
+
+        if show:
+            ax.set_ylabel('Depth (km)')
+            plt.tight_layout()
+            plt.show()
+
+        return ax
+
+    def plot_interfaces(self, zmax=75, ax=None):
+        """
+        Plot model as interfaces with possibly dipping layers
+        """
+
+        # Defaults to not show the plot
+        show = False
+
+        # Find depths of all interfaces
+        depths = np.concatenate(([0.], np.cumsum(self.thickn)))/1000.
+        maxdep = depths[-1] + 10
+        xs = np.array([-maxdep/2, maxdep/2])
+
+        # Generate new plot if an Axis is not passed
+        if ax is None:
+            fig = plt.figure(figsize=(4, 4))
+            ax = fig.add_subplot(111)
+            show = True
+
+        ax.scatter(0, -0.6, 60, marker='v', c='black')
+        # Cycle through layers
+        for i, depth in enumerate(depths[:-1]):
+            dzdx = np.sin(self.dip[i]*np.pi/180)
+            zs = depth + xs*dzdx
+            ax.plot(xs, zs, color='black')
+            dipdir = (self.strike[i] + 90) % 360
+
+            if i == 0 or self.strike[i] != self.strike[i-1]:
+                ax.text(xs[-1], zs[-1], '>{:.0f}°'.format(dipdir),
+                        ha='left', va='center')
+
+            info = ('$V_P = {:.1f}$km/s, $V_S = {:.1f}$km/s, '
+                    '$\\rho = {:.1f}$kg/m$^3$').format(
+                    self.vp[i]/1000, self.vs[i]/1000, self.rho[i]/1000)
+            ax.text(0, depth, info,
+                    rotation=-self.dip[i],
+                    rotation_mode='anchor',
+                    ha='center', va='top')
+
+
+            if self.flag[i] == 0:
+                aninfo = '--{:.0f}%--{:.0f}°'.format(
+                          self.ani[i], self.trend[i])
+                ax.text(xs[-1], zs[-1] + self.thickn[i]/2000, aninfo,
+                        rotation=-self.plunge[i],
+                        rotation_mode='anchor',
+                        ha='center', va='center')
+
+        # Fix axes and labels
+        ax.spines['right'].set_visible(False)
+        ax.spines['top'].set_visible(False)
+        ax.xaxis.set_ticks_position('bottom')
+        ax.yaxis.set_ticks_position('left')
+        ax.set_ylim(0., zmax)
+        ax.axis('equal')
         ax.invert_yaxis()
 
         if show:
