@@ -101,7 +101,6 @@ class Model(object):
         self.plunge = _get_val(plunge)
         self.strike = _get_val(strike)
         self.dip = _get_val(dip)
-        self.write_model()
 
         tail = np.zeros(maxlay - self.nlay)
         self.fthickn = np.asfortranarray(np.append(self.thickn, tail))
@@ -807,8 +806,11 @@ def run_prs(model, baz, slow, verbose=False, wvtype='P', mults=2,
     # Write parameter file to be used by Raysum
     write_params(verbose, wvtype, mults, npts, dt, align, shift, rot)
 
-    # Write geometry (baz, slow) to be used by Raysum
+    # Write geometry (baz, slow) to sample.geom
     geom = write_geom(baz, slow)
+
+    # Write model to sample.mod
+    model.write_model()
 
     # Call Raysum to produce the output 'sample.tr' containing synthetic traces
     subprocess.call(["seis-spread", "sample.mod",
