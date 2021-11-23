@@ -170,7 +170,7 @@ c Assemble traces
           print *, 'Calling make_traces...'
         end if
         call make_traces(travel_time,amplitude,ntr,numph,nsamp,
-     &                   dt,align,shift,Tr_cart)
+     &                   dt,align,shift,verbose,Tr_cart)
      
         if (out_rot .eq. 1) then
 c Rotate to RTZ

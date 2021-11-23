@@ -8,7 +8,7 @@ c trace time for tt=0 (seconds), and Tr_cart is the resulting
 c traces in Cartesian coodinates, Tr_cart(:,1) being N-S, 2 E-W, and
 c 3 vertical.
       subroutine make_traces(tt,amp,ntr,nph,nsamp,dt,align,shift,
-     &                       Tr_cart)
+     &                       verbose,Tr_cart)
         
         implicit none
         include 'params.h'
@@ -21,7 +21,7 @@ c        Interface variables
 c        Scratch variables
         integer itr,iph,isamp,icomp
         real delta,max_t,tt_s,curamp(3)
-        
+        logical verbose
 c        Zero traces
         do isamp=1,nsamp
           do itr=1,ntr
@@ -43,7 +43,9 @@ c        Max. time that fits. The first sample is at t=0.
           do iph=1,nph
             tt_s=tt(iph,itr)-delta
             if ((tt_s .lt. 0.) .or. (tt_s .gt. max_t)) then
-              write (*,*) 'Phase ',iph,' cropped out of trace ',itr
+              if (verbose) then
+                write (*,*) 'Phase ',iph,' cropped out of trace ',itr
+              end if
             else
               do icomp=1,3
                 curamp(icomp)=amp(icomp,iph,itr)

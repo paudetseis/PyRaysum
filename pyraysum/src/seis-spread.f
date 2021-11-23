@@ -148,7 +148,7 @@ c Normalize arrivals
                  
 c Assemble traces
         call make_traces(travel_time,amplitude,ntr,numph,nsamp,
-     &                   dt,align,shift,Tr_cart)
+     &                   dt,align,shift,verbose,Tr_cart)
      
         if (out_rot .eq. 0) then
           call writetraces(iounit2,Tr_cart,ntr,nsamp,dt,align,shift)
