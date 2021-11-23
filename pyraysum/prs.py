@@ -28,6 +28,7 @@ Functions to interact with ``Raysum`` software
 import subprocess
 import types
 import numpy as np
+from scipy import signal
 import pandas as pd
 import matplotlib.pyplot as plt
 from obspy import Trace, Stream, UTCDateTime
@@ -827,6 +828,78 @@ def run_prs(model, baz, slow, verbose=False, wvtype='P', mults=2,
         streamlist.calculate_rfs()
 
     return streamlist
+
+
+cached_coefficients = {}
+
+
+def _get_cached_bandpass_coefs(order, corners):
+    # from pyrocko.Trace.filter
+    ck = (order, tuple(corners))
+    if ck not in cached_coefficients:
+        cached_coefficients[ck] = signal.butter(
+            order, corners, btype='band')
+
+    return cached_coefficients[ck]
+
+
+def filtered_rf_array(sspread_arr, arr_out, ntr, npts, dt, fmin, fmax):
+    """
+    Reads the traces produced by seis_spread and returns array of filtered
+    receiver functions. Roughly equivalent to subsequent calls to
+    ``read_traces()``, ``Stream.calculate_rfs()``, and ``Stream.filter()``,
+    stripped down for inversion purpusos.
+    - Reshapes them to [traces[components[amplitudes]] order
+    - Performs spectral devision to get receiver functions
+    - Filters them
+
+    Args:
+        sspread_arr (np.array):
+            Output of call_seis_spread
+        arr_out (np.array):
+            Initialized array of shape (ntr, 2, npts) to store output
+        ntr (int):
+            Number of traces (seis_spread parameter)
+        npts (int):
+            Number of points per trace (seis_spread parameter)
+        dt (float):
+            Sampling intervall (seis_spread parameter)
+        fmin (float):
+            Lower filter corner
+        fmax (float):
+            Upper filter corner
+
+    Returns:
+        Nothing, output is written to arrout
+        array (np.array):
+            array of filtered receiver functions
+
+    """
+
+    order = 2
+    def _bandpass(arr):
+        # from pyrocko.Trace.filter
+        (b, a) = _get_cached_bandpass_coefs(order, (2*dt*fmin, 2*dt*fmax))
+        arr -= np.mean(arr)
+        firstpass = signal.lfilter(b, a, arr)
+        return signal.lfilter(b, a, firstpass[::-1])[::-1]
+
+    # Crop unused overhang of oversized fortran arrays and transpose to
+    # [traces[components[samples]]] order
+    data = np.array([sspread_arr[0, :npts, :ntr],
+                     sspread_arr[1, :npts, :ntr],
+                     sspread_arr[2, :npts, :ntr]]).transpose(2, 0, 1)
+
+    for n, trace in enumerate(data):
+        ft_ztr = fft(trace[0])  # P or R or N
+        ft_rfr = fft(trace[1])  # V or T or E
+        ft_rft = fft(trace[2])  # H or Z or Z
+
+        # assuming PVH:
+        arr_out[n, 0, :] = _bandpass(
+            fftshift(np.real(ifft(np.divide(ft_rfr, ft_ztr)))))
+        arr_out[n, 1, :] = _bandpass(
+            fftshift(np.real(ifft(np.divide(ft_rft, ft_ztr)))))
 
 
 def run_frs(model, geometry, verbose=False, wvtype='P', mults=2,

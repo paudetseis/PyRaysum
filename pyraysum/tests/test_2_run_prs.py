@@ -1,6 +1,8 @@
 from pyraysum import prs, Model, Geometry
+from fraysum import call_seis_spread
 import numpy as np
 import pytest
+import matplotlib.pyplot as mp
 
 try:
     #  pytest
@@ -60,12 +62,78 @@ def test_frs():
     # Now load a different model and repeat (lower crustal anisotropic layer)
     model = mod.test_read_model_aniso()
 
-    fstreamlist = prs.run_frs(model, geom, rot=1, mults=0)
-    pstreamlist = prs.run_prs(model, baz, slow, rot=1, mults=0)
+    fstreamlist = prs.run_frs(model, geom, rot=2, mults=2)
+    pstreamlist = prs.run_prs(model, baz, slow, rot=2, mults=2)
 
     for fstr, pstr in zip(fstreamlist.streams, pstreamlist.streams):
         for fcomp, pcomp in zip(fstr, pstr):
             assert all(np.abs(fcomp.data - pcomp.data) < 2e-5)
+    
+    fstreamlist.calculate_rfs()
+    pstreamlist.calculate_rfs()
+
+    for fstr, pstr in zip(fstreamlist.rfs, pstreamlist.rfs):
+        for fcomp, pcomp in zip(fstr, pstr):
+            assert all(np.abs(fcomp.data - pcomp.data) < 2e-5)
+
+def test_filtered_rf_array():
+    from timeit import timeit
+    # Define range of slowness and back-azimuths
+    baz = range(0, 360, 15)
+    slow = 0.06 
+    dt = 0.05
+    rot = 2
+    mults = 0
+    verbose = 0
+    wvtype = 'P'
+    align = 2
+    npts = 1000
+    fmin = 0.05
+    fmax = 0.5
+
+    # Read first model with dipping lower crustal layer
+    model = mod.test_read_model_dip()
+    geom = Geometry(baz, slow)
+    rfarray = np.zeros((geom.ntr, 2, npts))
+
+
+    # To time this, do:
+    # print(timeit('_run_frs()', number=50, globals=globals()))
+    # >> 27.262143349274993
+    def _run_frs():
+        streams = prs.run_frs(model, geom, dt=dt, rot=rot, mults=mults,
+                              align=align, wvtype=wvtype, verbose=verbose,
+                              npts=npts)
+        streams.calculate_rfs()
+        streams.filter('rfs', 'bandpass', freqmin=fmin, freqmax=fmax,
+                       zerophase=True, corners=2)
+        return streams
+
+    # To time this, do:
+    # print(timeit('_run_sspread()', number=50, globals=globals()))
+    # >> 16.743131840601563
+    def _run_sspread():
+        tr_ph, _ = call_seis_spread(
+                model.fthickn, model.frho, model.fvp, model.fvs, model.fflag,
+                model.fani, model.ftrend, model.fplunge, model.fstrike, model.fdip,
+                model.nlay,
+                geom.fbaz, geom.fslow, geom.fdx, geom.fdy, geom.ntr,
+                wvtype, mults, npts, dt, align, dt, rot, verbose)
+
+        prs.filtered_rf_array(tr_ph, rfarray, geom.ntr, npts, dt, fmin, fmax)
+
+    streams = _run_frs()
+
+    _run_sspread()
+
+    fig, ax = mp.subplots(len(geom.geom), 2, tight_layout=True)
+    for l, (stream, array)  in enumerate(zip(streams.rfs, rfarray)):
+        for r, (scomp, acomp) in enumerate(zip(stream, array)):
+            ax[l, r].plot(scomp.data)
+            ax[l, r].plot(acomp)
+    fig.show()
+    #input('Press key to continue')
+    
 
 
 def test_single_event():
