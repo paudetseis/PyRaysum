@@ -49,8 +49,4 @@ setup(
         'pyraysum': [
             'examples/models/*.txt',
             'examples/Notebooks/*.ipynb']},
-    entry_points={
-    'console_scripts':
-    ['install-raysum=pyraysum.scripts.install_raysum:main']}
-
 )
