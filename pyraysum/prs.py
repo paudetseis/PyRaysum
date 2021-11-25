@@ -118,21 +118,6 @@ class Model(object):
     def __len__(self):
         return self.nlay
 
-    def write_model(self):
-        """
-        Write model parameters to file to be processed by raysum
-
-        """
-        file = open('sample.mod', 'w')
-        for i in range(self.nlay):
-            file.writelines([
-                str(self.thickn[i])+" "+str(self.rho[i])+" " +
-                str(self.vp[i])+" "+str(self.vs[i])+" " +
-                str(self.flag[i])+" "+str(self.ani[i])+" " +
-                str(self.trend[i])+" "+str(self.plunge[i])+" " +
-                str(self.strike[i])+" "+str(self.dip[i])+"\n"])
-        file.close()
-
 
     def plot(self, zmax=75.):
         """
@@ -331,6 +316,16 @@ class Model(object):
 
         return ax
 
+    def read_model(modfile, encoding=None):
+        """
+        Reads model parameters from file and returns a Model object.
+
+        Returns:
+            Model object
+        """
+        values = np.genfromtxt(modfile, dtype=None, encoding=encoding)
+        return Model(*zip(*values))
+
 
 class Geometry(object):
     """
@@ -396,67 +391,6 @@ class Geometry(object):
 
     def __len__(self):
         return self.ntr
-
-
-def read_model(modfile, encoding=None):
-    """
-    Reads model parameters from file and returns a Model object.
-
-    Returns:
-        Model object
-    """
-    values = np.genfromtxt(modfile, dtype=None, encoding=encoding)
-    return Model(*zip(*values))
-
-
-def write_params(verbose, wvtype, mults, npts, dt, align, shift, rot):
-    """
-    Write parameters to `raysum-params` used by Raysum
-
-    """
-
-    file = open("raysum-params", "w")
-    file.writelines("# Verbosity\n " + str(int(verbose)) + "\n")
-    file.writelines("# Phase name\n " + wvtype + "\n")
-    file.writelines("# Multiples: 0 for none, 1 for Moho, " +
-                    "2 all first-order\n " + str(mults) + "\n")
-    file.writelines("# Number of samples per trace\n " + str(npts) + "\n")
-    file.writelines("# Sample rate (seconds)\n " + str(dt) + "\n")
-    file.writelines("# Alignment: 0 is none, 1 aligns on P\n " +
-                    str(align) + "\n")
-    file.writelines("# Shift or traces (seconds)\n " + str(shift) + "\n")
-    file.writelines("# Rotation to output: 0 is NEZ, 1 is RTZ, 2 is PVH\n " +
-                    str(rot) + "\n")
-    file.close()
-
-    return
-
-
-def write_geom(baz, slow):
-
-    # Check whether arguments are array-like; if not, store them in list
-    if not hasattr(baz, "__len__"):
-        baz = [baz]
-    if not hasattr(slow, "__len__"):
-        slow = [slow]
-
-    # Write array_like objects to file to be used as input to Raysum
-    file = open("sample.geom", "w")
-
-    # This means we use pre-defined (baz, slow) pairs 
-    if len(baz) == len(slow):
-        dat = np.array(list(zip(baz, slow)))
-    # Otherwise expand the arrays
-    else:
-        dat = [(bb, ss) for ss in slow for bb in baz]
-
-    # Write to file
-    for dd in dat:
-        file.writelines([str(dd[0]) + " " + str(dd[1]*1.e-3) + " 0. 0.\n"])
-    file.close()
-
-    # Return geometry to be used by `run_prs` to avoid too much i/o
-    return dat
 
 
 class StreamList(object):
@@ -598,12 +532,12 @@ class StreamList(object):
 
 def read_traces(traces, **kwargs):
     """
-    Reads the traces produced by Raysum and stores them into a list
+    Extracts the traces produced by Raysum and stores them into a list
     of Stream objects
 
     Args:
-        traces (str) or (np.array):
-            Name of file containing traces or numpy.array holding the traces
+        traces (np.array):
+            Array holding the traces
         geom (array):
             Array of [baz, slow] values
         dt (float):
@@ -623,15 +557,6 @@ def read_traces(traces, **kwargs):
         (list): streamlist: List of Stream objects
 
     """
-
-    # Unpack the arguments
-    args = AttribDict({**kwargs})
-
-    kwlist = ['traces', 'dt', 'geom', 'rot', 'shift', 'npts', 'ntr']
-
-    for k in args:
-        if k not in kwlist:
-            raise(Exception('Incorrect kwarg: ', k))
 
     def _make_stats(net=None, sta=None, stime=None, dt=None,
                     slow=None, baz=None, wvtype=None, channel=None,
@@ -668,24 +593,26 @@ def read_traces(traces, **kwargs):
 
         return stats
 
-    if type(traces) == str:
-        # Read file output
-        try:
-            df = pd.read_csv(traces)
-        except:
-            raise(Exception("Can't read "+str(traces)))
 
-    elif type(traces) == np.ndarray:
-        # Read fortran output
-        npts = args.npts
-        ntr = args.ntr
+    # Unpack the arguments
+    args = AttribDict({**kwargs})
 
-        # Crop unused overhang of oversized fortran arrays
-        data = {'trace1': traces[0, :npts, :ntr].reshape(npts*ntr, order='F'),
-                'trace2': traces[1, :npts, :ntr].reshape(npts*ntr, order='F'),
-                'trace3': traces[2, :npts, :ntr].reshape(npts*ntr, order='F'),
-                'itr': np.array([args.npts*[tr] for tr in range(args.ntr)]).reshape(npts*ntr)}
-        df = pd.DataFrame(data=data)
+    kwlist = ['traces', 'dt', 'geom', 'rot', 'shift', 'npts', 'ntr']
+
+    for k in args:
+        if k not in kwlist:
+            raise(Exception('Incorrect kwarg: ', k))
+
+    # Read fortran output
+    npts = args.npts
+    ntr = args.ntr
+
+    # Crop unused overhang of oversized fortran arrays
+    data = {'trace1': traces[0, :npts, :ntr].reshape(npts*ntr, order='F'),
+            'trace2': traces[1, :npts, :ntr].reshape(npts*ntr, order='F'),
+            'trace3': traces[2, :npts, :ntr].reshape(npts*ntr, order='F'),
+            'itr': np.array([npts*[tr] for tr in range(ntr)]).reshape(npts*ntr)}
+    df = pd.DataFrame(data=data)
 
 
     # Component names
@@ -740,94 +667,6 @@ def read_traces(traces, **kwargs):
         streams.append(stream)
 
     return streams
-
-
-def run_prs(model, baz, slow, verbose=False, wvtype='P', mults=2,
-            npts=300, dt=0.025, align=1, shift=None, rot=0, rf=False):
-    """
-    Run Python Raysum
-
-    Calls seis-spread using a system call and stores traces in a list of Stream
-    objects
-
-    Input:
-        model (:class:`~pyraysum.prs.Model`):
-            Seismic velocity model
-        baz (array_like):
-            Array of input back-azimuth values in degrees. If same length as
-            slow, arrays will be zipped and itereated jointly else, elements of
-            arrays will be combined.
-        slow (array_like):
-            Array of input slowness values to model in s/km. If same length as
-            slow, arrays will be zipped and itereated jointly else, elements of
-            arrays will be combined.
-
-        verbose (bool):
-            Whether or not to increase verbosity of Raysum
-        wvtype (str):
-            Wave type of incoming wavefield ('P', 'SV', or 'SH')
-        mults (int):
-            ID for calculating free surface multiples
-            ('0': no multiples, '1': Moho only, '2': all first-order)
-        npts (int):
-            Number of samples in time series
-        dt (float):
-            Sampling distance in seconds
-        align (int):
-            ID for alignment of seismograms ('1': align at 'P',
-            '2': align at 'SV' or 'SH')
-        shift (float):
-            Time shift in seconds (positive shift moves seismograms
-            to greater lags)
-        rot (int):
-            ID for rotation: 0 is NEZ, 1 is RTZ, 2 is PVH
-        rf (bool):
-            Whether or not to calculate RFs
-
-    Returns:
-        (list): streamlist: List of Stream objects
-
-    """
-
-    args = AttribDict(**locals())
-
-    kwlist = ['model', 'baz', 'slow', 'verbose', 'wvtype', 'mults',
-              'npts', 'dt', 'align', 'shift', 'rot', 'rf']
-
-    for k in args:
-        if k not in kwlist:
-            raise(Exception('Incorrect kwarg: ', k))
-
-    if shift is None:
-        shift = dt
-
-    if args.rf and (args.rot == 0):
-        raise(Exception("The argument 'rot' cannot be '0'"))
-
-    # Write parameter file to be used by Raysum
-    write_params(verbose, wvtype, mults, npts, dt, align, shift, rot)
-
-    # Write geometry (baz, slow) to sample.geom
-    geom = write_geom(baz, slow)
-
-    # Write model to sample.mod
-    model.write_model()
-
-    # Call Raysum to produce the output 'sample.tr' containing synthetic traces
-    subprocess.call(["seis-spread", "sample.mod",
-                     "sample.geom", "sample.tr"])
-
-    # Read all traces and store them into a list of :class:`~obspy.core.Stream`
-    # objects
-    streams = read_traces('sample.tr', geom=geom, dt=dt, rot=rot, shift=shift)
-
-    # Store everything into StreamList object
-    streamlist = StreamList(model=model, geom=geom, streams=streams, args=args)
-
-    if rf:
-        streamlist.calculate_rfs()
-
-    return streamlist
 
 
 cached_coefficients = {}
