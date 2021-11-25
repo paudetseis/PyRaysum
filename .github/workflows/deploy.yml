@@ -45,7 +45,6 @@ jobs:
         run: |
           mkdir empty
           cd empty
-          install-raysum
           conda install pytest-cov
           pytest -v --cov=pyraysum ../pyraysum/tests/
           bash <(curl -s https://codecov.io/bash)
