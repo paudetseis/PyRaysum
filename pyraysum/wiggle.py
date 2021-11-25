@@ -65,11 +65,11 @@ def stack_all(stream, pws=False):
         weight += np.exp(1j*phase)
 
     # Normalize
-    tmp = tmp/np.float(len(stream))
+    tmp = tmp/float(len(stream))
 
     # Phase-weighting
     if pws:
-        weight = weight/np.float(len(stream))
+        weight = weight/float(len(stream))
         weight = np.real(abs(weight))
     else:
         weight = np.ones(len(stream[0].data))
