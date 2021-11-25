@@ -18,10 +18,11 @@ def test_Porter2011():
 
     # Read first model with dipping lower crustal layer
     model = mod.test_read_model_dip()
+    geom = Geometry(baz, slow)
 
     # Run Raysum with most default values and `rot=1` and `mults=0`
     # to reproduce the results of Porter et al., 2011
-    streamlist = prs.run_prs(model, baz, slow, rot=1, mults=0)
+    streamlist = prs.run_frs(model, geometry, rot=1, mults=0)
 
     # Calculate receiver functions
     streamlist.calculate_rfs()
@@ -36,7 +37,7 @@ def test_Porter2011():
     # Now load a different model and repeat (lower crustal anisotropic layer)
     model = mod.test_read_model_aniso()
 
-    streamlist = prs.run_prs(model, baz, slow, rot=1, mults=0)
+    streamlist = prs.run_frs(model, geometry, rot=1, mults=0)
     streamlist.calculate_rfs()
     streamlist.filter('all', 'lowpass', freq=1., zerophase=True, corners=2)
     streamlist.plot('all', tmin=-0.5, tmax=8.)
@@ -53,28 +54,14 @@ def test_frs():
     # Run Raysum with most default values and `rot=1` and `mults=0`
     # to reproduce the results of Porter et al., 2011
     fstreamlist = prs.run_frs(model, geom, rot=1, mults=0)
-    pstreamlist = prs.run_prs(model, baz, slow, rot=1, mults=0)
-
-    for fstr, pstr in zip(fstreamlist.streams, pstreamlist.streams):
-        for fcomp, pcomp in zip(fstr, pstr):
-            assert all(np.abs(fcomp.data - pcomp.data) < 1e-6)
 
     # Now load a different model and repeat (lower crustal anisotropic layer)
     model = mod.test_read_model_aniso()
 
     fstreamlist = prs.run_frs(model, geom, rot=2, mults=2)
-    pstreamlist = prs.run_prs(model, baz, slow, rot=2, mults=2)
 
-    for fstr, pstr in zip(fstreamlist.streams, pstreamlist.streams):
-        for fcomp, pcomp in zip(fstr, pstr):
-            assert all(np.abs(fcomp.data - pcomp.data) < 2e-5)
-    
     fstreamlist.calculate_rfs()
-    pstreamlist.calculate_rfs()
 
-    for fstr, pstr in zip(fstreamlist.rfs, pstreamlist.rfs):
-        for fcomp, pcomp in zip(fstr, pstr):
-            assert all(np.abs(fcomp.data - pcomp.data) < 2e-5)
 
 def test_filtered_rf_array():
     from timeit import timeit
@@ -143,11 +130,11 @@ def test_single_event():
     baz = 0.
     npts = 1500
     dt = 0.025      # s
-    streamlist = prs.run_prs(model, baz, slow, npts=npts, dt=dt, rot=2)
+    streamlist = prs.run_frs(model, geometry, npts=npts, dt=dt, rot=2)
     with pytest.raises(Exception):
-        assert prs.run_prs(model, baz, slow, npts=npts, dt=dt, rot=3)
-    streamlist = prs.run_prs(model, baz, slow, npts=npts, dt=dt, rot=1, wvtype='SV')
-    streamlist = prs.run_prs(model, baz, slow, npts=npts, dt=dt, rot=1, wvtype='SH')
+        assert prs.run_frs(model, geometry, npts=npts, dt=dt, rot=3)
+    streamlist = prs.run_frs(model, geometry, npts=npts, dt=dt, rot=1, wvtype='SV')
+    streamlist = prs.run_frs(model, geometry, npts=npts, dt=dt, rot=1, wvtype='SH')
 
 
 def test_rfs():
@@ -160,17 +147,17 @@ def test_rfs():
 
     # test 1
     with pytest.raises(Exception):
-        assert prs.run_prs(model, baz, slow, npts=npts, dt=dt, rot=0, rf=True)
-    streamlist1 = prs.run_prs(model, baz, slow, npts=npts, dt=dt, rot=1, rf=True)
-    streamlist1 = prs.run_prs(model, baz, slow, npts=npts, dt=dt, rot=2, rf=True)
+        assert prs.run_frs(model, geometry, npts=npts, dt=dt, rot=0, rf=True)
+    streamlist1 = prs.run_frs(model, geometry, npts=npts, dt=dt, rot=1, rf=True)
+    streamlist1 = prs.run_frs(model, geometry, npts=npts, dt=dt, rot=2, rf=True)
     streamlist1.filter('rfs', 'lowpass', freq=1., corners=2, zerophase=True)
     streamlist1.filter('streams', 'lowpass', freq=1., corners=2, zerophase=True)
 
     # test 2
-    streamlist2 = prs.run_prs(model, baz, slow, npts=npts, dt=dt)
+    streamlist2 = prs.run_frs(model, geometry, npts=npts, dt=dt)
     with pytest.raises(Exception):
         assert streamlist2.calculate_rfs()
 
-    streamlist2 = prs.run_prs(model, baz, slow, npts=npts, dt=dt, rot=1)
+    streamlist2 = prs.run_frs(model, geometry, npts=npts, dt=dt, rot=1)
     rflist = streamlist2.calculate_rfs()
     [rf.filter('lowpass', freq=1., corners=2, zerophase=True) for rf in rflist]

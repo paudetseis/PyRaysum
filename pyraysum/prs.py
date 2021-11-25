@@ -316,15 +316,15 @@ class Model(object):
 
         return ax
 
-    def read_model(modfile, encoding=None):
-        """
-        Reads model parameters from file and returns a Model object.
+def read_model(modfile, encoding=None):
+    """
+    Reads model parameters from file and returns a Model object.
 
-        Returns:
-            Model object
-        """
-        values = np.genfromtxt(modfile, dtype=None, encoding=encoding)
-        return Model(*zip(*values))
+    Returns:
+        Model object
+    """
+    values = np.genfromtxt(modfile, dtype=None, encoding=encoding)
+    return Model(*zip(*values))
 
 
 class Geometry(object):
