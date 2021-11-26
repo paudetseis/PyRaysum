@@ -76,27 +76,6 @@ Installing development version from source
 
    pip install .
 
-Installing the Fortran binaries
-+++++++++++++++++++++++++++++++
-
-After installing ``PyRaysum``, you need to compile and install the ``Raysum`` binaries by running the provided ``install-raysum`` script. Check out the helper page for the available options:
-
-.. sourcecode:: bash
-
-   install-raysum -h
-
-Running the script without arguments will attempt to install ``Raysum`` to default paths and fortran compiler (these are contained in the ``$PATH`` and ``$FC`` environment variables). If you installed ``PyRaysum`` using ``conda`` (and the ``fortran-compiler`` package), you can safely ignore the options and type ``install-raysum`` in the terminal. To call the script with options (which take precedence over any default ``conda`` environment variables), you would specify:
-
-.. sourcecode:: bash
-
-	install-raysum --path=/path/to/bin --fcompiler=gfortran
-
-Note that the ``--path`` option requires the full, absolute path. If you specify a path in one of the root directories, you may have to run ``install-raysum`` with super-user privileges, for example:
-
-.. sourcecode:: bash
-
-	sudo install-raysym --path=/usr/bin
-
 
 Usage
 -----
@@ -303,14 +282,13 @@ Modeling a single event
 
 .. sourcecode:: python
 
-   >>> from pyraysum import prs, Model
+   >>> from pyraysum import prs, Model, Geometry
    >>> # Define two-layer model with isotropic crust over isotropic half-space
    >>> model = Model([30000., 0], [2800., 3300.], [6000., 8000.], [3600., 4500.])
-   >>> slow = 0.06     # s/km
-   >>> baz = 0.
+   >>> geom = Geometry(0., 0.06) # baz = 0 deg; slow = 0.06 x/km
    >>> npts = 1500
    >>> dt = 0.025      # s
-   >>> streamlist = prs.run_prs(model, baz, slow, npts=npts, dt=dt)
+   >>> streamlist = prs.run_frs(model, geom, npts=npts, dt=dt)
 
    >>> type(streamlist[0])
    <class 'obspy.core.stream.Stream'>
@@ -344,11 +322,10 @@ Let's first define a simple 2-layer model:
 
 .. sourcecode:: python
 
-   >>> from pyraysum import prs, Model
+   >>> from pyraysum import prs, Model, Geometry
    >>> # Define two-layer model with isotropic crust over isotropic half-space
    >>> model = Model([30000., 0], [2800., 3300.], [6000., 8000.], [3600., 4500.])
-   >>> slow = 0.06     # s/km
-   >>> baz = 0.
+   >>> geom = Geometry(0., 0.06) # baz = 0 deg; slow = 0.06 x/km
    >>> npts = 1500
    >>> dt = 0.025      # s
 
@@ -357,7 +334,7 @@ Method 1
 
 .. sourcecode:: python
 
-   >>> streamlist = prs.run_prs(model, baz, slow, npts=npts, dt=dt, rot=1, rf=True)
+   >>> streamlist = prs.run_frs(model, geom, npts=npts, dt=dt, rot=1, rf=True)
    
    >>> print(streamlist.rfs[0])
    2 Trace(s) in Stream:
@@ -372,7 +349,7 @@ Method 2
 
 .. sourcecode:: python
 
-   >>> streamlist = prs.run_prs(model, baz, slow, npts=npts, dt=dt, rot=1)
+   >>> streamlist = prs.run_frs(model, geom, npts=npts, dt=dt, rot=1)
    >>> rflist = streamlist.calculate_rfs()
 
    >>> print(rflist[0])
@@ -383,7 +360,7 @@ Method 2
    >>> [rf.filter('lowpass', freq=1., corners=2, zerophase=True) for rf in rflist]
    >>> rflist[0].plot()
 
-Both methods will produce the same receiver function figure. Note that the zero lag time is the middle of the time axis. You can also notice wrap-around effects (weak arrivals before zero-lag time). Be careful when selecting time-sampling parameters when running ``Raysum``.
+Both methods will produce the same receiver function figure. Note that the zero lag time at the center of the time axis. You can also notice wrap-around effects (weak arrivals before zero-lag time). Be careful when selecting time-sampling parameters when running ``Raysum``.
 
 .. figure:: ../pyraysum/examples/picture/Figure_RF_Moho.png
    :align: center
