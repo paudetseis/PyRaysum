@@ -48,7 +48,6 @@ jobs:
       #     conda install pytest-cov
       #     pytest -v --cov=pyraysum ../pyraysum/tests/
       #     bash <(curl -s https://codecov.io/bash)
-
       - name: Make docs
         if: matrix.python-version == '3.8' 
         shell: bash -l {0}

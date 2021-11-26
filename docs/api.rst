@@ -35,7 +35,8 @@ Module ``prs``
 --------------
 
 .. automodule:: pyraysum.prs
-   :members:
+   :members: read_model, read_traces, filtered_rf_array, run_frs
+
 
 Module ``wiggle``
 -----------------

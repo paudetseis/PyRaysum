@@ -41,6 +41,7 @@ import fraysum
 class Model(object):
     """
     Model of the subsurface velocity structure 
+    
     ``model parameters``:
         - thickn (np.ndarray): Thickness of layers (m) (shape ``(nlay)``)
         - rho (np.ndarray): Density (kg/m^3) (shape ``(nlay)``)
