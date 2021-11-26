@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Module prs &mdash; pyraysum 0.0.1 documentation</title>
+  <title>Classes &mdash; pyraysum 0.1.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -49,8 +49,17 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Module <code class="docutils literal notranslate"><span class="pre">prs</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="#module-pyraysum.wiggle">Module <code class="docutils literal notranslate"><span class="pre">wiggle</span></code></a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Classes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#model">Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#geometry">Geometry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#streamlist">StreamList</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#modules">Modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-pyraysum.prs">Module <code class="docutils literal notranslate"><span class="pre">prs</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pyraysum.wiggle">Module <code class="docutils literal notranslate"><span class="pre">wiggle</span></code></a></li>
+</ul>
+</li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Jupyter Notebooks</span></p>
 <ul>
@@ -71,7 +80,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Module <code class="docutils literal notranslate"><span class="pre">prs</span></code></li>
+      <li>Classes</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/api.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -84,18 +93,28 @@
   <div class="figure align-center">
 <img alt="_images/PyRaysum_logo.png" src="_images/PyRaysum_logo.png" />
 </div>
-<div class="section" id="module-pyraysum.prs">
-<span id="module-prs"></span><h1>Module <code class="docutils literal notranslate"><span class="pre">prs</span></code><a class="headerlink" href="#module-pyraysum.prs" title="Permalink to this headline"></a></h1>
-<p>Functions to interact with <code class="docutils literal notranslate"><span class="pre">Raysum</span></code> software</p>
+<div class="section" id="classes">
+<h1>Classes<a class="headerlink" href="#classes" title="Permalink to this headline"></a></h1>
+<p><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyraysum</span></code> defines the following base classes:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#pyraysum.prs.Model" title="pyraysum.prs.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a></p></li>
+<li><p><a class="reference internal" href="#pyraysum.prs.Geometry" title="pyraysum.prs.Geometry"><code class="xref py py-class docutils literal notranslate"><span class="pre">Geometry</span></code></a></p></li>
+<li><p><a class="reference internal" href="#pyraysum.prs.StreamList" title="pyraysum.prs.StreamList"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamList</span></code></a></p></li>
+</ul>
+<div class="section" id="model">
+<h2>Model<a class="headerlink" href="#model" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyraysum.prs.Model">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pyraysum.prs.</span></span><span class="sig-name descname"><span class="pre">Model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">thickn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ani</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plunge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strike</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyraysum.prs.Model" title="Permalink to this definition"></a></dt>
-<dd><dl class="simple">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyraysum.prs.</span></span><span class="sig-name descname"><span class="pre">Model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">thickn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ani</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plunge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strike</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxlay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">15</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyraysum.prs.Model" title="Permalink to this definition"></a></dt>
+<dd><p>Model of the subsurface velocity structure</p>
+<dl>
 <dt><code class="docutils literal notranslate"><span class="pre">model</span> <span class="pre">parameters</span></code>:</dt><dd><ul class="simple">
 <li><p>thickn (np.ndarray): Thickness of layers (m) (shape <code class="docutils literal notranslate"><span class="pre">(nlay)</span></code>)</p></li>
 <li><p>rho (np.ndarray): Density (kg/m^3) (shape <code class="docutils literal notranslate"><span class="pre">(nlay)</span></code>)</p></li>
 <li><p>vp (np.ndarray): P-wave velocity (m/s) (shape <code class="docutils literal notranslate"><span class="pre">(nlay)</span></code>)</p></li>
 <li><p>vs (np.ndarray): S-wave velocity (m/s) (shape <code class="docutils literal notranslate"><span class="pre">(nlay)</span></code>)</p></li>
+<li><p>fvp (np.ndarray): P-wave velocity (m/s) (shape <code class="docutils literal notranslate"><span class="pre">(maxlay)</span></code>)</p></li>
+<li><p>fvs (np.ndarray): S-wave velocity (m/s) (shape <code class="docutils literal notranslate"><span class="pre">(maxlay)</span></code>)</p></li>
 <li><dl class="simple">
 <dt>flag (list of str, optional, defaut: <code class="docutils literal notranslate"><span class="pre">1</span></code> or isotropic):</dt><dd><p>Flags for type of layer material (dimension <code class="docutils literal notranslate"><span class="pre">nlay</span></code>)</p>
 </dd>
@@ -123,16 +142,43 @@
 </dl>
 </li>
 <li><p>nlay (int): Number of layers</p></li>
-<li><p>a (np.ndarray): Elastic thickness (shape <code class="docutils literal notranslate"><span class="pre">(3,</span> <span class="pre">3,</span> <span class="pre">3,</span> <span class="pre">3,</span> <span class="pre">nlay)</span></code>)</p></li>
 </ul>
+<p>To broadcast the model to the the fortran routine use:
+- maxlay (int): Maximum number of layers defined in params.h
+- fthickn (np.ndarray): Thickness of layers (m) (shape <code class="docutils literal notranslate"><span class="pre">(maxlay)</span></code>)
+- frho (np.ndarray): Density (kg/m^3) (shape <code class="docutils literal notranslate"><span class="pre">(maxlay)</span></code>)
+- fflag (list of str, optional, defaut: <code class="docutils literal notranslate"><span class="pre">1</span></code> or isotropic):</p>
+<blockquote>
+<div><p>Flags for type of layer material (dimension <code class="docutils literal notranslate"><span class="pre">maxlay</span></code>)</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>fani (np.ndarray, optional): Anisotropy (percent) (shape <code class="docutils literal notranslate"><span class="pre">(maxlay)</span></code>)</p></li>
+<li><dl class="simple">
+<dt>ftrend (np.ndarray, optional):</dt><dd><p>Trend of symmetry axis (radians) (shape <code class="docutils literal notranslate"><span class="pre">(maxlay)</span></code>)</p>
 </dd>
 </dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="pyraysum.prs.Model.write_model">
-<span class="sig-name descname"><span class="pre">write_model</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyraysum.prs.Model.write_model" title="Permalink to this definition"></a></dt>
-<dd><p>Write model parameters to file to be processed by raysum</p>
-</dd></dl>
-
+</li>
+<li><dl class="simple">
+<dt>fplunge (np.ndarray, optional):</dt><dd><p>Plunge of symmetry axis (radians) (shape <code class="docutils literal notranslate"><span class="pre">(maxlay)</span></code>)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>fstrike (np.ndarray, optional):</dt><dd><p>azimuth of interface in RHR (radians) (shape <code class="docutils literal notranslate"><span class="pre">(maxlay)</span></code>)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>fdip (np.ndarray, optional):</dt><dd><p>dip of interface in RHR (radians) (shape <code class="docutils literal notranslate"><span class="pre">(maxlay)</span></code>)</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>Warning: To optimize construction of models, build the input arrays for
+pyraysum.run_frs() in the correct shape.</p>
+<p>TODO: - a (np.ndarray): Elastic thickness (shape <code class="docutils literal notranslate"><span class="pre">(3,</span> <span class="pre">3,</span> <span class="pre">3,</span> <span class="pre">3,</span> <span class="pre">nlay)</span></code>)</p>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyraysum.prs.Model.plot">
 <span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">zmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">75.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyraysum.prs.Model.plot" title="Permalink to this definition"></a></dt>
@@ -155,8 +201,89 @@
 - [ ] continue until bottom of model</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="pyraysum.prs.Model.plot_interfaces">
+<span class="sig-name descname"><span class="pre">plot_interfaces</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">zmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">75</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyraysum.prs.Model.plot_interfaces" title="Permalink to this definition"></a></dt>
+<dd><p>Plot model as interfaces with possibly dipping layers</p>
 </dd></dl>
 
+</dd></dl>
+
+</div>
+<div class="section" id="geometry">
+<h2>Geometry<a class="headerlink" href="#geometry" title="Permalink to this headline"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyraysum.prs.Geometry">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyraysum.prs.</span></span><span class="sig-name descname"><span class="pre">Geometry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">baz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slow</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxtr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyraysum.prs.Geometry" title="Permalink to this definition"></a></dt>
+<dd><p>Recording greometry at the seismic station. Compute one synthetic trace for
+each array element.</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">model</span> <span class="pre">parameters</span></code>:</dt><dd><ul class="simple">
+<li><p>baz (np.ndarray): Ray backazimuths (deg)</p></li>
+<li><p>slow (np.ndarray): Ray slownesses (km/s)</p></li>
+<li><p>geom (np.ndarray): Array of zipped [baz, slow] pairs.</p></li>
+<li><dl class="simple">
+<dt>dx (np.ndarray): North-offset of the seismic station (m)</dt><dd><p>(shape <code class="docutils literal notranslate"><span class="pre">(ntr)</span></code>)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>dy (np.ndarray): East-offset of the seismic station (m)</dt><dd><p>(shape <code class="docutils literal notranslate"><span class="pre">(ntr)</span></code>)</p>
+</dd>
+</dl>
+</li>
+<li><p>ntr: (int) Number of traces</p></li>
+</ul>
+<p>To broadcast the model to the the fortran routine use:
+- maxtr (int): Maximum number of traces defined in params.h
+- fbaz (np.ndarray): Ray backazimuth (radians) (shape <code class="docutils literal notranslate"><span class="pre">(maxtr)</span></code>)
+- fslow (np.ndarray): Ray slowness (m/s) (shape <code class="docutils literal notranslate"><span class="pre">(maxtr)</span></code>)
+- fdx (np.ndarray): North-offset of the seismic station (m)</p>
+<blockquote>
+<div><p>(shape <code class="docutils literal notranslate"><span class="pre">(maxtr)</span></code>)</p>
+</div></blockquote>
+<ul class="simple">
+<li><dl class="simple">
+<dt>fdy (np.ndarray): East-offset of the seismic station (m)</dt><dd><p>(shape <code class="docutils literal notranslate"><span class="pre">(maxtr)</span></code>)</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>Warning: To optimize construction of ray geometries, build the input
+arrays for pyraysum.run_frs() in the correct shape.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="streamlist">
+<h2>StreamList<a class="headerlink" href="#streamlist" title="Permalink to this headline"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyraysum.prs.StreamList">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyraysum.prs.</span></span><span class="sig-name descname"><span class="pre">StreamList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">streams</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyraysum.prs.StreamList" title="Permalink to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="pyraysum.prs.StreamList.calculate_rfs">
+<span class="sig-name descname"><span class="pre">calculate_rfs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyraysum.prs.StreamList.calculate_rfs" title="Permalink to this definition"></a></dt>
+<dd><p>Method to generate receiver functions from displacement traces.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>rflist: Stream containing Radial and Transverse receiver functions</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>(list)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="modules">
+<h1>Modules<a class="headerlink" href="#modules" title="Permalink to this headline"></a></h1>
+<div class="section" id="module-pyraysum.prs">
+<span id="module-prs"></span><h2>Module <code class="docutils literal notranslate"><span class="pre">prs</span></code><a class="headerlink" href="#module-pyraysum.prs" title="Permalink to this headline"></a></h2>
+<p>Functions to interact with <code class="docutils literal notranslate"><span class="pre">Raysum</span></code> software</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyraysum.prs.read_model">
 <span class="sig-prename descclassname"><span class="pre">pyraysum.prs.</span></span><span class="sig-name descname"><span class="pre">read_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">modfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyraysum.prs.read_model" title="Permalink to this definition"></a></dt>
@@ -169,24 +296,22 @@
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="pyraysum.prs.write_params">
-<span class="sig-prename descclassname"><span class="pre">pyraysum.prs.</span></span><span class="sig-name descname"><span class="pre">write_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wvtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mults</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">align</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rot</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyraysum.prs.write_params" title="Permalink to this definition"></a></dt>
-<dd><p>Write parameters to <cite>raysum-params</cite> used by Raysum</p>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="pyraysum.prs.read_traces">
-<span class="sig-prename descclassname"><span class="pre">pyraysum.prs.</span></span><span class="sig-name descname"><span class="pre">read_traces</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tracefile</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyraysum.prs.read_traces" title="Permalink to this definition"></a></dt>
-<dd><p>Reads the traces produced by Raysum and stores them into a list
+<span class="sig-prename descclassname"><span class="pre">pyraysum.prs.</span></span><span class="sig-name descname"><span class="pre">read_traces</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traces</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyraysum.prs.read_traces" title="Permalink to this definition"></a></dt>
+<dd><p>Extracts the traces produced by Raysum and stores them into a list
 of Stream objects</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>tracefile</strong> (<em>str</em>) – Name of file containing traces</p></li>
+<li><p><strong>traces</strong> (<em>np.array</em>) – Array holding the traces</p></li>
 <li><p><strong>geom</strong> (<em>array</em>) – Array of [baz, slow] values</p></li>
 <li><p><strong>dt</strong> (<em>float</em>) – Sample distance in seconds</p></li>
 <li><p><strong>rot</strong> (<em>int</em>) – ID for rotation: 0 is NEZ, 1 is RTZ, 2 is PVH</p></li>
 <li><p><strong>shift</strong> (<em>float</em>) – Time shift in seconds</p></li>
+<li><p><strong>output</strong> (<em>To interpret fraysum</em>) – </p></li>
+<li><p><strong>supply</strong> – </p></li>
+<li><p><strong>ntr</strong> (<em>int</em>) – Number of traces</p></li>
+<li><p><strong>npts</strong> (<em>int</em>) – Number of points per trace</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -199,42 +324,87 @@ of Stream objects</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="pyraysum.prs.run_prs">
-<span class="sig-prename descclassname"><span class="pre">pyraysum.prs.</span></span><span class="sig-name descname"><span class="pre">run_prs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">baz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slow</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wvtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'P'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.025</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">align</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyraysum.prs.run_prs" title="Permalink to this definition"></a></dt>
-<dd><p>Reads the traces produced by Raysum and stores them into a list
-of Stream objects</p>
+<dt class="sig sig-object py" id="pyraysum.prs.filtered_rf_array">
+<span class="sig-prename descclassname"><span class="pre">pyraysum.prs.</span></span><span class="sig-name descname"><span class="pre">filtered_rf_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sspread_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arr_out</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ntr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fmin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fmax</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyraysum.prs.filtered_rf_array" title="Permalink to this definition"></a></dt>
+<dd><p>Reads the traces produced by seis_spread and returns array of filtered
+receiver functions. Roughly equivalent to subsequent calls to
+<code class="docutils literal notranslate"><span class="pre">read_traces()</span></code>, <code class="docutils literal notranslate"><span class="pre">Stream.calculate_rfs()</span></code>, and <code class="docutils literal notranslate"><span class="pre">Stream.filter()</span></code>,
+stripped down for inversion purpusos.
+- Reshapes them to [traces[components[amplitudes]] order
+- Performs spectral devision to get receiver functions
+- Filters them</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>model</strong> (<a class="reference internal" href="#pyraysum.prs.Model" title="pyraysum.prs.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>) – Seismic velocity model</p></li>
-<li><p><strong>baz</strong> (<em>array_like</em>) – Array of input back-azimuth values in degrees</p></li>
-<li><p><strong>slow</strong> (<em>array_like</em>) – Array of input slowness values to model in s/km</p></li>
-<li><p><strong>verbose</strong> (<em>bool</em>) – Whether or not to increase verbosity of Raysum</p></li>
-<li><p><strong>wvtype</strong> (<em>str</em>) – Wave type of incoming wavefield (‘P’, ‘SV’, or ‘SH’)</p></li>
-<li><p><strong>mults</strong> (<em>int</em>) – ID for calculating free surface multiples
-(‘0’: no multiples, ‘1’: Moho only, ‘2’: all first-order)</p></li>
-<li><p><strong>npts</strong> (<em>int</em>) – Number of samples in time series</p></li>
-<li><p><strong>dt</strong> (<em>float</em>) – Sampling distance in seconds</p></li>
-<li><p><strong>align</strong> (<em>int</em>) – ID for alignment of seismograms (‘1’: align at ‘P’,
-‘2’: align at ‘SV’ or ‘SH’)</p></li>
-<li><p><strong>shift</strong> (<em>float</em>) – Time shift in seconds (positive shift moves seismograms
-to greater lags)</p></li>
-<li><p><strong>rot</strong> (<em>int</em>) – ID for rotation: 0 is NEZ, 1 is RTZ, 2 is PVH</p></li>
-<li><p><strong>rf</strong> (<em>bool</em>) – Whether or not to calculate RFs</p></li>
+<li><p><strong>sspread_arr</strong> (<em>np.array</em>) – Output of call_seis_spread</p></li>
+<li><p><strong>arr_out</strong> (<em>np.array</em>) – Initialized array of shape (ntr, 2, npts) to store output</p></li>
+<li><p><strong>ntr</strong> (<em>int</em>) – Number of traces (seis_spread parameter)</p></li>
+<li><p><strong>npts</strong> (<em>int</em>) – Number of points per trace (seis_spread parameter)</p></li>
+<li><p><strong>dt</strong> (<em>float</em>) – Sampling intervall (seis_spread parameter)</p></li>
+<li><p><strong>fmin</strong> (<em>float</em>) – Lower filter corner</p></li>
+<li><p><strong>fmax</strong> (<em>float</em>) – Upper filter corner</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>streamlist: List of Stream objects</p>
+<dd class="field-even"><p><p>Nothing, output is written to arrout
+array (np.array):</p>
+<blockquote>
+<div><p>array of filtered receiver functions</p>
+</div></blockquote>
+</p>
 </dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>(list)</p>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyraysum.prs.run_frs">
+<span class="sig-prename descclassname"><span class="pre">pyraysum.prs.</span></span><span class="sig-name descname"><span class="pre">run_frs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wvtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'P'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.025</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">align</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyraysum.prs.run_frs" title="Permalink to this definition"></a></dt>
+<dd><p>Run Fortran Raysum</p>
+<p>Calls the compiled call-seis-spread binary and stores traces in a list of
+Stream objects</p>
+<dl class="simple">
+<dt>Input:</dt><dd><dl class="simple">
+<dt>model (<a class="reference internal" href="#pyraysum.prs.Model" title="pyraysum.prs.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>):</dt><dd><p>Subsurface velocity structure model</p>
+</dd>
+<dt>model (<a class="reference internal" href="#pyraysum.prs.Geometry" title="pyraysum.prs.Geometry"><code class="xref py py-class docutils literal notranslate"><span class="pre">Geometry</span></code></a>):</dt><dd><p>Recording geometry</p>
+</dd>
+<dt>verbose (bool):</dt><dd><p>Whether or not to increase verbosity of Raysum</p>
+</dd>
+<dt>wvtype (str):</dt><dd><p>Wave type of incoming wavefield (‘P’, ‘SV’, or ‘SH’)</p>
+</dd>
+<dt>mults (int):</dt><dd><p>ID for calculating free surface multiples
+(‘0’: no multiples, ‘1’: Moho only, ‘2’: all first-order)</p>
+</dd>
+<dt>npts (int):</dt><dd><p>Number of samples in time series</p>
+</dd>
+<dt>dt (float):</dt><dd><p>Sampling distance in seconds</p>
+</dd>
+<dt>align (int):</dt><dd><p>ID for alignment of seismograms (‘1’: align at ‘P’,
+‘2’: align at ‘SV’ or ‘SH’)</p>
+</dd>
+<dt>shift (float):</dt><dd><p>Time shift in seconds (positive shift moves seismograms
+to greater lags)</p>
+</dd>
+<dt>rot (int):</dt><dd><p>ID for rotation: 0 is NEZ, 1 is RTZ, 2 is PVH</p>
+</dd>
+<dt>rf (bool):</dt><dd><p>Whether or not to calculate RFs</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>streamlist: List of Stream objects</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>(list)</p>
 </dd>
 </dl>
 </dd></dl>
 
 </div>
 <div class="section" id="module-pyraysum.wiggle">
-<span id="module-wiggle"></span><h1>Module <code class="docutils literal notranslate"><span class="pre">wiggle</span></code><a class="headerlink" href="#module-pyraysum.wiggle" title="Permalink to this headline"></a></h1>
+<span id="module-wiggle"></span><h2>Module <code class="docutils literal notranslate"><span class="pre">wiggle</span></code><a class="headerlink" href="#module-pyraysum.wiggle" title="Permalink to this headline"></a></h2>
 <p>Functions to plot single station displacement or receiver function seismograms.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyraysum.wiggle.stack_all">
@@ -334,6 +504,7 @@ seismograms</p></li>
 </dl>
 </dd></dl>
 
+</div>
 </div>
 
 
