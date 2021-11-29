@@ -7,6 +7,7 @@ def test_imports():
     import matplotlib
     import pyraysum
     from pyraysum import prs, Model, StreamList
+    import fraysum
     assert True
     return
 
