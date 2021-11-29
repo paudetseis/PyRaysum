@@ -42,14 +42,14 @@ jobs:
           conda install obspy fortran-compiler pandas
           pip install -e .
 
-      - name: Tests
-        shell: bash -l {0}
-        run: |
-          mkdir empty
-          cd empty
-          conda install pytest-cov
-          pytest -v --cov=pyraysum ../pyraysum/tests/
-          bash <(curl -s https://codecov.io/bash)
+      # - name: Tests
+      #   shell: bash -l {0}
+      #   run: |
+      #     mkdir empty
+      #     cd empty
+      #     conda install pytest-cov
+      #     pytest -v --cov=pyraysum ../pyraysum/tests/
+      #     bash <(curl -s https://codecov.io/bash)
 
       - name: Make docs
         if: matrix.python-version == '3.8' 
