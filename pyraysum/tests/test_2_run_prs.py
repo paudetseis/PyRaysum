@@ -45,25 +45,25 @@ def test_Porter2011():
     streamlist.filter('all', 'lowpass', freq=1., zerophase=True, corners=2)
     streamlist.plot('all', tmin=-0.5, tmax=8.)
 
-def test_frs():
-    # Define range of slowness and back-azimuths
-    baz = np.arange(0., 360., 10.)
-    slow = 0.06
+# def test_frs():
+#     # Define range of slowness and back-azimuths
+#     baz = np.arange(0., 360., 10.)
+#     slow = 0.06
 
-    # Read first model with dipping lower crustal layer
-    model = mod.test_read_model_dip()
-    geom = Geometry(baz, slow)
+#     # Read first model with dipping lower crustal layer
+#     model = mod.test_read_model_dip()
+#     geom = Geometry(baz, slow)
 
-    # Run Raysum with most default values and `rot=1` and `mults=0`
-    # to reproduce the results of Porter et al., 2011
-    fstreamlist = prs.run_frs(model, geom, rot=1, mults=0)
+#     # Run Raysum with most default values and `rot=1` and `mults=0`
+#     # to reproduce the results of Porter et al., 2011
+#     fstreamlist = prs.run_frs(model, geom, rot=1, mults=0)
 
-    # Now load a different model and repeat (lower crustal anisotropic layer)
-    model = mod.test_read_model_aniso()
+#     # Now load a different model and repeat (lower crustal anisotropic layer)
+#     model = mod.test_read_model_aniso()
 
-    fstreamlist = prs.run_frs(model, geom, rot=2, mults=2)
+#     fstreamlist = prs.run_frs(model, geom, rot=2, mults=2)
 
-    fstreamlist.calculate_rfs()
+#     fstreamlist.calculate_rfs()
 
 
 def test_filtered_rf_array():
