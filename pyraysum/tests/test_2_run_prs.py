@@ -20,7 +20,7 @@ def test_Porter2011():
     model = mod.test_read_model_dip()
     geom = Geometry(baz, slow)
 
-    print('model', model._dict__)
+    print('model', model.__dict__)
     print('geom', geom.__dict__)
     print('running run_frs')
     # Run Raysum with most default values and `rot=1` and `mults=0`
