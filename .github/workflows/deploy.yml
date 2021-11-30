@@ -20,43 +20,46 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        python-version: [3.7, 3.8]
+        python: [3.7, 3.8, 3.9]
 
+    defaults:
+      run:
+        shell: bash -l {0}
+    
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-      - uses: conda-incubator/setup-miniconda@v2
+      - name: Setup Conda
+        uses: conda-incubator/setup-miniconda@v2
         with:
           auto-update-conda: true
-          activate-environment: test
+          environment-file: .github/test_conda_env.yml
           auto-activate-base: false
-          python-version: ${{ matrix.python-version }}
+          python-version: ${{ matrix.python }}
 
-      - name: Install
-        shell: bash -l {0}
+      - name: Conda info 
         run: |
           conda info
           conda config --add channels conda-forge
-          conda install obspy fortran-compiler pandas
-          pip install -e .
+
+      - name: Install
+        run: |
+          pip install -v --no-deps .
 
       - name: Tests
-        shell: bash -l {0}
         run: |
           mkdir empty
           cd empty
-          conda install pytest-cov
           pytest -v --cov=pyraysum ../pyraysum/tests/
           bash <(curl -s https://codecov.io/bash)
 
       - name: Make docs
-        if: matrix.python-version == '3.8' 
-        shell: bash -l {0}
+        if: matrix.python == '3.8' 
         run: |
           cd docs
-          conda install sphinx
           pip install sphinx_rtd_theme
           make html
           touch _build/html/.nojekyll
