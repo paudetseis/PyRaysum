@@ -49,12 +49,12 @@ jobs:
         run: |
           pip install -v --no-deps .
 
-      - name: Tests
-        run: |
-          mkdir empty
-          cd empty
-          pytest -v --cov=pyraysum ../pyraysum/tests/
-          bash <(curl -s https://codecov.io/bash)
+      # - name: Tests
+      #   run: |
+      #     mkdir empty
+      #     cd empty
+      #     pytest -v --cov=pyraysum ../pyraysum/tests/
+      #     bash <(curl -s https://codecov.io/bash)
 
       - name: Make docs
         if: matrix.python == '3.8' 
