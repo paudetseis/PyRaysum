@@ -65,7 +65,7 @@ Cf2py intent(out) :: Tr_cart, Tr_ph
 c ==================
 c Internal variables
 c Scratch variables:
-        integer i, j, iargc, verb
+        integer j, verb
         real amp_in
         logical verbose
 
@@ -119,7 +119,7 @@ c Set up model for calculation, make rotators
         if (verbose) then
           print *, 'Calling buildmodel...'
         end if
-        call buildmodel(aa,ar_list,rot,thick,rho,alpha,beta,isoflag,
+        call buildmodel(aa,ar_list,rot,rho,alpha,beta,isoflag,
      &                  pct,trend,plunge,strike,dip,nlay)
      
 c Return geometry for testing 
@@ -187,4 +187,4 @@ c Rotate to wavevector coordinates
      &                   rho(1),ntr,nsamp,Tr_ph)
         end if
                 
-      end
+      end subroutine
