@@ -1,6 +1,6 @@
 c####&
 
-      subroutine buildmodel(a,ar,rot,thick,rho,alpha,beta,isoflag,
+      subroutine buildmodel(a,ar,rot,rho,alpha,beta,isoflag,
      &                      pct,trend,plunge,strike,dip,nlay)
 c Set up model for use.
      
@@ -9,7 +9,7 @@ c Set up model for use.
         
 c Model variables:
         integer nlay        
-        real thick(maxlay),rho(maxlay),alpha(maxlay),beta(maxlay)
+        real rho(maxlay),alpha(maxlay),beta(maxlay)
         real pct(maxlay),trend(maxlay),plunge(maxlay)
         real strike(maxlay),dip(maxlay)
         logical isoflag(maxlay)
