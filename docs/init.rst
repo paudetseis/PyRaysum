@@ -77,6 +77,25 @@ Installing development version from source
    pip install .
 
 
+Testing
+-------
+
+``pyraysum`` is bundled with unit tests that can be run once the software is installed. 
+
+- Install ``pytest``
+
+.. sourcecode:: bash
+
+   conda install pytest
+
+- Run the tests
+
+.. sourcecode:: bash
+
+   mkdir empty
+   cd empty
+   pytest -v ../pyraysum/tests/
+
 Usage
 -----
 
