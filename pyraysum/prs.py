@@ -184,7 +184,7 @@ class Model(object):
         # Defaults to not show the plot
         show = False
 
-        # Find depths of all interfaces
+        # Find depths of all interfaces in km
         thickn = self.thickn.copy()
         if thickn[-1] == 0.:
             thickn[-1] = 50000.
@@ -293,7 +293,7 @@ class Model(object):
 
         # Find depths of all interfaces
         depths = np.concatenate(([0.], np.cumsum(self.thickn)))/1000.
-        maxdep = depths[-1] + 10
+        maxdep = depths[-1] + 50
         xs = np.array([-maxdep/2, maxdep/2])
 
         # Generate new plot if an Axis is not passed
