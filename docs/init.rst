@@ -76,9 +76,8 @@ Installing development version from source
 
    pip install .
 
-
 Testing
--------
++++++++
 
 ``pyraysum`` is bundled with unit tests that can be run once the software is installed. 
 
