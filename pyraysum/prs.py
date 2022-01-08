@@ -47,8 +47,6 @@ class Model(object):
         - rho (np.ndarray): Density (kg/m^3) (shape ``(nlay)``)
         - vp (np.ndarray): P-wave velocity (m/s) (shape ``(nlay)``)
         - vs (np.ndarray): S-wave velocity (m/s) (shape ``(nlay)``)
-        - fvp (np.ndarray): P-wave velocity (m/s) (shape ``(maxlay)``)
-        - fvs (np.ndarray): S-wave velocity (m/s) (shape ``(maxlay)``)
         - flag (list of str, optional, defaut: ``1`` or isotropic):
             Flags for type of layer material (dimension ``nlay``)
         - ani (np.ndarray, optional): Anisotropy (percent) (shape ``(nlay)``)
@@ -66,6 +64,8 @@ class Model(object):
         - maxlay (int): Maximum number of layers defined in params.h
         - fthickn (np.ndarray): Thickness of layers (m) (shape ``(maxlay)``)
         - frho (np.ndarray): Density (kg/m^3) (shape ``(maxlay)``)
+        - fvp (np.ndarray): P-wave velocity (m/s) (shape ``(maxlay)``)
+        - fvs (np.ndarray): S-wave velocity (m/s) (shape ``(maxlay)``)
         - fflag (list of str, optional, defaut: ``1`` or isotropic):
             Flags for type of layer material (dimension ``maxlay``)
         - fani (np.ndarray, optional): Anisotropy (percent) (shape ``(maxlay)``)
@@ -89,15 +89,19 @@ class Model(object):
                  strike=None, dip=None, maxlay=15):
 
         def _get_val(v):
-            return (np.array([v] * self.nlay if isinstance(v, (int, float))
-                             else v) if v is not None else [0.]*self.nlay)
+            if v is not None:
+                return np.array([v] * self.nlay
+                                if isinstance(v, (int, float))
+                                else v)
+            else:
+                return np.array([0.]*self.nlay)
         self.nlay = len(thickn)
         self.thickn = np.array(thickn)
         self.rho = np.array(rho) if rho is not None else [None] * self.nlay
         self.vp = np.array(vp)
         self.vs = np.array(vs)
-        self.flag = ([flag] * self.nlay if isinstance(flag, int)
-                       else list(flag))
+        self.flag = np.array([flag] * self.nlay if isinstance(flag, int)
+                             else list(flag))
         self.ani = _get_val(ani)
         self.trend = _get_val(trend)
         self.plunge = _get_val(plunge)
@@ -118,6 +122,47 @@ class Model(object):
 
     def __len__(self):
         return self.nlay
+
+    def __str__(self):
+        buf = '# thickn      vp      vs     rho  flag aniso  trend  '
+        buf += 'plunge  strike   dip\n'
+
+        f = '{: 8.1f} {: 7.1f} {: 7.1f} {: 7.1f}    {: 1.0f} {: 5.1f} {: 6.1f}   '
+        f += '{: 5.1f}  {: 6.1f} {: 5.1f}\n'
+
+        for th, vp, vs, r, fl, a, tr, p, s, d in zip(
+                self.thickn, self.vp, self.vs, self.rho, self.flag, self.ani,
+                self.trend, self.plunge, self.strike, self.dip):
+            buf += f.format(th, vp, vs, r, fl, a, tr, p, s, d)
+
+        return buf
+
+    def save(self, fname, info=''):
+        """
+        Save subsurface model to raysum model file
+
+        fname: (str)
+            Name of the output file
+
+        info: (str)
+            String to write into file header
+        """
+
+        from datetime import datetime
+
+        if not info.startswith('#'):
+            info = '# ' + info
+        if not info.endswith('\n'):
+            info += '\n'
+
+
+        buf = '# Raysum velocity model created with PyRaysum\n'
+        buf += '# on: {:}\n'.format(datetime.now().isoformat(' ', 'seconds'))
+        buf += info
+        buf += self.__str__()
+
+        with open(fname, 'w') as fil:
+            fil.write(buf)
 
 
     def plot(self, zmax=75.):
