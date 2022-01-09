@@ -137,7 +137,7 @@ class Model(object):
 
         return buf
 
-    def save(self, fname, info=''):
+    def save(self, fname='sample.mod', info=''):
         """
         Save subsurface model to raysum model file
 
@@ -155,6 +155,9 @@ class Model(object):
         if not info.endswith('\n'):
             info += '\n'
 
+        if not isinstance(fname, str):
+            print("Warning: filename reverts to default 'sample.mod'")
+            fname = 'sample.mod'
 
         buf = '# Raysum velocity model created with PyRaysum\n'
         buf += '# on: {:}\n'.format(datetime.now().isoformat(' ', 'seconds'))
@@ -163,37 +166,6 @@ class Model(object):
 
         with open(fname, 'w') as fil:
             fil.write(buf)
-
-
-    def print(self):
-        form = "{0:5.0f} {1:4.0f} {2:4.0f} {3:4.0f} {4} {5:5.2f} {6:5.2f} {7:5.2f} {8:5.0f} {9:5.0f}"
-        print('Model: ')
-        for i in range(self.nlay):
-            print(form.format(self.thickn[i], self.rho[i], self.vp[i], self.vs[i], 
-            self.flag[i], self.ani[i], self.trend[i], self.plunge[i], self.strike[i], 
-            self.dip[i]))
-
-
-    def write_model(self, filename='sample.mod'):
-        """
-        Write model parameters to file to be processed by raysum
-        """
-
-        if not isinstance(filename, str):
-            print("Warning: filename reverts to default 'sample.mod'")
-            filename = 'sample.mod'
-
-        file = open(filename, 'w')
-        file.writelines("# Sample model file used by Raysum")
-        for i in range(self.nlay):
-            file.writelines([
-                str(self.thickn[i])+" "+str(self.rho[i])+" " +
-                str(self.vp[i])+" "+str(self.vs[i])+" " +
-                str(self.flag[i])+" "+str(self.ani[i])+" " +
-                str(self.trend[i])+" "+str(self.plunge[i])+" " +
-                str(self.strike[i])+" "+str(self.dip[i])+"\n"])
-        file.close()
-
 
     def plot(self, zmax=75.):
         """
