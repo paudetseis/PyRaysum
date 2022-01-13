@@ -27,6 +27,7 @@ Functions to interact with ``Raysum`` software
 '''
 import subprocess
 import types
+from datetime import datetime
 import numpy as np
 from scipy import signal
 import pandas as pd
@@ -137,18 +138,16 @@ class Model(object):
 
         return buf
 
-    def save(self, fname='sample.mod', info=''):
+    def save(self, fname='sample.mod', comment=''):
         """
         Save subsurface model to raysum model file
 
         fname: (str)
             Name of the output file
 
-        info: (str)
+        comment: (str)
             String to write into file header
         """
-
-        from datetime import datetime
 
         if not info.startswith('#'):
             info = '# ' + info
