@@ -125,7 +125,7 @@ class Model(object):
         return self.nlay
 
     def __str__(self):
-        buf = '# thickn      vp      vs     rho  flag aniso  trend  '
+        buf = '# thickn     rho      vp      vs  flag aniso  trend  '
         buf += 'plunge  strike   dip\n'
 
         f = '{: 8.1f} {: 7.1f} {: 7.1f} {: 7.1f}    {: 1.0f} {: 5.1f} {: 6.1f}   '
@@ -134,7 +134,7 @@ class Model(object):
         for th, vp, vs, r, fl, a, tr, p, s, d in zip(
                 self.thickn, self.vp, self.vs, self.rho, self.flag, self.ani,
                 self.trend, self.plunge, self.strike, self.dip):
-            buf += f.format(th, vp, vs, r, fl, a, tr, p, s, d)
+            buf += f.format(th, r, vp, vs, fl, a, tr, p, s, d)
 
         return buf
 
