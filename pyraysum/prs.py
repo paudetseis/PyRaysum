@@ -149,9 +149,9 @@ class Model(object):
             String to write into file header
         """
 
-        if not info.startswith('#'):
+        if not comment.startswith('#'):
             info = '# ' + info
-        if not info.endswith('\n'):
+        if not comment.endswith('\n'):
             info += '\n'
 
         if not isinstance(fname, str):
@@ -160,7 +160,7 @@ class Model(object):
 
         buf = '# Raysum velocity model created with PyRaysum\n'
         buf += '# on: {:}\n'.format(datetime.now().isoformat(' ', 'seconds'))
-        buf += info
+        buf += comment
         buf += self.__str__()
 
         with open(fname, 'w') as fil:
