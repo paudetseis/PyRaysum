@@ -150,9 +150,9 @@ class Model(object):
         """
 
         if not comment.startswith('#'):
-            info = '# ' + info
+            comment = '# ' + comment
         if not comment.endswith('\n'):
-            info += '\n'
+            comment += '\n'
 
         if not isinstance(fname, str):
             print("Warning: filename reverts to default 'sample.mod'")
