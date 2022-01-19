@@ -569,12 +569,11 @@ class StreamList(object):
         wiggle.rf_wiggles(self.rfs, scale=scale, tmin=tmin, tmax=tmax)
 
     def filter_streams(self, ftype, **kwargs):
-        for stream in self.streams:
-            stream.filter(ftype, **kwargs)
+        [stream.filter(ftype, **kwargs) for stream in self.streams]
 
     def filter_rfs(self, ftype, **kwargs):
-        for rf in self.rfs:
-            rf.filter(ftype, **kwargs)
+        [rf.filter(ftype, **kwargs) for rf in self.rfs]
+            
 
 
 def read_traces(traces, **kwargs):
