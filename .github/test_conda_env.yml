@@ -2,6 +2,7 @@ name: test
 channels:
   - conda-forge
 dependencies:
+  - numpy=1.21.5
   - obspy
   - pandas
   - pytest-cov
