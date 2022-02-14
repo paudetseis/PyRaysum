@@ -17,13 +17,14 @@ on:
 jobs:
   # This workflow contains a single job called "build"
   build:
+    name: Python ${{ matrix.python-version }}
     # The type of runner that the job will run on
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        python: [3.7, 3.8, 3.9]
+        python: ['3.7', '3.8', '3.9']
 
     defaults:
       run:
