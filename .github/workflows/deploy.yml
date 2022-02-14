@@ -44,6 +44,7 @@ jobs:
       - name: Conda info 
         run: |
           conda info
+          conda list
           conda config --add channels conda-forge
 
       - name: Install
