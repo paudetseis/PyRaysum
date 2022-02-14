@@ -58,7 +58,7 @@ jobs:
       #     bash <(curl -s https://codecov.io/bash)
 
       - name: Make docs
-        if: matrix.python == '3.8' 
+        if: matrix.python == '3.9' 
         run: |
           cd docs
           pip install sphinx_rtd_theme
