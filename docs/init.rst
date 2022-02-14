@@ -38,6 +38,12 @@ Dependencies
 By  default, both ``numpy`` and ``matplotlib`` are installed as dependencies
 of ``obspy``.
 
+.. warning::
+    There appears to be an issue when installing `obspy==1.2.2` with `numpy=1.22.2`. 
+    If you run into `AttributeError: 'numpy.int64' object has no attribute 'split'`,
+    you can downgrade to `numpy=1.21.5` with `conda install numpy=1.21.5` within the
+    conda environment (see below).
+
 Conda environment
 +++++++++++++++++
 
