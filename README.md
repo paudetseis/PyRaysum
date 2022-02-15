@@ -12,7 +12,7 @@ waves are supported.
 [![build](https://github.com/paudetseis/PyRaysum/workflows/Build/badge.svg)](https://github.com/paudetseis/PyRaysum/actions)
 [![codecov](https://codecov.io/gh/paudetseis/PyRaysum/branch/main/graph/badge.svg?token=59F1SWLM9Q)](https://codecov.io/gh/paudetseis/PyRaysum)
 ![GitHub](https://img.shields.io/github/license/paudetseis/pyraysum)
-[![view - Documentation](https://img.shields.io/badge/view-Documentation-blue?style=for-the-badge)](/docs/ "Go to project documentation")
+
 
 Installation, API documentation, scripts and tutorials are described at https://paudetseis.github.io/PyRaysum/
 
