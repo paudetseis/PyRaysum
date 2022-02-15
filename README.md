@@ -27,6 +27,6 @@ Examples of contributions include notebooks that describe published examples of 
 
 #### Citing
 
-If you use `PyRaysum` in your work, please cite the Zenodo DOI (not yet available) and the following paper:
+If you use `PyRaysum` in your work, please cite the [`Zenodo DOI`](https://doi.org/10.5281/zenodo.6095749) and the following paper:
 
 - Frederiksen, A.W., and Bostock, M.G. (1999) Modelling teleseismic waves in dipping anisotropic structures. Geophysical Journal International 141: 401-412.
