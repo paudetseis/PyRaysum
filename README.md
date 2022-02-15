@@ -16,7 +16,7 @@ waves are supported.
 
 Installation, API documentation, scripts and tutorials are described at https://paudetseis.github.io/PyRaysum/
 
-Authors: [`Pascal Audet`](https://www.uogeophysics.com/authors/admin/), `Wasja Bloch`](https://www.eoas.ubc.ca/people/wasjabloch) (Developers and Maintainers of `PyRaysum`) & [`Andrew Frederiksen`](https://umanitoba.ca/faculties/environment/departments/geo_sciences/research_facilities/AndrewFrederiksen.html) & (Developer of original `Fortran` version)
+Authors: [`Pascal Audet`](https://www.uogeophysics.com/authors/admin/), [`Wasja Bloch`](https://www.eoas.ubc.ca/people/wasjabloch) (Developers and Maintainers of `PyRaysum`) & [`Andrew Frederiksen`](https://umanitoba.ca/faculties/environment/departments/geo_sciences/research_facilities/AndrewFrederiksen.html) & (Developer of original `Fortran` version)
 
 #### Contributing
 
