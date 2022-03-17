@@ -17,13 +17,14 @@ on:
 jobs:
   # This workflow contains a single job called "build"
   build:
+    name: Python ${{ matrix.python-version }}
     # The type of runner that the job will run on
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        python: [3.7, 3.8, 3.9]
+        python: ['3.7', '3.8', '3.9']
 
     defaults:
       run:
@@ -43,6 +44,7 @@ jobs:
       - name: Conda info 
         run: |
           conda info
+          conda list
           conda config --add channels conda-forge
 
       - name: Install
@@ -57,7 +59,7 @@ jobs:
       #     bash <(curl -s https://codecov.io/bash)
 
       - name: Make docs
-        if: matrix.python == '3.8' 
+        if: matrix.python == '3.9' 
         run: |
           cd docs
           pip install sphinx_rtd_theme

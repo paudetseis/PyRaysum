@@ -37,7 +37,7 @@ def stack_all(stream, pws=False):
     Stacks all traces in ``Stream`` objects.
 
     Args:
-        stream (:class:`~obspy.core.Stream`)
+        stream (:class:`~obspy.core.Stream`):
             Contains traces to stack
         pws (bool):
             Enables Phase-Weighted Stacking
@@ -106,8 +106,8 @@ def rf_wiggles(rflist, btyp='baz', wvtype='P', pws=False, tmin=-5., tmax=20,
             Whether or not to save the figure
         ftitle (str):
             Title of figure to be saved
-        wvtype (str):
-            Wave type ('P', 'SV', or 'SH')
+        fmt (str):
+            Output format ('png', 'jpg', or 'eps', etc.)
 
     Returns:
         None
@@ -261,6 +261,8 @@ def stream_wiggles(streamlist, btyp='baz', wvtype='P', tmin=-5., tmax=20.,
             Whether or not to save the figure
         ftitle (str):
             Title of figure to be saved
+        fmt (str):
+            Output format ('png', 'jpg', or 'eps', etc.)
 
     Returns:
         None
@@ -380,7 +382,7 @@ def seis_wiggles(stream, tmin=-5., tmax=20., save=False,
         ftitle (str):
             Title of figure to be saved
         fmt (str):
-            Format of figure to be saved
+            Output format ('png', 'jpg', or 'eps', etc.)
 
     Returns:
         None

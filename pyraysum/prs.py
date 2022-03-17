@@ -27,6 +27,7 @@ Functions to interact with ``Raysum`` software
 '''
 import subprocess
 import types
+from datetime import datetime
 import numpy as np
 from scipy import signal
 import pandas as pd
@@ -40,18 +41,21 @@ import fraysum
 
 class Model(object):
     """
-    Model of the subsurface velocity structure 
+    Model of the subsurface seismic velocity structure 
     
-    ``model parameters``:
-        - thickn (np.ndarray): Thickness of layers (m) (shape ``(nlay)``)
-        - rho (np.ndarray): Density (kg/m^3) (shape ``(nlay)``)
-        - vp (np.ndarray): P-wave velocity (m/s) (shape ``(nlay)``)
-        - vs (np.ndarray): S-wave velocity (m/s) (shape ``(nlay)``)
-        - fvp (np.ndarray): P-wave velocity (m/s) (shape ``(maxlay)``)
-        - fvs (np.ndarray): S-wave velocity (m/s) (shape ``(maxlay)``)
+    ``Parameters``:
+        - thickn (np.ndarray): 
+            Thickness of layers (m) (shape ``(nlay)``)
+        - rho (np.ndarray): 
+            Density (kg/m^3) (shape ``(nlay)``)
+        - vp (np.ndarray): 
+            P-wave velocity (m/s) (shape ``(nlay)``)
+        - vs (np.ndarray): 
+            S-wave velocity (m/s) (shape ``(nlay)``)
         - flag (list of str, optional, defaut: ``1`` or isotropic):
             Flags for type of layer material (dimension ``nlay``)
-        - ani (np.ndarray, optional): Anisotropy (percent) (shape ``(nlay)``)
+        - ani (np.ndarray, optional): 
+            Anisotropy (percent) (shape ``(nlay)``)
         - trend (np.ndarray, optional):
             Trend of symmetry axis (degree) (shape ``(nlay)``)
         - plunge (np.ndarray, optional):
@@ -60,15 +64,25 @@ class Model(object):
             azimuth of interface in RHR (degree) (shape ``(nlay)``)
         - dip (np.ndarray, optional):
             dip of interface in RHR (degree) (shape ``(nlay)``)
-        - nlay (int): Number of layers
+        - nlay (int): 
+            Number of layers
 
-        To broadcast the model to the the fortran routine use:
-        - maxlay (int): Maximum number of layers defined in params.h
-        - fthickn (np.ndarray): Thickness of layers (m) (shape ``(maxlay)``)
-        - frho (np.ndarray): Density (kg/m^3) (shape ``(maxlay)``)
+        To broadcast the model to the the fortran routine use
+
+        - maxlay (int): 
+            Maximum number of layers defined in params.h
+        - fthickn (np.ndarray): 
+            Thickness of layers (m) (shape ``(maxlay)``)
+        - frho (np.ndarray): 
+            Density (kg/m^3) (shape ``(maxlay)``)
+        - fvp (np.ndarray): 
+            P-wave velocity (m/s) (shape ``(maxlay)``)
+        - fvs (np.ndarray): 
+            S-wave velocity (m/s) (shape ``(maxlay)``)
         - fflag (list of str, optional, defaut: ``1`` or isotropic):
             Flags for type of layer material (dimension ``maxlay``)
-        - fani (np.ndarray, optional): Anisotropy (percent) (shape ``(maxlay)``)
+        - fani (np.ndarray, optional): 
+            Anisotropy (percent) (shape ``(maxlay)``)
         - ftrend (np.ndarray, optional):
             Trend of symmetry axis (radians) (shape ``(maxlay)``)
         - fplunge (np.ndarray, optional):
@@ -78,10 +92,12 @@ class Model(object):
         - fdip (np.ndarray, optional):
             dip of interface in RHR (radians) (shape ``(maxlay)``)
 
-        Warning: To optimize construction of models, build the input arrays for
-        pyraysum.run_frs() in the correct shape.
+        .. note:: 
 
-        TODO: - a (np.ndarray): Elastic thickness (shape ``(3, 3, 3, 3, nlay)``)
+            To optimize construction of models, build the input arrays for
+            ``pyraysum.run_frs()`` in the correct shape.
+
+            TODO: ``- a (np.ndarray): Elastic thickness (shape ``(3, 3, 3, 3, nlay)``)``
     """
 
     def __init__(self, thickn, rho, vp, vs, flag=1,
@@ -89,15 +105,19 @@ class Model(object):
                  strike=None, dip=None, maxlay=15):
 
         def _get_val(v):
-            return (np.array([v] * self.nlay if isinstance(v, (int, float))
-                             else v) if v is not None else [0.]*self.nlay)
+            if v is not None:
+                return np.array([v] * self.nlay
+                                if isinstance(v, (int, float))
+                                else v)
+            else:
+                return np.array([0.]*self.nlay)
         self.nlay = len(thickn)
         self.thickn = np.array(thickn)
         self.rho = np.array(rho) if rho is not None else [None] * self.nlay
         self.vp = np.array(vp)
         self.vs = np.array(vs)
-        self.flag = ([flag] * self.nlay if isinstance(flag, int)
-                       else list(flag))
+        self.flag = np.array([flag] * self.nlay if isinstance(flag, int)
+                             else list(flag))
         self.ani = _get_val(ani)
         self.trend = _get_val(trend)
         self.plunge = _get_val(plunge)
@@ -119,40 +139,53 @@ class Model(object):
     def __len__(self):
         return self.nlay
 
+    def __str__(self):
+        buf = '# thickn     rho      vp      vs  flag aniso  trend  '
+        buf += 'plunge  strike   dip\n'
 
-    def print(self):
-        form = "{0:5.0f} {1:4.0f} {2:4.0f} {3:4.0f} {4} {5:5.2f} {6:5.2f} {7:5.2f} {8:5.0f} {9:5.0f}"
-        print('Model: ')
-        for i in range(self.nlay):
-            print(form.format(self.thickn[i], self.rho[i], self.vp[i], self.vs[i], 
-            self.flag[i], self.ani[i], self.trend[i], self.plunge[i], self.strike[i], 
-            self.dip[i]))
+        f = '{: 8.1f} {: 7.1f} {: 7.1f} {: 7.1f}    {: 1.0f} {: 5.1f} {: 6.1f}   '
+        f += '{: 5.1f}  {: 6.1f} {: 5.1f}\n'
 
+        for th, vp, vs, r, fl, a, tr, p, s, d in zip(
+                self.thickn, self.vp, self.vs, self.rho, self.flag, self.ani,
+                self.trend, self.plunge, self.strike, self.dip):
+            buf += f.format(th, r, vp, vs, fl, a, tr, p, s, d)
 
-    def write_model(self, filename='sample.mod'):
+        return buf
+
+    def save(self, fname='sample.mod', comment=''):
         """
-        Write model parameters to file to be processed by raysum
+        Save seismic velocity model to raysum model file
+
+        Args:
+            fname (str): Name of the output file
+            comment (str): String to write into file header
+
         """
 
-        if not isinstance(filename, str):
+        if not comment.startswith('#'):
+            comment = '# ' + comment
+        if not comment.endswith('\n'):
+            comment += '\n'
+
+        if not isinstance(fname, str):
             print("Warning: filename reverts to default 'sample.mod'")
-            filename = 'sample.mod'
+            fname = 'sample.mod'
 
-        file = open(filename, 'w')
-        file.writelines("# Sample model file used by Raysum")
-        for i in range(self.nlay):
-            file.writelines([
-                str(self.thickn[i])+" "+str(self.rho[i])+" " +
-                str(self.vp[i])+" "+str(self.vs[i])+" " +
-                str(self.flag[i])+" "+str(self.ani[i])+" " +
-                str(self.trend[i])+" "+str(self.plunge[i])+" " +
-                str(self.strike[i])+" "+str(self.dip[i])+"\n"])
-        file.close()
+        buf = '# Raysum velocity model created with PyRaysum\n'
+        buf += '# on: {:}\n'.format(datetime.now().isoformat(' ', 'seconds'))
+        buf += comment
+        buf += self.__str__()
 
+        with open(fname, 'w') as fil:
+            fil.write(buf)
 
     def plot(self, zmax=75.):
         """
         Plot model as both stair case and layers - show it
+
+        Args:
+            zmax (float): Maximum depth of model to plot (km)
 
         """
 
@@ -179,6 +212,15 @@ class Model(object):
         """
         Plot model as stair case and show it
 
+        Args:
+            zmax (float): 
+                Maximum depth of model to plot (km)
+            ax (plt.axis): 
+                Axis handle for plotting. If ``None``, show the plot
+
+        Returns:
+            (plt.axis): 
+                ax: Axis handle for plotting. 
         """
 
         # Defaults to not show the plot
@@ -233,10 +275,22 @@ class Model(object):
         """
         Plot model as horizontal layers and show it
 
-        TODO: Change current routine to painting approach
-        - [ ] paint background with top layer
-        - [ ] paint layer 1 from top to bottom (incl. dip layer)
-        - [ ] continue until bottom of model
+        Args:
+            zmax (float): 
+                Maximum depth of model to plot (km)
+            ax (plt.axis): 
+                Axis handle for plotting. If ``None``, show the plot
+
+        Returns:
+            (plt.axis): 
+                ax: Axis handle for plotting
+
+        .. note:: 
+
+            Change current routine for painting approach
+            - [ ] paint background with top layer
+            - [ ] paint layer 1 from top to bottom (incl. dip layer)
+            - [ ] continue until bottom of model
         """
 
         # Defaults to not show the plot
@@ -283,9 +337,20 @@ class Model(object):
 
         return ax
 
+
     def plot_interfaces(self, zmax=75, ax=None):
         """
         Plot model as interfaces with possibly dipping layers
+
+        Args:
+            zmax (float): 
+                Maximum depth of model to plot (km)
+            ax (plt.axis): 
+                Axis handle for plotting. If ``None``, show the plot
+
+        Returns:
+            (plt.axis): ax: Axis handle for plotting
+
         """
 
         # Defaults to not show the plot
@@ -347,12 +412,15 @@ class Model(object):
 
         return ax
 
+
 def read_model(modfile, encoding=None):
     """
-    Reads model parameters from file and returns a Model object.
+    Reads model parameters from file and returns an instance of class 
+    :class:`~pyraysum.prs.Model`.
 
     Returns:
-        Model object
+        (:class:`~pyraysum.prs.Model`): model: Seismic velocity model for current simulation
+
     """
     values = np.genfromtxt(modfile, dtype=None, encoding=encoding)
     return Model(*zip(*values))
@@ -360,31 +428,42 @@ def read_model(modfile, encoding=None):
 
 class Geometry(object):
     """
-    Recording greometry at the seismic station. Compute one synthetic trace for
+    Recording geometry at the seismic station. Compute one synthetic trace for
     each array element.
 
-    ``model parameters``:
-        - baz (np.ndarray): Ray backazimuths (deg)
-        - slow (np.ndarray): Ray slownesses (km/s)
-        - geom (np.ndarray): Array of zipped [baz, slow] pairs.
-        - dx (np.ndarray): North-offset of the seismic station (m)
-            (shape ``(ntr)``)
-        - dy (np.ndarray): East-offset of the seismic station (m)
-            (shape ``(ntr)``)
-        - ntr: (int) Number of traces
+    ``Parameters``:
+        - baz (np.ndarray): 
+            Ray backazimuths (deg)
+        - slow (np.ndarray): 
+            Ray slownesses (km/s)
+        - geom (np.ndarray): 
+            Array of zipped [baz, slow] pairs.
+        - dx (np.ndarray): 
+            North-offset of the seismic station (m) (shape ``(ntr)``)
+        - dy (np.ndarray): 
+            East-offset of the seismic station (m) (shape ``(ntr)``)
+        - ntr (int): 
+            Number of traces
 
         To broadcast the model to the the fortran routine use:
-        - maxtr (int): Maximum number of traces defined in params.h
-        - fbaz (np.ndarray): Ray backazimuth (radians) (shape ``(maxtr)``)
-        - fslow (np.ndarray): Ray slowness (m/s) (shape ``(maxtr)``)
-        - fdx (np.ndarray): North-offset of the seismic station (m)
-            (shape ``(maxtr)``)
-        - fdy (np.ndarray): East-offset of the seismic station (m)
-            (shape ``(maxtr)``)
 
-        Warning: To optimize construction of ray geometries, build the input
-        arrays for pyraysum.run_frs() in the correct shape.
+        - maxtr (int): 
+            Maximum number of traces defined in params.h
+        - fbaz (np.ndarray): 
+            Ray backazimuth (radians) (shape ``(maxtr)``)
+        - fslow (np.ndarray): 
+            Ray slowness (m/s) (shape ``(maxtr)``)
+        - fdx (np.ndarray): 
+            North-offset of the seismic station (m) (shape ``(maxtr)``)
+        - fdy (np.ndarray): 
+            East-offset of the seismic station (m) (shape ``(maxtr)``)
+
+    .. note::
+
+        To optimize construction of ray geometries, build the input
+        arrays for ``pyraysum.run_frs()`` in the correct shape.
     """
+
 
     def __init__(self, baz, slow, dx=[0], dy=[0], maxtr=500):
 
@@ -420,11 +499,29 @@ class Geometry(object):
         self.fdx = np.asfortranarray(np.append(self.dx, tail))
         self.fdy = np.asfortranarray(np.append(self.dy, tail))
 
+
     def __len__(self):
         return self.ntr
 
 
 class StreamList(object):
+    """
+    List of streams of 3-component synthetic seismograms produced by Raysum. 
+    Includes methods to calculate receiver functions, filter and plot the 
+    streams.
+
+    ``Parameters``:
+        - model (:class:`~pyraysum.prs.Model`): 
+            Instance of class :class:`~pyraysum.prs.Model`
+        - geom (:class:`~pyraysum.prs.Geometry`): 
+            Instance of class :class:`~pyraysum.prs.Geometry`
+        - streams (List): 
+            List of :class:`~obspy.core.Stream` objects.
+        - args (Dictionary): 
+            Dictionary attributes of all input arguments
+
+    """
+
 
     def __init__(self, model=None, geom=None, streams=None,
                  args=None):
@@ -434,12 +531,15 @@ class StreamList(object):
         self.streams = streams
         self.args = AttribDict(args)
 
+
     def calculate_rfs(self):
         """
-        Method to generate receiver functions from displacement traces.
+        Method to generate receiver functions from displacement traces. Also
+        stores ``rflist`` as attribute of the :class:`~pyraysum.prs.StreamList`
+        object.
 
         Returns:
-            (list):
+            (list): 
                 rflist: Stream containing Radial and Transverse receiver functions
 
         """
@@ -507,7 +607,20 @@ class StreamList(object):
 
         return rflist
 
+
     def plot(self, typ, **kwargs):
+        """ 
+
+        Plots the displacement seismograms and/or receiver functions stored in
+        :class:`~pyraysum.prs.StreamList` streams.
+
+        Args:
+            typ (str): 
+                Type of plot to show. Options are ``'streams'``, 
+                ``'rfs'``, or ``'all'`` for the displacement seismograms, 
+                receiver functions, or both
+
+        """
         if typ == 'streams':
             self.plot_streams(**kwargs)
         elif typ == 'rfs':
@@ -525,10 +638,25 @@ class StreamList(object):
             except:
                 raise(Exception("Cannot plot 'all'"))
         else:
-            msg = "'typ' has to be either 'streams' or 'rfs'"
+            msg = "'typ' has to be either 'streams', 'rfs' or 'all'"
             raise(TypeError(msg))
 
+
     def filter(self, typ, ftype, **kwargs):
+        """ 
+
+        Filters the displacement seismograms and/or receiver functions stored in
+        :class:`~pyraysum.prs.StreamList` streams.
+
+        Args:
+            typ (str): 
+                Type of plot to show. Options are ``'streams'``, 
+                ``'rfs'``, or ``'all'`` for the displacement seismograms, 
+                receiver functions, or both
+            ftype (str):
+                Type of filter to use. 
+
+        """
         if typ == 'streams':
             self.filter_streams(ftype, **kwargs)
         elif typ == 'rfs':
@@ -553,12 +681,11 @@ class StreamList(object):
         wiggle.rf_wiggles(self.rfs, scale=scale, tmin=tmin, tmax=tmax)
 
     def filter_streams(self, ftype, **kwargs):
-        for stream in self.streams:
-            stream.filter(ftype, **kwargs)
+        [stream.filter(ftype, **kwargs) for stream in self.streams]
 
     def filter_rfs(self, ftype, **kwargs):
-        for rf in self.rfs:
-            rf.filter(ftype, **kwargs)
+        [rf.filter(ftype, **kwargs) for rf in self.rfs]
+            
 
 
 def read_traces(traces, **kwargs):
@@ -578,22 +705,24 @@ def read_traces(traces, **kwargs):
         shift (float):
             Time shift in seconds
 
-        To interpret fraysum output, supply:
-        ntr (int):
-            Number of traces
-        npts (int):
-            Number of points per trace
+    .. note::
+        To interpret fraysum output, supply:``
+            ntr (int):
+                Number of traces
+            npts (int):
+                Number of points per trace``
 
     Returns:
-        (list): streamlist: List of Stream objects
+        (:class:`~pyraysum.prs.StreamList`): streamlist: List of Stream objects
 
     """
+
 
     def _make_stats(net=None, sta=None, stime=None, dt=None,
                     slow=None, baz=None, wvtype=None, channel=None,
                     taxis=None):
         """
-        Updates the ``stats`` doctionary from an obspy ``Trace`` object.
+        Updates the ``stats`` dictionary from an obspy ``Trace`` object.
 
         Args:
             net (str): Network name
@@ -609,6 +738,7 @@ def read_traces(traces, **kwargs):
         Returns:
             (:class:`~obspy.core.Trace`):
                 tr: Trace with updated stats
+
         """
 
         stats = AttribDict()
@@ -717,10 +847,11 @@ def filtered_rf_array(sspread_arr, arr_out, ntr, npts, dt, fmin, fmax):
     """
     Reads the traces produced by seis_spread and returns array of filtered
     receiver functions. Roughly equivalent to subsequent calls to
-    ``read_traces()``, ``Stream.calculate_rfs()``, and ``Stream.filter()``,
-    stripped down for inversion purpusos.
+    ``read_traces()``, ``StreamList.calculate_rfs()``, and ``StreamList.filter()``,
+    stripped down for inversion purposes.
+
     - Reshapes them to [traces[components[amplitudes]] order
-    - Performs spectral devision to get receiver functions
+    - Performs spectral division to get receiver functions
     - Filters them
 
     Args:
@@ -740,9 +871,8 @@ def filtered_rf_array(sspread_arr, arr_out, ntr, npts, dt, fmin, fmax):
             Upper filter corner
 
     Returns:
-        Nothing, output is written to arrout
-        array (np.array):
-            array of filtered receiver functions
+        None:
+            Output is written to arrout (np.ndarray)
 
     """
 
@@ -780,7 +910,7 @@ def run_frs(model, geometry, verbose=False, wvtype='P', mults=2,
     Calls the compiled call-seis-spread binary and stores traces in a list of
     Stream objects
 
-    Input:
+    Args:
         model (:class:`~pyraysum.prs.Model`):
             Subsurface velocity structure model
         model (:class:`~pyraysum.prs.Geometry`):
@@ -808,7 +938,26 @@ def run_frs(model, geometry, verbose=False, wvtype='P', mults=2,
             Whether or not to calculate RFs
 
     Returns:
-        (list): streamlist: List of Stream objects
+        (:class:`~pyraysum.prs.StreamList`): streamlist: List of Stream objects
+
+    Example
+    -------
+    >>> from pyraysum import prs, Model, Geometry
+    >>> # Define two-layer model with isotropic crust over isotropic half-space
+    >>> model = Model([30000., 0], [2800., 3300.], [6000., 8000.], [3600., 4500.])
+    >>> geom = Geometry(0., 0.06) # baz = 0 deg; slow = 0.06 x/km
+    >>> npts = 1500
+    >>> dt = 0.025      # s
+    >>> streamlist = prs.run_frs(model, geom, npts=npts, dt=dt)
+    >>> type(streamlist[0])
+    <class 'obspy.core.stream.Stream'>
+    >>> print(st)
+    3 Trace(s) in Stream:
+    3 Trace(s) in Stream:
+    .synt..BHN | 2020-11-30T21:04:43.890339Z - 2020-11-30T21:05:21.365339Z | 40.0 Hz, 1500 samples
+    .synt..BHE | 2020-11-30T21:04:43.891418Z - 2020-11-30T21:05:21.366418Z | 40.0 Hz, 1500 samples
+    .synt..BHZ | 2020-11-30T21:04:43.891692Z - 2020-11-30T21:05:21.366692Z | 40.0 Hz, 1500 samples   
+    >>> st.plot(size=(600, 450))
 
     """
 
