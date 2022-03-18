@@ -114,6 +114,7 @@ class Model(object):
                                 else v)
             else:
                 return np.array([0.]*self.nlay)
+
         self.nlay = len(thickn)
         self.thickn = np.array(thickn)
         self.rho = np.array(rho) if rho is not None else [None] * self.nlay
@@ -132,6 +133,9 @@ class Model(object):
 
         self._set_fattributes()
 
+        self._useratts = ['thickn', 'rho', 'vp', 'vs', 'vpvs', 'flag', 'ani',
+                          'trend', 'plunge', 'strike', 'dip']
+
 
     def __len__(self):
         return self.nlay
@@ -149,7 +153,7 @@ class Model(object):
             buf += f.format(th, r, vp, vs, fl, a, tr, p, s, d)
 
         return buf
-       
+
     def _set_fattributes(self):
         tail = np.zeros(self.maxlay - self.nlay)
         self.fthickn = np.asfortranarray(np.append(self.thickn, tail))
@@ -184,6 +188,41 @@ class Model(object):
             raise ValueError(msg)
 
         self._set_fattributes()
+
+    def split(self, n):
+        """
+        Split layer n into two with half the thickness each, but otherwise
+        identical parameters.
+
+        Args:
+            n : (int)
+                Index of the layer to split
+        """
+
+        for att in self._useratts:
+            self.__dict__[att] = np.insert(self.__dict__[att], n,
+                                           self.__dict__[att][n])
+
+        self.thickn[n] /= 2
+        self.thickn[n+1] /= 2
+        self.nlay += 1
+
+        self.update()
+
+    def remove(self, n):
+        """
+        Remove layer n
+
+        Args:
+            n : (int)
+                Index of the layer to remove
+        """
+
+        for att in self._useratts:
+            self.__dict__[att] = np.delete(self.__dict__[att], n)
+
+        self.nlay -= 1
+        self.update()
 
     def save(self, fname='sample.mod', comment=''):
         """
