@@ -52,6 +52,9 @@ class Model(object):
             P-wave velocity (m/s) (shape ``(nlay)``)
         - vs (np.ndarray): 
             S-wave velocity (m/s) (shape ``(nlay)``)
+        - vpvs (np.ndarray): 
+            P-to-S velocity ratio (shape ``(nlay)``)
+            Ignored unless ``update`` with keyword 'fix' is used.
         - flag (list of str, optional, defaut: ``1`` or isotropic):
             Flags for type of layer material (dimension ``nlay``)
         - ani (np.ndarray, optional): 
@@ -116,6 +119,7 @@ class Model(object):
         self.rho = np.array(rho) if rho is not None else [None] * self.nlay
         self.vp = np.array(vp)
         self.vs = np.array(vs)
+        self.vpvs = self.vp / self.vs
         self.flag = np.array([flag] * self.nlay if isinstance(flag, int)
                              else list(flag))
         self.ani = _get_val(ani)
@@ -124,17 +128,10 @@ class Model(object):
         self.strike = _get_val(strike)
         self.dip = _get_val(dip)
 
-        tail = np.zeros(maxlay - self.nlay)
-        self.fthickn = np.asfortranarray(np.append(self.thickn, tail))
-        self.frho = np.asfortranarray(np.append(self.rho, tail))
-        self.fvp = np.asfortranarray(np.append(self.vp, tail))
-        self.fvs = np.asfortranarray(np.append(self.vs, tail))
-        self.fflag = np.asfortranarray(np.append(self.flag, tail))
-        self.fani = np.asfortranarray(np.append(self.ani, tail))
-        self.ftrend = np.asfortranarray(np.append(self.trend, tail) * np.pi/180)
-        self.fplunge = np.asfortranarray(np.append(self.plunge, tail) * np.pi/180)
-        self.fstrike = np.asfortranarray(np.append(self.strike, tail) * np.pi/180)
-        self.fdip = np.asfortranarray(np.append(self.dip, tail) * np.pi/180)
+        self.maxlay = maxlay
+
+        self._set_fattributes()
+
 
     def __len__(self):
         return self.nlay
@@ -152,6 +149,41 @@ class Model(object):
             buf += f.format(th, r, vp, vs, fl, a, tr, p, s, d)
 
         return buf
+       
+    def _set_fattributes(self):
+        tail = np.zeros(self.maxlay - self.nlay)
+        self.fthickn = np.asfortranarray(np.append(self.thickn, tail))
+        self.frho = np.asfortranarray(np.append(self.rho, tail))
+        self.fvp = np.asfortranarray(np.append(self.vp, tail))
+        self.fvs = np.asfortranarray(np.append(self.vs, tail))
+        self.fflag = np.asfortranarray(np.append(self.flag, tail))
+        self.fani = np.asfortranarray(np.append(self.ani, tail))
+        self.ftrend = np.asfortranarray(np.append(self.trend, tail) * np.pi/180)
+        self.fplunge = np.asfortranarray(np.append(self.plunge, tail) * np.pi/180)
+        self.fstrike = np.asfortranarray(np.append(self.strike, tail) * np.pi/180)
+        self.fdip = np.asfortranarray(np.append(self.dip, tail) * np.pi/180)
+
+    def update(self, fix=None):
+        """
+        Update fortran attributes after user attributes have changed.
+
+        Args:
+            fix : None or (str)
+                Change vp or vs according to vpvs attribute, where vpvs = vp/vs
+                None: Ignore vpvs attribute
+                'vp': Keep vp fixed and set vs = vp / vpvs
+                'vs': Keep vs fixed and set vp = vs * vpvs
+        """
+
+        if fix == 'vp':
+            self.vs = self.vp / self.vpvs
+        elif fix == 'vs':
+            self.vp = self.vs * self.vpvs
+        elif fix:
+            msg = 'Unknown fix keyword: ' + fix
+            raise ValueError(msg)
+
+        self._set_fattributes()
 
     def save(self, fname='sample.mod', comment=''):
         """
