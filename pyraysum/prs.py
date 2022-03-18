@@ -183,7 +183,9 @@ class Model(object):
             self.vs = self.vp / self.vpvs
         elif fix == 'vs':
             self.vp = self.vs * self.vpvs
-        elif fix:
+        elif not fix:
+            self.vpvs = self.vp / self.vs
+        else:
             msg = 'Unknown fix keyword: ' + fix
             raise ValueError(msg)
 
