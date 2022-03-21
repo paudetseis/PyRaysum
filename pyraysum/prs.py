@@ -191,7 +191,7 @@ class Model(object):
 
         self._set_fattributes()
 
-    def split(self, n):
+    def split_layer(self, n):
         """
         Split layer n into two with half the thickness each, but otherwise
         identical parameters.
@@ -211,7 +211,7 @@ class Model(object):
 
         self.update()
 
-    def remove(self, n):
+    def remove_layer(self, n):
         """
         Remove layer n
 
