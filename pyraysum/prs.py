@@ -191,6 +191,101 @@ class Model(object):
 
         self._set_fattributes()
 
+    def change(self, commands):
+        """
+        Change model layers using simple command sting.
+
+        Args:
+
+        commands (str)
+        An arbitray number command substrings seperated by ';'. Each substring
+        has the form:
+
+        KEY LAYER SIGN INCREMET;
+        
+        where
+
+        KEY [t|vp|vs|psp|pss|s|d|a|tr|pl] is the attribute to change
+            t    thicknes (km)
+            vp   P wave velocity (m/s)
+            vs   S wave velocity (m/s)
+            psp  P to S wave velocity ratio with fixed S wave velocity
+            pss  P to S wave velocity ratio with fixed P wave velocity
+            s    strike (deg)
+            d    dip (deg)
+            a    anisotropy %
+            tr   trend of the anisotropy axis (deg)
+            pl   plunge ot the anisotropy axis (deg)
+        
+        LAYER (int) is the index of the layer
+        
+        SIGN [+|-] is to increase / decrease the attribute
+        
+        INCREMENT (float) is the amount of change
+
+        Example:
+
+        change('t0+10;psp0-0.2;d1+5') does
+        1. Increase the thickness of the first layer by 10 km
+        2. Decrease Vp/Vs of the of the first layer by 0.2, holding Vs fixed
+        3. Increase the dip of the second layer by 5 degree
+        """
+        ATT = {'t': 'thickn',
+               'vp': 'vp',
+               'vs': 'vs',
+               'psp': 'vpvs',
+               'pss': 'vpvs',
+               's': 'strike',
+               'd': 'dip',
+               'a': 'ani',
+               'tr': 'trend',
+               'pl': 'plunge'}
+
+        for command in commands.split(';'):
+            if not command:
+                continue
+
+            # split by sign
+            for sign in '+-':
+                ans = command.split(sign)
+                if len(ans) == 2:
+                    break
+
+            (attlay, inc) = ans
+
+            # Split attribute and layer
+            for n, char in enumerate(attlay):
+                if char in '0123456789':
+                    break
+
+            att = attlay[:n]
+            lay = int(attlay[n:])
+            inc = float(inc)
+
+            # convert thicknes to kilometer
+            if att == 't':
+                inc *= 1000
+
+            # Which velocity to fix
+            fix = None
+            if att == 'pss':
+                fix = 'vp'
+            if att == 'psp':
+                fix = 'vs'
+
+            attribute = ATT[att]
+
+            # Apply
+            if sign == '+':
+                MOD.__dict__[attribute][lay] += inc
+            if sign == '-':
+                MOD.__dict__[attribute][lay] -= inc
+
+            self.update(fix=fix)
+
+            msg = 'Changed: {:}[{:d}] {:}= {:}'.format(attribute, lay, sign, inc)
+            print(msg)
+
     def split_layer(self, n):
         """
         Split layer n into two with half the thickness each, but otherwise
