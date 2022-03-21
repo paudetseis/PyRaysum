@@ -277,9 +277,9 @@ class Model(object):
 
             # Apply
             if sign == '+':
-                MOD.__dict__[attribute][lay] += inc
+                self.__dict__[attribute][lay] += inc
             if sign == '-':
-                MOD.__dict__[attribute][lay] -= inc
+                self.__dict__[attribute][lay] -= inc
 
             self.update(fix=fix)
 
