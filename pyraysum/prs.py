@@ -281,6 +281,11 @@ class Model(object):
             if sign == '-':
                 self.__dict__[attribute][lay] -= inc
 
+            # Set isotropy flag iff layer is isotropic
+            self.flag[lay] = 1
+            if self.ani[lay] != 0:
+                self.flag[lay] = 0
+
             self.update(fix=fix)
 
             msg = 'Changed: {:}[{:d}] {:}= {:}'.format(attribute, lay, sign, inc)
