@@ -672,10 +672,42 @@ class Geometry(object):
         self.fdx = np.asfortranarray(np.append(self.dx, tail))
         self.fdy = np.asfortranarray(np.append(self.dy, tail))
 
-
     def __len__(self):
         return self.ntr
 
+    def __str__(self):
+        out = ''
+        form = '{: 7.2f} {: 8.4f} {:7.2f} {:7.2f}\n'
+        for bb, ss, xx, yy in zip(self.baz, self.slow, self.dx, self.dy):
+            out += form.format(bb, ss, xx, yy)
+        return out
+
+    def save(self, fname='sample.geom'):
+        """
+        Save ray geometry as ascii file
+
+        Args:
+            fname: (str)
+            Name of file
+        """
+
+        with open(fname, "w") as f:
+            f.write(self.__str__())
+
+        print('Geometry saved to: ' + fname)
+
+def read_geometry(geomfile, encoding=None):
+    """
+    Reads geometry parameters from file and returns an instance of class 
+    :class:`~pyraysum.prs.Geometry`.
+
+    Returns:
+        (:class:`~pyraysum.prs.Geometry`):
+        geometry: Ray geometry for current simulation
+
+    """
+    values = np.genfromtxt(geomfile, dtype=None, encoding=encoding)
+    return Geometry(*zip(*values))
 
 class StreamList(object):
     """
