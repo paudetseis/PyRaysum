@@ -375,6 +375,14 @@ class Model(object):
         self.nlay -= bottom - top
         self.update()
 
+    def times(self):
+        """
+        Arrival times (seconds) of the direct conversions for vertically
+        propagating tays.
+        """
+        # TODO: Supply Geometry object to calculate for a given ray geometry
+        return np.cumsum(self.thickn/self.vs - self.thickn/self.vp)[:-1]
+
     def save(self, fname='sample.mod', comment=''):
         """
         Save seismic velocity model to raysum model file
