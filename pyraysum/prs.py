@@ -326,6 +326,55 @@ class Model(object):
         self.nlay -= 1
         self.update()
 
+    def combine_layers(self, top, bottom):
+        """
+        Combine layers between top and bottom index into one with summed
+        thicknes and average vp, vs, and rho.
+
+        Args:
+            top : (int)
+                Index of topmost layer to include in combination
+            bottom : (int)
+                Index of bottommost layer to include in combination
+
+        Raises:
+            IndexError if bottom less or equal top
+            ValueError if any layer is anisotropic
+            ValueError if any layer has a differs in strike or dip
+        """
+        if bottom <= top:
+            raise IndexError('bottom must be larger than top.')
+
+        bot = bottom + 1
+
+        if not all(self.flag[top:bot]):
+            raise ValueError('Can only combine isotropic layers')
+
+        if not all(self.dip[top:bot][0] == self.dip[top:bot]):
+            raise ValueError('All layers must have the same dip')
+
+        if not all(self.strike[top:bot][0] == self.strike[top:bot]):
+            raise ValueError('All layers must have the same strike')
+
+        thickn = sum(self.thickn[top:bot])
+        weights = self.thickn[top:bot] / thickn
+
+        layer = {'thickn': thickn,
+                 'vp': sum(self.vp[top:bot] * weights),
+                 'vs': sum(self.vs[top:bot] * weights),
+                 'rho': sum(self.rho[top:bot] * weights)}
+
+        for att in self._useratts:
+            try:
+                self.__dict__[att][top] = layer[att]
+            except KeyError:
+                pass
+            self.__dict__[att] = np.delete(self.__dict__[att],
+                                           range(top+1, bot))
+
+        self.nlay -= bottom - top
+        self.update()
+
     def save(self, fname='sample.mod', comment=''):
         """
         Save seismic velocity model to raysum model file
