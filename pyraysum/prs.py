@@ -201,16 +201,18 @@ class Model(object):
         An arbitray number command substrings seperated by ';'. Each substring
         has the form:
 
-        KEY LAYER SIGN INCREMET;
+        KEY LAYER SIGN VAL;
         
         where
 
         KEY [t|vp|vs|psp|pss|s|d|a|tr|pl] is the attribute to change
             t    thicknes (km)
-            vp   P wave velocity (m/s)
-            vs   S wave velocity (m/s)
+            vp   P wave velocity (km/s)
+            vs   S wave velocity (km/s)
             psp  P to S wave velocity ratio with fixed S wave velocity
+                 (changing P wave velocity)
             pss  P to S wave velocity ratio with fixed P wave velocity
+                 (changing S wave velocity)
             s    strike (deg)
             d    dip (deg)
             a    anisotropy %
@@ -219,16 +221,18 @@ class Model(object):
         
         LAYER (int) is the index of the layer
         
-        SIGN [+|-] is to increase / decrease the attribute
+        SIGN [=|+|-] is to set / increase / decrease the attribute
         
-        INCREMENT (float) is the amount of change
+        VAL (float) is the value to which to change or by which to increase
+                    or decrease
 
         Example:
 
-        change('t0+10;psp0-0.2;d1+5') does
+        Model.change('t0+10;psp0-0.2;d1+5;s1=45') does
         1. Increase the thickness of the first layer by 10 km
         2. Decrease Vp/Vs of the of the first layer by 0.2, holding Vs fixed
         3. Increase the dip of the second layer by 5 degree
+        4. Set the strike of the second layer to 45 degree
         """
         ATT = {'t': 'thickn',
                'vp': 'vp',
@@ -246,7 +250,7 @@ class Model(object):
                 continue
 
             # split by sign
-            for sign in '+-':
+            for sign in '=+-':
                 ans = command.split(sign)
                 if len(ans) == 2:
                     break
@@ -258,12 +262,12 @@ class Model(object):
                 if char in '0123456789':
                     break
 
-            att = attlay[:n]
+            att = attlay[:n].strip()
             lay = int(attlay[n:])
             inc = float(inc)
 
-            # convert thicknes to kilometer
-            if att == 't':
+            # convert thicknes and velocities from kilometers
+            if att in ['t', 'vp', 'vs']:
                 inc *= 1000
 
             # Which velocity to fix
@@ -276,9 +280,12 @@ class Model(object):
             attribute = ATT[att]
 
             # Apply
-            if sign == '+':
+            if sign == '=':
+                self.__dict__[attribute][lay] = inc
+                sign = '' # to print nicely below
+            elif sign == '+':
                 self.__dict__[attribute][lay] += inc
-            if sign == '-':
+            elif sign == '-':
                 self.__dict__[attribute][lay] -= inc
 
             # Set isotropy flag iff layer is isotropic
