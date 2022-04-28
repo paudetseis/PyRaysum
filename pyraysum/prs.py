@@ -193,46 +193,53 @@ class Model(object):
 
     def change(self, commands):
         """
-        Change model layers using simple command sting.
+        Change model layers using a command sting.
 
         Args:
+            commands (str)
 
-        commands (str)
-        An arbitray number command substrings seperated by ';'. Each substring
-        has the form:
+            An arbitray number command substrings seperated by ';'. Each
+            substring has the form:
 
-        KEY LAYER SIGN VAL;
-        
-        where
+            KEY LAYER SIGN VAL;
 
-        KEY [t|vp|vs|psp|pss|s|d|a|tr|pl] is the attribute to change
-            t    thicknes (km)
-            vp   P wave velocity (km/s)
-            vs   S wave velocity (km/s)
-            psp  P to S wave velocity ratio with fixed S wave velocity
-                 (changing P wave velocity)
-            pss  P to S wave velocity ratio with fixed P wave velocity
-                 (changing S wave velocity)
-            s    strike (deg)
-            d    dip (deg)
-            a    anisotropy %
-            tr   trend of the anisotropy axis (deg)
-            pl   plunge ot the anisotropy axis (deg)
-        
-        LAYER (int) is the index of the layer
-        
-        SIGN [=|+|-] is to set / increase / decrease the attribute
-        
-        VAL (float) is the value to which to change or by which to increase
-                    or decrease
+            where
+
+            KEY [t|vp|vs|psp|pss|s|d|a|tr|pl] is the attribute to change
+
+                t    thicknes (km)
+                vp   P wave velocity (km/s)
+                vs   S wave velocity (km/s)
+                psp  P to S wave velocity ratio with fixed S wave velocity
+                     (changing P wave velocity)
+                pss  P to S wave velocity ratio with fixed P wave velocity
+                     (changing S wave velocity)
+                s    strike (deg)
+                d    dip (deg)
+                a    anisotropy %
+                tr   trend of the anisotropy axis (deg)
+                pl   plunge ot the anisotropy axis (deg)
+
+            LAYER (int) is the index of the layer
+
+            SIGN [=|+|-] is to set / increase / decrease the attribute
+
+            VAL (float) is the value to which to change or by which to increase
+                        or decrease
+
+        Returns:
+            changed (list of 3*tuple)
+               List of changes applied of the form:
+               (attribute, layer, newvalue)
 
         Example:
 
-        Model.change('t0+10;psp0-0.2;d1+5;s1=45') does
-        1. Increase the thickness of the first layer by 10 km
-        2. Decrease Vp/Vs of the of the first layer by 0.2, holding Vs fixed
-        3. Increase the dip of the second layer by 5 degree
-        4. Set the strike of the second layer to 45 degree
+            Model.change('t0+10;psp0-0.2;d1+5;s1=45') does
+            1. Increase the thickness of the first layer by 10 km
+            2. Decrease Vp/Vs of the of the first layer by 0.2, holding Vs
+               fixed
+            3. Increase the dip of the second layer by 5 degree
+            4. Set the strike of the second layer to 45 degree
         """
         ATT = {'t': 'thickn',
                'vp': 'vp',
@@ -245,30 +252,32 @@ class Model(object):
                'tr': 'trend',
                'pl': 'plunge'}
 
+        changed = []
         for command in commands.split(';'):
+            command = command.strip()
             if not command:
                 continue
 
             # split by sign
             for sign in '=+-':
-                ans = command.split(sign)
+                ans = command.split(sign, maxsplit=1)
                 if len(ans) == 2:
                     break
 
-            (attlay, inc) = ans
+            (attlay, val) = ans
 
             # Split attribute and layer
             for n, char in enumerate(attlay):
                 if char in '0123456789':
                     break
 
-            att = attlay[:n].strip()
+            att = attlay[:n]
             lay = int(attlay[n:])
-            inc = float(inc)
+            val = float(val)
 
             # convert thicknes and velocities from kilometers
             if att in ['t', 'vp', 'vs']:
-                inc *= 1000
+                val *= 1000
 
             # Which velocity to fix
             fix = None
@@ -281,12 +290,12 @@ class Model(object):
 
             # Apply
             if sign == '=':
-                self.__dict__[attribute][lay] = inc
-                sign = '' # to print nicely below
+                self.__dict__[attribute][lay] = val
+                sign = ''  # to print nicely below
             elif sign == '+':
-                self.__dict__[attribute][lay] += inc
+                self.__dict__[attribute][lay] += val
             elif sign == '-':
-                self.__dict__[attribute][lay] -= inc
+                self.__dict__[attribute][lay] -= val
 
             # Set isotropy flag iff layer is isotropic
             self.flag[lay] = 1
@@ -295,8 +304,12 @@ class Model(object):
 
             self.update(fix=fix)
 
-            msg = 'Changed: {:}[{:d}] {:}= {:}'.format(attribute, lay, sign, inc)
+            msg = 'Changed: {:}[{:d}] {:}= {:}'.format(
+                    attribute, lay, sign, val)
             print(msg)
+            changed.append((attribute, lay, self.__dict__[attribute][lay]))
+
+        return changed
 
     def split_layer(self, n):
         """
@@ -614,9 +627,12 @@ class Model(object):
                 ax.text(xs[-1], zs[-1], '>{:.0f}°'.format(dipdir),
                         ha='left', va='center')
 
-            info = ('$V_P = {:.1f}$km/s, $V_S = {:.1f}$km/s, '
+            info = ('$V_P = {:.1f}$km/s, '
+                    '$V_S = {:.1f}$km/s, '
+                    '$V_P/V_S = {:.2f}$, '
                     '$\\rho = {:.1f}$kg/m$^3$').format(
-                    self.vp[i]/1000, self.vs[i]/1000, self.rho[i]/1000)
+                        self.vp[i]/1000, self.vs[i]/1000,
+                        self.vpvs[i], self.rho[i]/1000)
             ax.text(0, depth, info,
                     rotation=-self.dip[i],
                     rotation_mode='anchor',
