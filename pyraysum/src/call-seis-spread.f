@@ -65,7 +65,7 @@ Cf2py intent(out) :: Tr_cart, Tr_ph
 c ==================
 c Internal variables
 c Scratch variables:
-        integer j, verb
+        integer j, verb, il
         real amp_in
         logical verbose
 
@@ -108,6 +108,14 @@ c Determine initial phase
         if (verbose) then
           write (*,*) 'Initial phase is ',iphname
         end if
+
+        do il=1,nlay
+          if (thick(il) .lt. 0) then
+            write (*,*) 'WARNING: Thickness of layer was negative.'
+            write (*,*) '         Set to 0.'
+            thick(il) = 0
+          end if
+        end do
 
 c Write out model for testing      
         if (verbose) then
