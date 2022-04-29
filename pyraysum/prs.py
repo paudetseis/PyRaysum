@@ -774,6 +774,7 @@ class Geometry(object):
 
         print('Geometry saved to: ' + fname)
 
+
 def read_geometry(geomfile, encoding=None):
     """
     Reads geometry parameters from file and returns an instance of class 
@@ -787,10 +788,126 @@ def read_geometry(geomfile, encoding=None):
     values = np.genfromtxt(geomfile, dtype=None, encoding=encoding)
     return Geometry(*zip(*values))
 
+
+class RC(object):
+    """
+    Run Controll parameters for run_frs()
+
+    ``Parameters``:
+        wvtype (str):
+            Wave type of incoming wavefield ('P', 'SV', or 'SH')
+        mults (int):
+            ID for calculating free surface multiples
+            ('0': no multiples, '1': Moho only, '2': all first-order)
+        npts (int):
+            Number of samples in time series
+        dt (float):
+            Sampling distance in seconds
+        align (int):
+            ID for alignment of seismograms ('1': align at 'P',
+            '2': align at 'SV' or 'SH')
+        shift (float or None):
+            Time shift in seconds (positive shift moves seismograms
+            to greater lags). If None, set to dt, which is most often the desired
+            behaviour.
+        rot (int):
+            ID for rotation: 0 is NEZ, 1 is RTZ, 2 is PVH
+        verbose (int):
+            Verbosity. 0 - silent; 1 - verbose
+
+    ``Attributes``:
+        parameters (tuple):
+            parameters in order expected by run_frs() and call_seis_spread()
+    """
+
+    def __init__(self, verbose=0, wvtype='P', mults=2,
+                 npts=300, dt=0.025, align=1, shift=None, rot=0):
+
+        if wvtype not in ['P', 'SV', 'SH']:
+            msg = "wvtype must be 'P', 'SV', or 'SH', not: " + wvtype
+            raise ValueError(msg)
+
+        if mults not in [0, 1, 2, '0', '1', '2']:
+            msg = "mults must be 0, 1, or 2, not: " + wvtype
+            raise ValueError(msg)
+
+        if align not in [1, 2, '1', '2']:
+            msg = "align must be 1, or 2, not: " + wvtype
+            raise ValueError(msg)
+
+        self.verbose = int(verbose)
+        self.wvtype = wvtype
+        self.mults = int(mults)
+        self.npts = int(npts)
+        self.dt = float(dt)
+        self.align = int(align)
+        self.rot = int(rot)
+        
+        if shift is None:
+            self.shift = self.dt
+        else:
+            self.shift = float(shift)
+
+        self.parameters = (self.wvtype, self.mults, self.npts, self.dt,
+                           self.align, self.shift, self.rot, self.verbose)
+
+
+    def __str__(self):
+        out = "# Verbosity\n"
+        out += "{:}\n".format(int(self.verbose))
+        out += "# Phase name\n"
+        out += "{:}\n".format(self.wvtype)
+        out += "# Multiples: 0 for none, 1 for Moho, 2 all first-order\n"
+        out += "{:}\n".format(self.mults)
+        out += "# Number of samples per trace\n"
+        out += "{:}\n".format(self.npts)
+        out += "# Sample rate (seconds)\n"
+        out += "{:}\n".format(self.dt)
+        out += "# Alignment: 0 is none, 1 aligns on P\n"
+        out += "{:}\n".format(self.align)
+        out += "# Shift or traces (seconds)\n"
+        out += "{:}\n".format(self.shift)
+        out += "# Rotation to output: 0 is NEZ, 1 is RTZ, 2 is PVH\n"
+        out += "{:}\n".format(self.rot)
+        return out
+
+    def save(self, fname='raysum-param'):
+        """
+        Save as raysum parameter file
+
+        Args:
+            fname: (str)
+            Name of file
+        """
+
+        with open(fname, "w") as f:
+            f.write(self.__str__())
+
+
+def read_rc(paramfile):
+    """
+    Reads raysum runcontroll parameters from file and returns an instance of class
+    :class:`~pyraysum.prs.RC`.
+
+    Returns:
+        (:class:`~pyraysum.prs.Parameter`):
+    """
+    with open(paramfile, 'r') as f:
+        lines = f.readlines()
+
+    values = []
+    for line in lines:
+        line = line.strip()
+        if line.startswith('#'):
+            continue
+        values.append(line)
+    return RC(*zip(*values))
+
+
 class StreamList(object):
     """
-    List of streams of 3-component synthetic seismograms produced by Raysum. 
-    Includes methods to calculate receiver functions, filter and plot the 
+    List of streams of 3-component synthetic seismograms produced by Raysum.
+    Includes methods to calculate receiver functions, filter and plot the
     streams.
 
     ``Parameters``:
@@ -1185,8 +1302,8 @@ def filtered_rf_array(sspread_arr, arr_out, ntr, npts, dt, fmin, fmax):
             fftshift(np.real(ifft(np.divide(ft_rft, ft_ztr)))))
 
 
-def run_frs(model, geometry, verbose=False, wvtype='P', mults=2,
-            npts=300, dt=0.025, align=1, shift=None, rot=0, rf=False):
+def run_frs(model, geometry, wvtype='P', mults=2, npts=300, dt=0.025, align=1,
+            shift=None, rot=0, verbose=0, rf=False, rc=None):
     """
     Run Fortran Raysum
 
@@ -1196,10 +1313,8 @@ def run_frs(model, geometry, verbose=False, wvtype='P', mults=2,
     Args:
         model (:class:`~pyraysum.prs.Model`):
             Subsurface velocity structure model
-        model (:class:`~pyraysum.prs.Geometry`):
+        geometry (:class:`~pyraysum.prs.Geometry`):
             Recording geometry
-        verbose (bool):
-            Whether or not to increase verbosity of Raysum
         wvtype (str):
             Wave type of incoming wavefield ('P', 'SV', or 'SH')
         mults (int):
@@ -1214,11 +1329,16 @@ def run_frs(model, geometry, verbose=False, wvtype='P', mults=2,
             '2': align at 'SV' or 'SH')
         shift (float):
             Time shift in seconds (positive shift moves seismograms
-            to greater lags)
+            to greater lags). If None, set to dt, which is most often the desired
+            behaviour.
         rot (int):
             ID for rotation: 0 is NEZ, 1 is RTZ, 2 is PVH
+        verbose (int):
+            Whether or not to increase verbosity of Raysum
         rf (bool):
             Whether or not to calculate RFs
+        rc (:class:`~pyraysum.prs.RC`):
+            Overwrite kwargs with parameters stored here.
 
     Returns:
         (:class:`~pyraysum.prs.StreamList`): streamlist: List of Stream objects
@@ -1247,7 +1367,7 @@ def run_frs(model, geometry, verbose=False, wvtype='P', mults=2,
     args = AttribDict(**locals())
 
     kwlist = ['model', 'geometry', 'verbose', 'wvtype', 'mults',
-              'npts', 'dt', 'align', 'shift', 'rot', 'rf']
+              'npts', 'dt', 'align', 'shift', 'rot', 'rf', 'rc']
 
     for k in args:
         if k not in kwlist:
@@ -1259,12 +1379,15 @@ def run_frs(model, geometry, verbose=False, wvtype='P', mults=2,
     if args.rf and (args.rot == 0):
         raise(Exception("The argument 'rot' cannot be '0'"))
 
+    if rc:
+        wvtype, mults, npts, dt, align, shift, rot, verbose = rc.parameters
+
     tr_ph, _ = fraysum.call_seis_spread(
             model.fthickn, model.frho, model.fvp, model.fvs, model.fflag,
             model.fani, model.ftrend, model.fplunge, model.fstrike, model.fdip,
             model.nlay,
             geometry.fbaz, geometry.fslow, geometry.fdx, geometry.fdy, geometry.ntr,
-            wvtype, mults, npts, dt, align, shift, rot, int(verbose))
+            wvtype, mults, npts, dt, align, shift, rot, verbose)
 
     # Read all traces and store them into a list of :class:`~obspy.core.Stream`
     streams = read_traces(tr_ph, geom=geometry.geom, dt=dt, rot=rot, shift=shift,
