@@ -191,7 +191,7 @@ class Model(object):
 
         self._set_fattributes()
 
-    def change(self, commands):
+    def change(self, commands, verbose=True):
         """
         Change model layers using a command sting.
 
@@ -226,6 +226,9 @@ class Model(object):
 
             VAL (float) is the value to which to change or by which to increase
                         or decrease
+
+        verbose (bool):
+            Print changed parameters to screen.
 
         Returns:
             changed (list of 3*tuple)
@@ -303,11 +306,12 @@ class Model(object):
                 self.flag[lay] = 0
 
             self.update(fix=fix)
-
-            msg = 'Changed: {:}[{:d}] {:}= {:}'.format(
-                    attribute, lay, sign, val)
-            print(msg)
             changed.append((attribute, lay, self.__dict__[attribute][lay]))
+
+            if verbose:
+                msg = 'Changed: {:}[{:d}] {:}= {:}'.format(
+                        attribute, lay, sign, val)
+                print(msg)
 
         return changed
 
