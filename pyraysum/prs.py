@@ -1380,11 +1380,17 @@ def run_frs(model, geometry, wvtype='P', mults=2, npts=300, dt=0.025, align=1,
     if shift is None:
         shift = dt
 
+    if rc:
+        wvtype, mults, npts, dt, align, shift, rot, verbose = rc.parameters
+        for kw in kwlist:
+            try:
+                args.update({kw: rc.__dict__[kw]})
+            except KeyError:
+                continue
+
     if args.rf and (args.rot == 0):
         raise(Exception("The argument 'rot' cannot be '0'"))
 
-    if rc:
-        wvtype, mults, npts, dt, align, shift, rot, verbose = rc.parameters
 
     tr_ph, _ = fraysum.call_seis_spread(
             model.fthickn, model.frho, model.fvp, model.fvs, model.fflag,
