@@ -111,7 +111,7 @@ class Model(object):
             if v is not None:
                 return np.array([v] * self.nlay
                                 if isinstance(v, (int, float))
-                                else v)
+                                else v, dtype=float)
             else:
                 return np.array([0.]*self.nlay)
 
