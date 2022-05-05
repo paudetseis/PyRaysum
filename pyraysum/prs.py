@@ -905,7 +905,7 @@ def read_rc(paramfile):
         if line.startswith('#'):
             continue
         values.append(line)
-    return RC(*zip(*values))
+    return RC(*values)
 
 
 class StreamList(object):
