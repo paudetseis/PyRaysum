@@ -908,7 +908,7 @@ def read_rc(paramfile):
     return RC(*values)
 
 
-class StreamList(object):
+class Seismogram(object):
     """
     List of streams of 3-component synthetic seismograms produced by Raysum.
     Includes methods to calculate receiver functions, filter and plot the
@@ -939,7 +939,7 @@ class StreamList(object):
     def calculate_rfs(self):
         """
         Method to generate receiver functions from displacement traces. Also
-        stores ``rflist`` as attribute of the :class:`~pyraysum.prs.StreamList`
+        stores ``rflist`` as attribute of the :class:`~pyraysum.prs.Seismogram`
         object.
 
         Returns:
@@ -1016,7 +1016,7 @@ class StreamList(object):
         """ 
 
         Plots the displacement seismograms and/or receiver functions stored in
-        :class:`~pyraysum.prs.StreamList` streams.
+        :class:`~pyraysum.prs.Seismogram` streams.
 
         Args:
             typ (str): 
@@ -1050,7 +1050,7 @@ class StreamList(object):
         """ 
 
         Filters the displacement seismograms and/or receiver functions stored in
-        :class:`~pyraysum.prs.StreamList` streams.
+        :class:`~pyraysum.prs.Seismogram` streams.
 
         Args:
             typ (str): 
@@ -1117,7 +1117,7 @@ def read_traces(traces, **kwargs):
                 Number of points per trace``
 
     Returns:
-        (:class:`~pyraysum.prs.StreamList`): streamlist: List of Stream objects
+        (:class:`~pyraysum.prs.Seismogram`): streamlist: List of Stream objects
 
     """
 
@@ -1251,7 +1251,7 @@ def filtered_rf_array(sspread_arr, arr_out, ntr, npts, dt, fmin, fmax):
     """
     Reads the traces produced by seis_spread and returns array of filtered
     receiver functions. Roughly equivalent to subsequent calls to
-    ``read_traces()``, ``StreamList.calculate_rfs()``, and ``StreamList.filter()``,
+    ``read_traces()``, ``Seismogram.calculate_rfs()``, and ``Seismogram.filter()``,
     stripped down for inversion purposes.
 
     - Reshapes them to [traces[components[amplitudes]] order
@@ -1345,7 +1345,7 @@ def run_frs(model, geometry, wvtype='P', mults=2, npts=300, dt=0.025, align=1,
             Overwrite kwargs with parameters stored here.
 
     Returns:
-        (:class:`~pyraysum.prs.StreamList`): streamlist: List of Stream objects
+        (:class:`~pyraysum.prs.Seismogram`): streamlist: List of Stream objects
 
     Example
     -------
@@ -1407,8 +1407,8 @@ def run_frs(model, geometry, wvtype='P', mults=2, npts=300, dt=0.025, align=1,
         streams = read_traces(tr_ph, geom=geometry.geom, dt=dt, rot=rot, shift=shift,
                               npts=npts, ntr=geometry.ntr)
 
-    # Store everything into StreamList object
-    streamlist = StreamList(model=model, geom=geometry.geom, streams=streams, args=args)
+    # Store everything into Seismogram object
+    streamlist = Seismogram(model=model, geom=geometry.geom, streams=streams, args=args)
 
     if rf:
         streamlist.calculate_rfs()
