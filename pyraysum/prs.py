@@ -1392,7 +1392,7 @@ def run_frs(model, geometry, wvtype='P', mults=2, npts=300, dt=0.025, align=1,
         raise(Exception("The argument 'rot' cannot be '0'"))
 
 
-    tr_ph, _ = fraysum.call_seis_spread(
+    tr_ph, tr_cart = fraysum.call_seis_spread(
             model.fthickn, model.frho, model.fvp, model.fvs, model.fflag,
             model.fani, model.ftrend, model.fplunge, model.fstrike, model.fdip,
             model.nlay,
@@ -1400,8 +1400,12 @@ def run_frs(model, geometry, wvtype='P', mults=2, npts=300, dt=0.025, align=1,
             wvtype, mults, npts, dt, align, shift, rot, verbose)
 
     # Read all traces and store them into a list of :class:`~obspy.core.Stream`
-    streams = read_traces(tr_ph, geom=geometry.geom, dt=dt, rot=rot, shift=shift,
-                          npts=npts, ntr=geometry.ntr)
+    if rot == 0:
+        streams = read_traces(tr_cart, geom=geometry.geom, dt=dt, rot=rot, shift=shift,
+                              npts=npts, ntr=geometry.ntr)
+    else:
+        streams = read_traces(tr_ph, geom=geometry.geom, dt=dt, rot=rot, shift=shift,
+                              npts=npts, ntr=geometry.ntr)
 
     # Store everything into StreamList object
     streamlist = StreamList(model=model, geom=geometry.geom, streams=streams, args=args)
