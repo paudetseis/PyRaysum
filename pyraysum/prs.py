@@ -186,7 +186,7 @@ class Model(object):
         elif not fix:
             self.vpvs = self.vp / self.vs
         else:
-            msg = 'Unknown fix keyword: ' + fix
+            msg = 'Unknown value for fix keyword: ' + fix
             raise ValueError(msg)
 
         self._set_fattributes()
@@ -950,14 +950,14 @@ class Seismogram(object):
 
         if self.args.rot == 0:
             msg = "Receiver functions cannot be calculated with 'rot == 0'\n"
-            raise(Exception(msg))
+            raise(ValueError(msg))
 
         if self.args.rot == 1:
             cmpts = ['R', 'T', 'Z']
         elif self.args.rot == 2:
             cmpts = ['V', 'H', 'P']
         else:
-            raise(Exception('rotation ID invalid: '+str(self.args.rot)))
+            raise(ValueError('rotation ID invalid: '+str(self.args.rot)))
 
         rflist = []
 
@@ -993,7 +993,7 @@ class Seismogram(object):
             elif self.args.wvtype == 'SH':
                 rft.data = fftshift(np.real(ifft(np.divide(-ft_ztr, ft_rft))))
             else:
-                raise(Exception("wave typye invalid: "+self.args.wvtype))
+                raise(ValueError("wave typye invalid: "+self.args.wvtype))
 
             # Update stats
             rfr.stats.channel = 'RF'+cmpts[0]
@@ -1028,22 +1028,13 @@ class Seismogram(object):
         if typ == 'streams':
             self.plot_streams(**kwargs)
         elif typ == 'rfs':
-            try:
-                self.plot_rfs(**kwargs)
-            except:
-                raise(Exception("Cannot plot 'rfs'"))
+            self.plot_rfs(**kwargs)
         elif typ == 'all':
-            try:
-                self.plot_streams(**kwargs)
-                try:
-                    self.plot_rfs(**kwargs)
-                except:
-                    raise(Exception("Cannot plot 'rfs'"))
-            except:
-                raise(Exception("Cannot plot 'all'"))
+            self.plot_streams(**kwargs)
+            self.plot_rfs(**kwargs)
         else:
             msg = "'typ' has to be either 'streams', 'rfs' or 'all'"
-            raise(TypeError(msg))
+            raise(ValueError(msg))
 
 
     def filter(self, typ, ftype, **kwargs):
@@ -1064,16 +1055,13 @@ class Seismogram(object):
         if typ == 'streams':
             self.filter_streams(ftype, **kwargs)
         elif typ == 'rfs':
-            try:
                 self.filter_rfs(ftype, **kwargs)
-            except:
-                raise(Exception("Cannot filter 'rfs'"))
         elif typ == 'all':
             self.filter_streams(ftype, **kwargs)
             try:
                 self.filter_rfs(ftype, **kwargs)
             except:
-                print("Cannot filter 'rfs'")
+                print("Cannot filter 'rfs'. Continuing.")
         else:
             msg = "'typ' has to be either 'streams', 'rfs' or 'all'"
             raise(TypeError(msg))
@@ -1166,7 +1154,7 @@ def read_traces(traces, **kwargs):
 
     for k in args:
         if k not in kwlist:
-            raise(Exception('Incorrect kwarg: ', k))
+            raise(NameError('Unknown kwarg: ', k))
 
     # Read fortran output
     npts = args.npts
@@ -1188,7 +1176,7 @@ def read_traces(traces, **kwargs):
     elif args.rot == 2:
         component = ['P', 'V', 'H']
     else:
-        raise(Exception('invalid "rot" value: not in 0, 1, 2'))
+        raise(ValueError('Invalid value for "rot": Must be 0, 1, 2'))
 
     # Number of "event" traces produced
     ntr = np.max(df.itr) + 1
@@ -1375,7 +1363,7 @@ def run_frs(model, geometry, wvtype='P', mults=2, npts=300, dt=0.025, align=1,
 
     for k in args:
         if k not in kwlist:
-            raise(Exception('Incorrect kwarg: ', k))
+            raise(NameError('kwarg not defined: ', k))
 
     if shift is None:
         shift = dt
@@ -1389,7 +1377,9 @@ def run_frs(model, geometry, wvtype='P', mults=2, npts=300, dt=0.025, align=1,
                 continue
 
     if args.rf and (args.rot == 0):
-        raise(Exception("The argument 'rot' cannot be '0'"))
+        msg = "Receiver functions cannot be calculated in ZNE coordinated, i.e. "
+        msg += "'rot' must not be '0'"
+        raise(ValueError(msg))
 
 
     tr_ph, tr_cart = fraysum.call_seis_spread(
