@@ -806,7 +806,7 @@ class RC(object):
         npts (int):
             Number of samples in time series
         dt (float):
-            Sampling distance in seconds
+            Sampling intervall in seconds
         align (int):
             ID for alignment of seismograms ('1': align at 'P',
             '2': align at 'SV' or 'SH')
@@ -832,11 +832,11 @@ class RC(object):
             raise ValueError(msg)
 
         if mults not in [0, 1, 2, '0', '1', '2']:
-            msg = "mults must be 0, 1, or 2, not: " + wvtype
+            msg = "mults must be 0, 1, or 2, not: " + mults
             raise ValueError(msg)
 
         if align not in [1, 2, '1', '2']:
-            msg = "align must be 1, or 2, not: " + wvtype
+            msg = "align must be 1, or 2, not: " + align
             raise ValueError(msg)
 
         self.verbose = int(verbose)
@@ -951,8 +951,7 @@ class Seismogram(object):
         if self.args.rot == 0:
             msg = "Receiver functions cannot be calculated with 'rot == 0'\n"
             raise(ValueError(msg))
-
-        if self.args.rot == 1:
+        elif self.args.rot == 1:
             cmpts = ['R', 'T', 'Z']
         elif self.args.rot == 2:
             cmpts = ['V', 'H', 'P']
@@ -1195,21 +1194,21 @@ def read_traces(traces, **kwargs):
         # Store into trace by channel with stats information
         # Channel 1
 
-        stats = _make_stats(net='', sta='synt', stime=UTCDateTime(),
+        stats = _make_stats(net='', sta='syn', stime=UTCDateTime(),
                             dt=args.dt, slow=args.geom[itr][1],
                             baz=args.geom[itr][0],
                             channel='BH'+component[0], taxis=taxis)
         tr1 = Trace(data=ddf.trace1.values, header=stats)
 
         # Channel 2
-        stats = _make_stats(net='', sta='synt', stime=UTCDateTime(),
+        stats = _make_stats(net='', sta='syn', stime=UTCDateTime(),
                             dt=args.dt, slow=args.geom[itr][1],
                             baz=args.geom[itr][0],
                             channel='BH'+component[1], taxis=taxis)
         tr2 = Trace(data=ddf.trace2.values, header=stats)
 
         # Channel 3
-        stats = _make_stats(net='', sta='synt', stime=UTCDateTime(),
+        stats = _make_stats(net='', sta='syn', stime=UTCDateTime(),
                             dt=args.dt, slow=args.geom[itr][1],
                             baz=args.geom[itr][0],
                             channel='BH'+component[2], taxis=taxis)
@@ -1294,8 +1293,8 @@ def filtered_rf_array(sspread_arr, arr_out, ntr, npts, dt, fmin, fmax):
             fftshift(np.real(ifft(np.divide(ft_rft, ft_ztr)))))
 
 
-def run_frs(model, geometry, wvtype='P', mults=2, npts=300, dt=0.025, align=1,
-            shift=None, rot=0, verbose=0, rf=False, rc=None):
+def run(model, geometry, wvtype='P', mults=2, npts=300, dt=0.025, align=1,
+        shift=None, rot=0, verbose=0, rf=False, rc=None):
     """
     Run Fortran Raysum
 
@@ -1317,7 +1316,7 @@ def run_frs(model, geometry, wvtype='P', mults=2, npts=300, dt=0.025, align=1,
         dt (float):
             Sampling distance in seconds
         align (int):
-            ID for alignment of seismograms ('1': align at 'P',
+            ID for time alignment of seismograms ('0': No alignment, '1': align at 'P',
             '2': align at 'SV' or 'SH')
         shift (float):
             Time shift in seconds (positive shift moves seismograms
