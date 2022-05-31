@@ -405,9 +405,9 @@ class Model(object):
         # TODO: Supply Geometry object to calculate for a given ray geometry
         return np.cumsum(self.thickn/self.vs - self.thickn/self.vp)[:-1]
 
-    def save(self, fname='sample.mod', comment=''):
+    def write(self, fname='sample.mod', comment=''):
         """
-        Save seismic velocity model to raysum model file
+        Write seismic velocity model to disk as raysum ascii model file
 
         Args:
             fname (str): Name of the output file
@@ -764,9 +764,9 @@ class Geometry(object):
             out += form.format(bb, ss, xx, yy)
         return out
 
-    def save(self, fname='sample.geom'):
+    def write(self, fname='sample.geom'):
         """
-        Save ray geometry as ascii file
+        Write ray geometry to disk as ascii file
 
         Args:
             fname: (str)
@@ -776,7 +776,7 @@ class Geometry(object):
         with open(fname, "w") as f:
             f.write(self.__str__())
 
-        print('Geometry saved to: ' + fname)
+        print('Geometry written to: ' + fname)
 
 
 def read_geometry(geomfile, encoding=None):
@@ -875,9 +875,9 @@ class RC(object):
         out += "{:}\n".format(self.rot)
         return out
 
-    def save(self, fname='raysum-param'):
+    def write(self, fname='raysum-param'):
         """
-        Save as raysum parameter file
+        Write parameter file to disk
 
         Args:
             fname: (str)
