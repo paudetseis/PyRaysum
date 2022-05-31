@@ -30,7 +30,6 @@ import types
 from datetime import datetime
 import numpy as np
 from scipy import signal
-import pandas as pd
 import matplotlib.pyplot as plt
 from obspy import Trace, Stream, UTCDateTime
 from obspy.core import AttribDict
@@ -1160,11 +1159,10 @@ def read_traces(traces, **kwargs):
     ntr = args.ntr
 
     # Crop unused overhang of oversized fortran arrays
-    data = {'trace1': traces[0, :npts, :ntr].reshape(npts*ntr, order='F'),
-            'trace2': traces[1, :npts, :ntr].reshape(npts*ntr, order='F'),
-            'trace3': traces[2, :npts, :ntr].reshape(npts*ntr, order='F'),
-            'itr': np.array([npts*[tr] for tr in range(ntr)]).reshape(npts*ntr)}
-    df = pd.DataFrame(data=data)
+    trace1 = np.array(traces[0, :npts, :ntr].reshape(npts*ntr, order='F'))
+    trace2 = np.array(traces[1, :npts, :ntr].reshape(npts*ntr, order='F'))
+    trace3 = np.array(traces[2, :npts, :ntr].reshape(npts*ntr, order='F'))
+    itr = np.array([npts*[tr] for tr in range(ntr)]).reshape(npts*ntr)
 
 
     # Component names
@@ -1178,41 +1176,41 @@ def read_traces(traces, **kwargs):
         raise(ValueError('Invalid value for "rot": Must be 0, 1, 2'))
 
     # Number of "event" traces produced
-    ntr = np.max(df.itr) + 1
+    ntr = np.max(itr) + 1
 
     # Time axis
-    npts = len(df[df.itr == 0].trace1.values)
+    npts = len(trace1[itr == 0])
     taxis = np.arange(npts)*args.dt - args.shift
 
     streams = []
 
-    for itr in range(ntr):
+    for iitr in range(ntr):
 
         # Split by trace ID
-        ddf = df[df.itr == itr]
+        istr = itr == iitr
 
         # Store into trace by channel with stats information
         # Channel 1
 
         stats = _make_stats(net='', sta='syn', stime=UTCDateTime(),
-                            dt=args.dt, slow=args.geom[itr][1],
-                            baz=args.geom[itr][0],
+                            dt=args.dt, slow=args.geom[iitr][1],
+                            baz=args.geom[iitr][0],
                             channel='BH'+component[0], taxis=taxis)
-        tr1 = Trace(data=ddf.trace1.values, header=stats)
+        tr1 = Trace(data=trace1[istr], header=stats)
 
         # Channel 2
         stats = _make_stats(net='', sta='syn', stime=UTCDateTime(),
-                            dt=args.dt, slow=args.geom[itr][1],
-                            baz=args.geom[itr][0],
+                            dt=args.dt, slow=args.geom[iitr][1],
+                            baz=args.geom[iitr][0],
                             channel='BH'+component[1], taxis=taxis)
-        tr2 = Trace(data=ddf.trace2.values, header=stats)
+        tr2 = Trace(data=trace2[istr], header=stats)
 
         # Channel 3
         stats = _make_stats(net='', sta='syn', stime=UTCDateTime(),
-                            dt=args.dt, slow=args.geom[itr][1],
-                            baz=args.geom[itr][0],
+                            dt=args.dt, slow=args.geom[iitr][1],
+                            baz=args.geom[iitr][0],
                             channel='BH'+component[2], taxis=taxis)
-        tr3 = Trace(data=ddf.trace3.values, header=stats)
+        tr3 = Trace(data=trace3[istr], header=stats)
 
         # Store into Stream object and append to list
         stream = Stream(traces=[tr1, tr2, tr3])
