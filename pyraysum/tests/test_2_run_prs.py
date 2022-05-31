@@ -22,10 +22,10 @@ def test_Porter2011():
 
     print('model', model.__dict__)
     print('geom', geom.__dict__)
-    print('running run_frs')
+    print('running run()')
     # Run Raysum with most default values and `rot=1` and `mults=0`
     # to reproduce the results of Porter et al., 2011
-    streamlist = prs.run_frs(model, geom, rot=1, mults=0)
+    streamlist = prs.run(model, geom, rot=1, mults=0)
 
     # Calculate receiver functions
     streamlist.calculate_rfs()
@@ -40,7 +40,7 @@ def test_Porter2011():
     # Now load a different model and repeat (lower crustal anisotropic layer)
     model = mod.test_read_model_aniso()
 
-    streamlist = prs.run_frs(model, geom, rot=1, mults=0)
+    streamlist = prs.run(model, geom, rot=1, mults=0)
     streamlist.calculate_rfs()
     streamlist.filter('all', 'lowpass', freq=1., zerophase=True, corners=2)
     streamlist.plot('all', tmin=-0.5, tmax=8.)
@@ -56,12 +56,12 @@ def test_frs():
 
     # Run Raysum with most default values and `rot=1` and `mults=0`
     # to reproduce the results of Porter et al., 2011
-    fstreamlist = prs.run_frs(model, geom, rot=1, mults=0)
+    fstreamlist = prs.run(model, geom, rot=1, mults=0)
 
     # Now load a different model and repeat (lower crustal anisotropic layer)
     model = mod.test_read_model_aniso()
 
-    fstreamlist = prs.run_frs(model, geom, rot=2, mults=2)
+    fstreamlist = prs.run(model, geom, rot=2, mults=2)
 
     fstreamlist.calculate_rfs()
 
@@ -91,7 +91,7 @@ def test_filtered_rf_array():
     # print(timeit('_run_frs()', number=50, globals=globals()))
     # >> 27.262143349274993
     def _run_frs():
-        streams = prs.run_frs(model, geom, dt=dt, rot=rot, mults=mults,
+        streams = prs.run(model, geom, dt=dt, rot=rot, mults=mults,
                               align=align, wvtype=wvtype, verbose=verbose,
                               npts=npts)
         streams.calculate_rfs()
@@ -107,7 +107,7 @@ def test_filtered_rf_array():
                 model.fthickn, model.frho, model.fvp, model.fvs, model.fflag,
                 model.fani, model.ftrend, model.fplunge, model.fstrike, model.fdip,
                 model.nlay,
-                geom.fbaz, geom.fslow, geom.fdx, geom.fdy, geom.ntr,
+                geom.fbaz, geom.fslow, geom.fdn, geom.fde, geom.ntr,
                 wvtype, mults, npts, dt, align, dt, rot, verbose)
 
         prs.filtered_rf_array(tr_ph, rfarray, geom.ntr, npts, dt, fmin, fmax)
@@ -134,11 +134,11 @@ def test_single_event():
     npts = 1500
     dt = 0.025      # s
     geom = Geometry(baz, slow)
-    streamlist = prs.run_frs(model, geom, npts=npts, dt=dt, rot=2)
+    streamlist = prs.run(model, geom, npts=npts, dt=dt, rot=2)
     with pytest.raises(Exception):
-        assert prs.run_frs(model, geom, npts=npts, dt=dt, rot=3)
-    streamlist = prs.run_frs(model, geom, npts=npts, dt=dt, rot=1, wvtype='SV')
-    streamlist = prs.run_frs(model, geom, npts=npts, dt=dt, rot=1, wvtype='SH')
+        assert prs.run(model, geom, npts=npts, dt=dt, rot=3)
+    streamlist = prs.run(model, geom, npts=npts, dt=dt, rot=1, wvtype='SV')
+    streamlist = prs.run(model, geom, npts=npts, dt=dt, rot=1, wvtype='SH')
 
 
 def test_rfs():
@@ -153,17 +153,17 @@ def test_rfs():
 
     # test 1
     with pytest.raises(Exception):
-        assert prs.run_frs(model, geom, npts=npts, dt=dt, rot=0, rf=True)
-    streamlist1 = prs.run_frs(model, geom, npts=npts, dt=dt, rot=1, rf=True)
-    streamlist1 = prs.run_frs(model, geom, npts=npts, dt=dt, rot=2, rf=True)
+        assert prs.run(model, geom, npts=npts, dt=dt, rot=0, rf=True)
+    streamlist1 = prs.run(model, geom, npts=npts, dt=dt, rot=1, rf=True)
+    streamlist1 = prs.run(model, geom, npts=npts, dt=dt, rot=2, rf=True)
     streamlist1.filter('rfs', 'lowpass', freq=1., corners=2, zerophase=True)
     streamlist1.filter('streams', 'lowpass', freq=1., corners=2, zerophase=True)
 
     # test 2
-    streamlist2 = prs.run_frs(model, geom, npts=npts, dt=dt)
+    streamlist2 = prs.run(model, geom, npts=npts, dt=dt)
     with pytest.raises(Exception):
         assert streamlist2.calculate_rfs()
 
-    streamlist2 = prs.run_frs(model, geom, npts=npts, dt=dt, rot=1)
+    streamlist2 = prs.run(model, geom, npts=npts, dt=dt, rot=1)
     rflist = streamlist2.calculate_rfs()
     [rf.filter('lowpass', freq=1., corners=2, zerophase=True) for rf in rflist]
