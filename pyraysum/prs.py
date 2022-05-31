@@ -693,9 +693,9 @@ class Geometry(object):
             Ray slownesses (km/s)
         - geom (np.ndarray): 
             Array of zipped [baz, slow] pairs.
-        - dx (np.ndarray): 
+        - dn (np.ndarray): 
             North-offset of the seismic station (m) (shape ``(ntr)``)
-        - dy (np.ndarray): 
+        - de (np.ndarray): 
             East-offset of the seismic station (m) (shape ``(ntr)``)
         - ntr (int): 
             Number of traces
@@ -708,9 +708,9 @@ class Geometry(object):
             Ray backazimuth (radians) (shape ``(maxtr)``)
         - fslow (np.ndarray): 
             Ray slowness (m/s) (shape ``(maxtr)``)
-        - fdx (np.ndarray): 
+        - fdn (np.ndarray): 
             North-offset of the seismic station (m) (shape ``(maxtr)``)
-        - fdy (np.ndarray): 
+        - fde (np.ndarray): 
             East-offset of the seismic station (m) (shape ``(maxtr)``)
 
     .. note::
@@ -720,7 +720,7 @@ class Geometry(object):
     """
 
 
-    def __init__(self, baz, slow, dx=[0], dy=[0], maxtr=500):
+    def __init__(self, baz, slow, dn=[0], de=[0], maxtr=500):
 
         if type(baz) == int or type(baz) == float:
             baz = [baz]
@@ -739,20 +739,20 @@ class Geometry(object):
 
         self.ntr = len(self.baz)
 
-        self.dx = np.array(dx)
-        self.dy = np.array(dy)
+        self.dn = np.array(dn)
+        self.de = np.array(de)
 
-        if len(self.dx) != self.ntr:
-            self.dx = np.full(self.ntr, self.dx[0])
+        if len(self.dn) != self.ntr:
+            self.dn = np.full(self.ntr, self.dn[0])
 
-        if len(self.dy) != self.ntr:
-            self.dy = np.full(self.ntr, self.dy[0])
+        if len(self.de) != self.ntr:
+            self.de = np.full(self.ntr, self.de[0])
 
         tail = np.zeros(maxtr - self.ntr)
         self.fbaz = np.asfortranarray(np.append(self.baz, tail) * np.pi/180)
         self.fslow = np.asfortranarray(np.append(self.slow, tail) * 1e-3)
-        self.fdx = np.asfortranarray(np.append(self.dx, tail))
-        self.fdy = np.asfortranarray(np.append(self.dy, tail))
+        self.fdn = np.asfortranarray(np.append(self.dn, tail))
+        self.fde = np.asfortranarray(np.append(self.de, tail))
 
     def __len__(self):
         return self.ntr
@@ -760,7 +760,7 @@ class Geometry(object):
     def __str__(self):
         out = ''
         form = '{: 7.2f} {: 8.4f} {:7.2f} {:7.2f}\n'
-        for bb, ss, xx, yy in zip(self.baz, self.slow, self.dx, self.dy):
+        for bb, ss, xx, yy in zip(self.baz, self.slow, self.dn, self.de):
             out += form.format(bb, ss, xx, yy)
         return out
 
@@ -1386,7 +1386,7 @@ def run_frs(model, geometry, wvtype='P', mults=2, npts=300, dt=0.025, align=1,
             model.fthickn, model.frho, model.fvp, model.fvs, model.fflag,
             model.fani, model.ftrend, model.fplunge, model.fstrike, model.fdip,
             model.nlay,
-            geometry.fbaz, geometry.fslow, geometry.fdx, geometry.fdy, geometry.ntr,
+            geometry.fbaz, geometry.fslow, geometry.fdn, geometry.fde, geometry.ntr,
             wvtype, mults, npts, dt, align, shift, rot, verbose)
 
     # Read all traces and store them into a list of :class:`~obspy.core.Stream`
