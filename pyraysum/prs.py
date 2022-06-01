@@ -43,34 +43,36 @@ class Model(object):
     Model of the subsurface seismic velocity structure 
     
     ``Parameters``:
-        - thickn (np.ndarray): 
+        - thickn (list): 
             Thickness of layers (m) (shape ``(nlay)``)
-        - rho (float or np.ndarray): 
+        - rho (float or list): 
             Density (kg/m^3) (shape ``(nlay)``)
-        - vp (float or np.ndarray): 
+        - vp (float or list): 
             P-wave velocity (m/s) (shape ``(nlay)``)
-        - vs (float or np.ndarray, optional): 
+        - vs (float or list, opional): 
             S-wave velocity (m/s) (shape ``(nlay)``)
             If None, computed from ``vpvs``
-        - vpvs (float or np.ndarray, optional): 
+        - vpvs (float or list, optional): 
             P-to-S velocity ratio (shape ``(nlay)``)
             Defaults to 1.73. Ignored if ``vs`` is set.
         - flag (list of str, optional, defaut: ``1`` or isotropic):
             Flags for type of layer material (dimension ``nlay``)
-        - ani (float or np.ndarray, optional): 
+        - ani (float or list, optional): 
             Anisotropy (percent) (shape ``(nlay)``)
-        - trend (float or np.ndarray, optional):
+        - trend (float or list, optional):
             Trend of symmetry axis (degree) (shape ``(nlay)``)
-        - plunge (float or np.ndarray, optional):
+        - plunge (float or list, optional):
             Plunge of symmetry axis (degree) (shape ``(nlay)``)
-        - strike (float or np.ndarray, optional):
+        - strike (float or list, optional):
             azimuth of interface in RHR (degree) (shape ``(nlay)``)
-        - dip (float or np.ndarray, optional):
+        - dip (float or list, optional):
             dip of interface in RHR (degree) (shape ``(nlay)``)
+
+    ``Attributes``:
         - nlay (int): 
             Number of layers
 
-        To broadcast the model to the the fortran routine use
+        To broadcast the model to the the fortran routine call_seis_spread use
 
         - maxlay (int): 
             Maximum number of layers defined in params.h
@@ -94,13 +96,6 @@ class Model(object):
             azimuth of interface in RHR (radians) (shape ``(maxlay)``)
         - fdip (np.ndarray, optional):
             dip of interface in RHR (radians) (shape ``(maxlay)``)
-
-        .. note:: 
-
-            To optimize construction of models, build the input arrays for
-            ``pyraysum.run_frs()`` in the correct shape.
-
-            TODO: ``- a (np.ndarray): Elastic thickness (shape ``(3, 3, 3, 3, nlay)``)``
     """
 
     def __init__(self, thickn, rho, vp, vs=None, vpvs=1.73, flag=1,
