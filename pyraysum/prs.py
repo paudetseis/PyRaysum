@@ -45,26 +45,27 @@ class Model(object):
     ``Parameters``:
         - thickn (np.ndarray): 
             Thickness of layers (m) (shape ``(nlay)``)
-        - rho (np.ndarray): 
+        - rho (float or np.ndarray): 
             Density (kg/m^3) (shape ``(nlay)``)
-        - vp (np.ndarray): 
+        - vp (float or np.ndarray): 
             P-wave velocity (m/s) (shape ``(nlay)``)
-        - vs (np.ndarray): 
+        - vs (float or np.ndarray, optional): 
             S-wave velocity (m/s) (shape ``(nlay)``)
-        - vpvs (np.ndarray): 
+            If None, computed from ``vpvs``
+        - vpvs (float or np.ndarray, optional): 
             P-to-S velocity ratio (shape ``(nlay)``)
-            Ignored unless ``update`` with keyword 'fix' is used.
+            Defaults to 1.73. Ignored if ``vs`` is set.
         - flag (list of str, optional, defaut: ``1`` or isotropic):
             Flags for type of layer material (dimension ``nlay``)
-        - ani (np.ndarray, optional): 
+        - ani (float or np.ndarray, optional): 
             Anisotropy (percent) (shape ``(nlay)``)
-        - trend (np.ndarray, optional):
+        - trend (float or np.ndarray, optional):
             Trend of symmetry axis (degree) (shape ``(nlay)``)
-        - plunge (np.ndarray, optional):
+        - plunge (float or np.ndarray, optional):
             Plunge of symmetry axis (degree) (shape ``(nlay)``)
-        - strike (np.ndarray, optional):
+        - strike (float or np.ndarray, optional):
             azimuth of interface in RHR (degree) (shape ``(nlay)``)
-        - dip (np.ndarray, optional):
+        - dip (float or np.ndarray, optional):
             dip of interface in RHR (degree) (shape ``(nlay)``)
         - nlay (int): 
             Number of layers
@@ -102,7 +103,7 @@ class Model(object):
             TODO: ``- a (np.ndarray): Elastic thickness (shape ``(3, 3, 3, 3, nlay)``)``
     """
 
-    def __init__(self, thickn, rho, vp, vs, flag=1,
+    def __init__(self, thickn, rho, vp, vs=None, vpvs=1.73, flag=1,
                  ani=None, trend=None, plunge=None,
                  strike=None, dip=None, maxlay=15):
 
@@ -116,10 +117,16 @@ class Model(object):
 
         self.nlay = len(thickn)
         self.thickn = np.array(thickn)
-        self.rho = np.array(rho) if rho is not None else [None] * self.nlay
-        self.vp = np.array(vp)
-        self.vs = np.array(vs)
-        self.vpvs = self.vp / self.vs
+        self.rho = _get_val(rho)
+        self.vp = _get_val(vp)
+
+        if vs is None:
+            self.vpvs = _get_val(vpvs)
+            self.vs = self.vp / self.vpvs
+        else:
+            self.vs = np.array(vs) 
+            self.vpvs = self.vp / self.vs
+
         self.flag = np.array([flag] * self.nlay if isinstance(flag, int)
                              else list(flag))
         self.ani = _get_val(ani)
