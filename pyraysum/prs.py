@@ -972,7 +972,7 @@ class Seismogram(object):
         """
 
         if self.rc.rot == 0:
-            msg = "Receiver functions cannot be calculated in geographical."
+            msg = "Receiver functions cannot be calculated in geographical "
             msg += "coordinates, i.e. rc.rot must not be 0"
             raise(ValueError(msg))
         elif self.rc.rot == 1:
@@ -1296,7 +1296,7 @@ def run(model, geometry, rc, rf=False):
     """
 
     if rf and rc.rot == 0:
-        msg = "Receiver functions cannot be calculated in ZNE coordinates"
+        msg = "Receiver functions cannot be calculated in ZNE coordinates, "
         msg += "i.e. in rc, 'rot' must not be '0'"
         raise(ValueError(msg))
 
