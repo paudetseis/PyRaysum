@@ -830,8 +830,11 @@ class RC(object):
         dt (float):
             Sampling intervall in seconds
         align (int):
-            ID for alignment of seismograms ('1': align at 'P',
-            '2': align at 'SV' or 'SH')
+            ID for time alignment of seismograms
+            0: do not align
+            1: align at 'P'
+            2: align at 'SV'
+            3: align at 'SH'
         shift (float or None):
             Time shift in seconds (positive shift moves seismograms
             to greater lags). If None, set to dt, which is most often the desired
@@ -846,8 +849,8 @@ class RC(object):
             parameters in order expected by ``call_seis_spread()``
     """
 
-    def __init__(self, verbose=0, wvtype='P', mults=2,
-                 npts=300, dt=0.025, align=1, shift=None, rot=0):
+    def __init__(self, verbose=1, wvtype='P', mults=0,
+                 npts=300, dt=0.025, align=1, shift=None, rot=1):
 
         if wvtype not in ['P', 'SV', 'SH']:
             msg = "wvtype must be 'P', 'SV', or 'SH', not: " + wvtype
@@ -857,8 +860,8 @@ class RC(object):
             msg = "mults must be 0, 1, or 2, not: " + mults
             raise ValueError(msg)
 
-        if align not in [1, 2, '1', '2']:
-            msg = "align must be 1, or 2, not: " + align
+        if align not in [0, 1, 2, 3, '0', '1', '2' ,'3']:
+            msg = "align must be 0, 1, 2, or 3, not: " + align
             raise ValueError(msg)
 
         self.verbose = int(verbose)
