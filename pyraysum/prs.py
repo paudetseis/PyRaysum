@@ -25,14 +25,11 @@
 Functions to interact with ``Raysum`` software
 
 '''
-import subprocess
-import types
 from datetime import datetime
 import numpy as np
 from scipy import signal
 import matplotlib.pyplot as plt
 from obspy import Trace, Stream, UTCDateTime
-from obspy.core import AttribDict
 from numpy.fft import fft, ifft, fftshift
 from pyraysum import wiggle
 import fraysum
@@ -84,18 +81,20 @@ class Model(object):
             P-wave velocity (m/s) (shape ``(maxlay)``)
         - fvs (np.ndarray): 
             S-wave velocity (m/s) (shape ``(maxlay)``)
-        - fflag (list of str, optional, defaut: ``1`` or isotropic):
+        - fflag (list of str):
             Flags for type of layer material (dimension ``maxlay``)
-        - fani (np.ndarray, optional): 
+        - fani (np.ndarray): 
             Anisotropy (percent) (shape ``(maxlay)``)
-        - ftrend (np.ndarray, optional):
+        - ftrend (np.ndarray):
             Trend of symmetry axis (radians) (shape ``(maxlay)``)
-        - fplunge (np.ndarray, optional):
+        - fplunge (np.ndarray):
             Plunge of symmetry axis (radians) (shape ``(maxlay)``)
-        - fstrike (np.ndarray, optional):
+        - fstrike (np.ndarray):
             azimuth of interface in RHR (radians) (shape ``(maxlay)``)
-        - fdip (np.ndarray, optional):
+        - fdip (np.ndarray):
             dip of interface in RHR (radians) (shape ``(maxlay)``)
+        - parameters (list):
+            model parameters in the order expected by ``fraysum.call_seis_spread``
     """
 
     def __init__(self, thickn, rho, vp, vs=None, vpvs=1.73, flag=1,
@@ -167,6 +166,10 @@ class Model(object):
         self.fplunge = np.asfortranarray(np.append(self.plunge, tail) * np.pi/180)
         self.fstrike = np.asfortranarray(np.append(self.strike, tail) * np.pi/180)
         self.fdip = np.asfortranarray(np.append(self.dip, tail) * np.pi/180)
+        self.parameters = [
+            self.fthickn, self.frho, self.fvp, self.fvs, self.fflag, self.fani,
+            self.ftrend, self.fplunge, self.fstrike, self.fdip, self.nlay,
+            ]
 
     def update(self, fix=None):
         """
@@ -678,8 +681,9 @@ def read_model(modfile, encoding=None):
         (:class:`~pyraysum.prs.Model`): model: Seismic velocity model for current simulation
 
     """
-    values = np.genfromtxt(modfile, dtype=None, encoding=encoding)
-    return Model(*zip(*values))
+    vals = np.genfromtxt(modfile, encoding=encoding)
+    # args:           thickn .. vs   vpvs       flag ... dip
+    return Model(*zip(*vals[:, :4]), None, *zip(*vals[:, 4:]))
 
 
 class Geometry(object):
@@ -713,11 +717,8 @@ class Geometry(object):
             North-offset of the seismic station (m) (shape ``(maxtr)``)
         - fde (np.ndarray): 
             East-offset of the seismic station (m) (shape ``(maxtr)``)
-
-    .. note::
-
-        To optimize construction of ray geometries, build the input
-        arrays for ``pyraysum.run_frs()`` in the correct shape.
+        - parameters (list):
+            geometry parameters in order expected by ``fraysum.call_seis_spread()``
     """
 
 
@@ -754,6 +755,7 @@ class Geometry(object):
         self.fslow = np.asfortranarray(np.append(self.slow, tail) * 1e-3)
         self.fdn = np.asfortranarray(np.append(self.dn, tail))
         self.fde = np.asfortranarray(np.append(self.de, tail))
+        self.parameters = [self.fbaz, self.fslow, self.fdn, self.fde, self.ntr]
 
     def __len__(self):
         return self.ntr
@@ -796,7 +798,7 @@ def read_geometry(geomfile, encoding=None):
 
 class RC(object):
     """
-    Run Controll parameters for run_frs()
+    Run Controll parameters for run()
 
     ``Parameters``:
         wvtype (str):
@@ -821,8 +823,8 @@ class RC(object):
             Verbosity. 0 - silent; 1 - verbose
 
     ``Attributes``:
-        parameters (tuple):
-            parameters in order expected by run_frs() and call_seis_spread()
+        parameters (list):
+            parameters in order expected by ``call_seis_spread()``
     """
 
     def __init__(self, verbose=0, wvtype='P', mults=2,
@@ -853,8 +855,8 @@ class RC(object):
         else:
             self.shift = float(shift)
 
-        self.parameters = (self.wvtype, self.mults, self.npts, self.dt,
-                           self.align, self.shift, self.rot, self.verbose)
+        self.parameters = [self.wvtype, self.mults, self.npts, self.dt,
+                           self.align, self.shift, self.rot, self.verbose]
 
 
     def __str__(self):
@@ -868,9 +870,9 @@ class RC(object):
         out += "{:}\n".format(self.npts)
         out += "# Sample rate (seconds)\n"
         out += "{:}\n".format(self.dt)
-        out += "# Alignment: 0 is none, 1 aligns on P\n"
+        out += "# Alignment: 0 is none, 1 aligns on P, 2 on SV, 3 on SH\n"
         out += "{:}\n".format(self.align)
-        out += "# Shift or traces (seconds)\n"
+        out += "# Shift of traces (seconds)\n"
         out += "{:}\n".format(self.shift)
         out += "# Rotation to output: 0 is NEZ, 1 is RTZ, 2 is PVH\n"
         out += "{:}\n".format(self.rot)
@@ -922,19 +924,18 @@ class Seismogram(object):
             Instance of class :class:`~pyraysum.prs.Geometry`
         - streams (List): 
             List of :class:`~obspy.core.Stream` objects.
-        - args (Dictionary): 
-            Dictionary attributes of all input arguments
+        - rc (:class:`~pyraysum.prs.RC`): 
+            Instance of class :class:`~pyraysum.prs.RC`
 
     """
 
 
-    def __init__(self, model=None, geom=None, streams=None,
-                 args=None):
+    def __init__(self, model=None, geom=None, rc=None, streams=None):
 
         self.model = model
         self.geom = geom
         self.streams = streams
-        self.args = AttribDict(args)
+        self.rc = rc
 
 
     def calculate_rfs(self):
@@ -946,18 +947,16 @@ class Seismogram(object):
         Returns:
             (list): 
                 rflist: Stream containing Radial and Transverse receiver functions
-
         """
 
-        if self.args.rot == 0:
-            msg = "Receiver functions cannot be calculated with 'rot == 0'\n"
+        if self.rc.rot == 0:
+            msg = "Receiver functions cannot be calculated in geographical."
+            msg += "coordinates, i.e. rc.rot must not be 0"
             raise(ValueError(msg))
-        elif self.args.rot == 1:
+        elif self.rc.rot == 1:
             cmpts = ['R', 'T', 'Z']
-        elif self.args.rot == 2:
+        elif self.rc.rot == 2:
             cmpts = ['V', 'H', 'P']
-        else:
-            raise(ValueError('rotation ID invalid: '+str(self.args.rot)))
 
         rflist = []
 
@@ -985,15 +984,13 @@ class Seismogram(object):
             ft_ztr = fft(ztr.data)
 
             # Spectral division to calculate receiver functions
-            if self.args.wvtype == 'P':
+            if self.rc.wvtype == 'P':
                 rfr.data = fftshift(np.real(ifft(np.divide(ft_rfr, ft_ztr))))
                 rft.data = fftshift(np.real(ifft(np.divide(ft_rft, ft_ztr))))
-            elif self.args.wvtype == 'SV':
+            elif self.rc.wvtype == 'SV':
                 rfr.data = fftshift(np.real(ifft(np.divide(-ft_ztr, ft_rfr))))
-            elif self.args.wvtype == 'SH':
+            elif self.rc.wvtype == 'SH':
                 rft.data = fftshift(np.real(ifft(np.divide(-ft_ztr, ft_rft))))
-            else:
-                raise(ValueError("wave typye invalid: "+self.args.wvtype))
 
             # Update stats
             rfr.stats.channel = 'RF'+cmpts[0]
@@ -1080,7 +1077,7 @@ class Seismogram(object):
             
 
 
-def read_traces(traces, **kwargs):
+def read_traces(traces, geom, dt, rot, shift, npts, ntr):
     """
     Extracts the traces produced by Raysum and stores them into a list
     of Stream objects
@@ -1109,70 +1106,19 @@ def read_traces(traces, **kwargs):
 
     """
 
-
-    def _make_stats(net=None, sta=None, stime=None, dt=None,
-                    slow=None, baz=None, wvtype=None, channel=None,
-                    taxis=None):
-        """
-        Updates the ``stats`` dictionary from an obspy ``Trace`` object.
-
-        Args:
-            net (str): Network name
-            sta (str): Station name
-            stime (:class:`~obspy.core.UTCDateTime`): Start time of trace
-            dt (float): Sampling distance in seconds
-            slow (float): Slowness value (s/km)
-            baz (float): Back-azimuth value (degrees)
-            wvtype (str): Wave type ('P', 'SV', or 'SH')
-            channel (str): Channel name
-            taxis (:class:`~numpy.ndarray`): Time axis in seconds
-
-        Returns:
-            (:class:`~obspy.core.Trace`):
-                tr: Trace with updated stats
-
-        """
-
-        stats = AttribDict()
-        stats.baz = baz
-        stats.slow = slow
-        stats.station = sta
-        stats.network = net
-        stats.starttime = stime
-        stats.delta = dt
-        stats.channel = channel
-        stats.wvtype = wvtype
-        stats.taxis = taxis
-
-        return stats
-
-
-    # Unpack the arguments
-    args = AttribDict({**kwargs})
-
-    kwlist = ['traces', 'dt', 'geom', 'rot', 'shift', 'npts', 'ntr']
-
-    for k in args:
-        if k not in kwlist:
-            raise(NameError('Unknown kwarg: ', k))
-
-    # Read fortran output
-    npts = args.npts
-    ntr = args.ntr
-
     # Crop unused overhang of oversized fortran arrays
-    trace1 = np.array(traces[0, :npts, :ntr].reshape(npts*ntr, order='F'))
-    trace2 = np.array(traces[1, :npts, :ntr].reshape(npts*ntr, order='F'))
-    trace3 = np.array(traces[2, :npts, :ntr].reshape(npts*ntr, order='F'))
+    trs = [traces[0, :npts, :ntr].reshape(npts*ntr, order='F'),
+           traces[1, :npts, :ntr].reshape(npts*ntr, order='F'),
+           traces[2, :npts, :ntr].reshape(npts*ntr, order='F')]
+
     itr = np.array([npts*[tr] for tr in range(ntr)]).reshape(npts*ntr)
 
-
     # Component names
-    if args.rot == 0:
+    if rot == 0:
         component = ['N', 'E', 'Z']
-    elif args.rot == 1:
+    elif rot == 1:
         component = ['R', 'T', 'Z']
-    elif args.rot == 2:
+    elif rot == 2:
         component = ['P', 'V', 'H']
     else:
         raise(ValueError('Invalid value for "rot": Must be 0, 1, 2'))
@@ -1181,8 +1127,8 @@ def read_traces(traces, **kwargs):
     ntr = np.max(itr) + 1
 
     # Time axis
-    npts = len(trace1[itr == 0])
-    taxis = np.arange(npts)*args.dt - args.shift
+    npts = len(trs[0][itr == 0])
+    taxis = np.arange(npts)*dt - shift
 
     streams = []
 
@@ -1191,31 +1137,24 @@ def read_traces(traces, **kwargs):
         # Split by trace ID
         istr = itr == iitr
 
-        # Store into trace by channel with stats information
-        # Channel 1
+        # Store into trace by component with stats information
+        stream = Stream()
+        for ic in [0, 1, 2]:
+            stats = {
+                    'baz': geom[iitr][0],
+                    'slow': geom[iitr][1],
+                    'station': 'syn',
+                    'network': '',
+                    'starttime': UTCDateTime(),
+                    'delta': dt,
+                    'channel': 'BH'+component[ic],
+                    'taxis': taxis,
+                    }
 
-        stats = _make_stats(net='', sta='syn', stime=UTCDateTime(),
-                            dt=args.dt, slow=args.geom[iitr][1],
-                            baz=args.geom[iitr][0],
-                            channel='BH'+component[0], taxis=taxis)
-        tr1 = Trace(data=trace1[istr], header=stats)
-
-        # Channel 2
-        stats = _make_stats(net='', sta='syn', stime=UTCDateTime(),
-                            dt=args.dt, slow=args.geom[iitr][1],
-                            baz=args.geom[iitr][0],
-                            channel='BH'+component[1], taxis=taxis)
-        tr2 = Trace(data=trace2[istr], header=stats)
-
-        # Channel 3
-        stats = _make_stats(net='', sta='syn', stime=UTCDateTime(),
-                            dt=args.dt, slow=args.geom[iitr][1],
-                            baz=args.geom[iitr][0],
-                            channel='BH'+component[2], taxis=taxis)
-        tr3 = Trace(data=trace3[istr], header=stats)
+            tr = Trace(data=trs[ic][istr], header=stats)
+            stream.append(tr)
 
         # Store into Stream object and append to list
-        stream = Stream(traces=[tr1, tr2, tr3])
         streams.append(stream)
 
     return streams
@@ -1293,8 +1232,7 @@ def filtered_rf_array(sspread_arr, arr_out, ntr, npts, dt, fmin, fmax):
             fftshift(np.real(ifft(np.divide(ft_rft, ft_ztr)))))
 
 
-def run(model, geometry, wvtype='P', mults=2, npts=300, dt=0.025, align=1,
-        shift=None, rot=0, verbose=0, rf=False, rc=None):
+def run(model, geometry, rc, rf=False):
     """
     Run Fortran Raysum
 
@@ -1306,30 +1244,10 @@ def run(model, geometry, wvtype='P', mults=2, npts=300, dt=0.025, align=1,
             Subsurface velocity structure model
         geometry (:class:`~pyraysum.prs.Geometry`):
             Recording geometry
-        wvtype (str):
-            Wave type of incoming wavefield ('P', 'SV', or 'SH')
-        mults (int):
-            ID for calculating free surface multiples
-            ('0': no multiples, '1': Moho only, '2': all first-order)
-        npts (int):
-            Number of samples in time series
-        dt (float):
-            Sampling distance in seconds
-        align (int):
-            ID for time alignment of seismograms ('0': No alignment, '1': align at 'P',
-            '2': align at 'SV' or 'SH')
-        shift (float):
-            Time shift in seconds (positive shift moves seismograms
-            to greater lags). If None, set to dt, which is most often the desired
-            behaviour.
-        rot (int):
-            ID for rotation: 0 is NEZ, 1 is RTZ, 2 is PVH
-        verbose (int):
-            Whether or not to increase verbosity of Raysum
+        rc (:class:`~pyraysum.prs.RC`):
+            Computation options
         rf (bool):
             Whether or not to calculate RFs
-        rc (:class:`~pyraysum.prs.RC`):
-            Overwrite kwargs with parameters stored here.
 
     Returns:
         (:class:`~pyraysum.prs.Seismogram`): streamlist: List of Stream objects
@@ -1355,51 +1273,29 @@ def run(model, geometry, wvtype='P', mults=2, npts=300, dt=0.025, align=1,
 
     """
 
-    args = AttribDict(**locals())
-
-    kwlist = ['model', 'geometry', 'verbose', 'wvtype', 'mults',
-              'npts', 'dt', 'align', 'shift', 'rot', 'rf', 'rc']
-
-    for k in args:
-        if k not in kwlist:
-            raise(NameError('kwarg not defined: ', k))
-
-    if shift is None:
-        shift = dt
-
-    if rc:
-        wvtype, mults, npts, dt, align, shift, rot, verbose = rc.parameters
-        for kw in kwlist:
-            try:
-                args.update({kw: rc.__dict__[kw]})
-            except KeyError:
-                continue
-
-    if args.rf and (args.rot == 0):
-        msg = "Receiver functions cannot be calculated in ZNE coordinated, i.e. "
-        msg += "'rot' must not be '0'"
+    if rf and rc.rot == 0:
+        msg = "Receiver functions cannot be calculated in ZNE coordinates"
+        msg += "i.e. in rc, 'rot' must not be '0'"
         raise(ValueError(msg))
 
-
     tr_ph, tr_cart = fraysum.call_seis_spread(
-            model.fthickn, model.frho, model.fvp, model.fvs, model.fflag,
-            model.fani, model.ftrend, model.fplunge, model.fstrike, model.fdip,
-            model.nlay,
-            geometry.fbaz, geometry.fslow, geometry.fdn, geometry.fde, geometry.ntr,
-            wvtype, mults, npts, dt, align, shift, rot, verbose)
+        *model.parameters, *geometry.parameters, *rc.parameters,
+        )
 
     # Read all traces and store them into a list of :class:`~obspy.core.Stream`
-    if rot == 0:
-        streams = read_traces(tr_cart, geom=geometry.geom, dt=dt, rot=rot, shift=shift,
-                              npts=npts, ntr=geometry.ntr)
+    if rc.rot == 0:
+        streams = read_traces(
+            tr_cart, geom=geometry.geom, dt=rc.dt, rot=rc.rot, shift=rc.shift,
+            npts=rc.npts, ntr=geometry.ntr)
     else:
-        streams = read_traces(tr_ph, geom=geometry.geom, dt=dt, rot=rot, shift=shift,
-                              npts=npts, ntr=geometry.ntr)
+        streams = read_traces(
+            tr_ph, geom=geometry.geom, dt=rc.dt, rot=rc.rot,
+            shift=rc.shift, npts=rc.npts, ntr=geometry.ntr)
 
     # Store everything into Seismogram object
-    streamlist = Seismogram(model=model, geom=geometry.geom, streams=streams, args=args)
+    seismogram = Seismogram(model=model, geom=geometry.geom, rc=rc, streams=streams)
 
     if rf:
-        streamlist.calculate_rfs()
+        seismogram.calculate_rfs()
 
-    return streamlist
+    return seismogram
