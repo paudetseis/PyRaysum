@@ -781,6 +781,25 @@ class Geometry(object):
 
         print('Geometry written to: ' + fname)
 
+    def plot(self, show=True):
+        """
+        Plot ray geometry in polar coordinates
+
+        Returns:
+            (plt.axis): ax: Axis handle for plotting
+
+        """
+
+        fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
+        ax.set_theta_zero_location('N')
+        ax.set_theta_direction('clockwise')
+        ax.scatter(self.baz * np.pi / 180, self.slow, color='black')
+        ax.set_title('Ray Backazimuth and Slowness')
+
+        if show:
+            fig.show()
+
+        return ax
 
 def read_geometry(geomfile, encoding=None):
     """
