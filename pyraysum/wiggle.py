@@ -142,9 +142,10 @@ def rf_wiggles(rflist, btyp='baz', wvtype='P', pws=False, tmin=-5., tmax=20,
 
     # Plot stack of all traces from str1 on top left
     ax1.fill_between(time, 0., tr1.data, where=tr1.data+1e-6 <= 0.,
-                     facecolor='blue', linewidth=0)
+                     facecolor='blue', linewidth=0, interpolate=True)
     ax1.fill_between(time, 0., tr1.data, where=tr1.data+1e-6 >= 0.,
-                     facecolor='red', linewidth=0)
+                     facecolor='red', linewidth=0, interpolate=True)
+    ax1.plot(time, tr1.data, linewidth=0.1, color='black')
     ax1.set_ylim(-np.max(np.abs(tr1.data)), np.max(np.abs(tr1.data)))
     ax1.set_yticks(())
     ax1.set_xticks(())
@@ -153,9 +154,10 @@ def rf_wiggles(rflist, btyp='baz', wvtype='P', pws=False, tmin=-5., tmax=20,
 
     # Plot stack of all SH traces on top right
     ax3.fill_between(time, 0., tr2.data, where=tr2.data+1e-6 <= 0.,
-                     facecolor='blue', linewidth=0)
+                     facecolor='blue', linewidth=0, interpolate=True)
     ax3.fill_between(time, 0., tr2.data, where=tr2.data+1e-6 >= 0.,
-                     facecolor='red', linewidth=0)
+                     facecolor='red', linewidth=0, interpolate=True)
+    ax3.plot(time, tr2.data, linewidth=0.1, color='black')
     ax3.set_xlim(tmin, tmax)
     ax3.set_ylim(-np.max(np.abs(tr1.data)), np.max(np.abs(tr1.data)))
     ax3.set_yticks(())
@@ -194,10 +196,11 @@ def rf_wiggles(rflist, btyp='baz', wvtype='P', pws=False, tmin=-5., tmax=20,
             # Fill positive in red, negative in blue
             ax.fill_between(
                 time, y, y+tr.data*maxval, where=tr.data+1e-6 <= 0.,
-                facecolor='blue', linewidth=0)
+                facecolor='blue', linewidth=0, interpolate=True)
             ax.fill_between(
                 time, y, y+tr.data*maxval, where=tr.data+1e-6 >= 0.,
-                facecolor='red', linewidth=0)
+                facecolor='red', linewidth=0, interpolate=True)
+            ax.plot(time, y+tr.data*maxval, linewidth=0.1, color='black')
 
         ax.set_xlim(tmin, tmax)
 
@@ -323,6 +326,7 @@ def stream_wiggles(streamlist, btyp='baz', wvtype='P', tmin=-5., tmax=20.,
             ax.fill_between(
                 time, y, y+tr.data*maxval, where=tr.data+1e-6 >= 0.,
                 facecolor='red', linewidth=0, interpolate=True)
+            ax.plot(time, y+tr.data*maxval, linewidth=0.1, color='black')
 
         ax.set_xlim(tmin, tmax)
 
