@@ -837,10 +837,13 @@ class RC(object):
             3: align at 'SH'
         shift (float or None):
             Time shift in seconds (positive shift moves seismograms
-            to greater lags). If None, set to dt, which is most often the desired
-            behaviour.
+            to greater lags). If None, set to dt, to include direct wave when
+            ``align`` > 0.
         rot (int):
-            ID for rotation: 0 is NEZ, 1 is RTZ, 2 is PVH
+            ID for rotation:
+            0 is ENZ (east, north, up)
+            1 is RTZ (radial, transverse, down [positive towards source])
+            2 is PVH (parallel P-, SH-, SV-polarization [positive in ray direction])
         verbose (int):
             Verbosity. 0 - silent; 1 - verbose
 
@@ -896,7 +899,7 @@ class RC(object):
         out += "{:}\n".format(self.align)
         out += "# Shift of traces (seconds)\n"
         out += "{:}\n".format(self.shift)
-        out += "# Rotation to output: 0 is NEZ, 1 is RTZ, 2 is PVH\n"
+        out += "# Rotation to output: 0 is ENZ, 1 is RTZ, 2 is PVH\n"
         out += "{:}\n".format(self.rot)
         return out
 
@@ -1112,7 +1115,10 @@ def read_traces(traces, geom, dt, rot, shift, npts, ntr):
         dt (float):
             Sample distance in seconds
         rot (int):
-            ID for rotation: 0 is NEZ, 1 is RTZ, 2 is PVH
+            ID for rotation:
+            0 is ENZ (east, north, up)
+            1 is RTZ (radial, transverse, down [positive towards source])
+            2 is PVH (parallel P-, SH-, SV-polarization [positive in ray direction])
         shift (float):
             Time shift in seconds
 
@@ -1137,11 +1143,15 @@ def read_traces(traces, geom, dt, rot, shift, npts, ntr):
 
     # Component names
     if rot == 0:
+        # Rotate to seismometer convention
         component = ['N', 'E', 'Z']
+        order = [1, 0, 2]
     elif rot == 1:
         component = ['R', 'T', 'Z']
+        order = [0, 1, 2]
     elif rot == 2:
         component = ['P', 'V', 'H']
+        order = [0, 1, 2]
     else:
         raise(ValueError('Invalid value for "rot": Must be 0, 1, 2'))
 
@@ -1161,7 +1171,7 @@ def read_traces(traces, geom, dt, rot, shift, npts, ntr):
 
         # Store into trace by component with stats information
         stream = Stream()
-        for ic in [0, 1, 2]:
+        for ic in order:
             stats = {
                     'baz': geom[iitr][0],
                     'slow': geom[iitr][1],
@@ -1173,7 +1183,12 @@ def read_traces(traces, geom, dt, rot, shift, npts, ntr):
                     'taxis': taxis,
                     }
 
-            tr = Trace(data=trs[ic][istr], header=stats)
+            if rot == 0 and component[ic] == 'Z':
+                # Raysum has z down, change here to z up
+                tr = Trace(data=-trs[ic][istr], header=stats)
+            else:
+                tr = Trace(data=trs[ic][istr], header=stats)
+
             stream.append(tr)
 
         # Store into Stream object and append to list
