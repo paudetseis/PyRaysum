@@ -641,7 +641,7 @@ class Model(object):
                     '$\\rho = {:.1f}$kg/m$^3$').format(
                         self.vp[i]/1000, self.vs[i]/1000,
                         self.vpvs[i], self.rho[i]/1000)
-            ax.text(0, depth, info,
+            ax.text(0, depth + 1, info,
                     rotation=-self.dip[i],
                     rotation_mode='anchor',
                     ha='center', va='top')

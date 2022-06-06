@@ -237,7 +237,7 @@ def rf_wiggles(rflist, btyp='baz', wvtype='P', pws=False, tmin=-5., tmax=20,
     else:
         plt.show()
 
-    return
+    return fig
 
 
 def stream_wiggles(streamlist, btyp='baz', wvtype='P', tmin=-5., tmax=20.,
@@ -272,8 +272,8 @@ def stream_wiggles(streamlist, btyp='baz', wvtype='P', tmin=-5., tmax=20.,
     """
 
     if not (btyp == 'baz' or btyp == 'slow' or btyp == 'dist'):
-        print('type has to be "baz" or "slow" or "dist"')
-        return
+        msg = 'type has to be "baz" or "slow" or "dist"'
+        raise ValueError(msg)
 
     # Re-order streams in list
     str1 = Stream(traces=[st[0] for st in streamlist])
@@ -366,7 +366,7 @@ def stream_wiggles(streamlist, btyp='baz', wvtype='P', tmin=-5., tmax=20.,
     else:
         plt.show()
 
-    return
+    return fig
 
 
 def seis_wiggles(stream, tmin=-5., tmax=20., save=False,
@@ -440,4 +440,4 @@ def seis_wiggles(stream, tmin=-5., tmax=20., save=False,
     else:
         plt.show()
 
-    return
+    return fig
