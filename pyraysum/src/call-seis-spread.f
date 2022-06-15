@@ -9,7 +9,8 @@ c####&
      &                            baz, slow, sta_dx, sta_dy, ntr,
      &                            iphname, mults, nsamp, dt, align,
      &                            shift, out_rot, verb,
-     &                            Tr_ph, Tr_cart)
+     &                            Tr_ph, Tr_cart, travel_time,
+     &                            amplitude, phaselist)
 
 c Anyone who fails to start a Fortran program with this line
 c should be severely beaten:
@@ -55,26 +56,26 @@ Cf2py   integer intent(in) :: ntr
 Cf2py   intent(in) :: baz, slow, sta_dx, sta_dy
         
 c ========================================
-c Output parameters !! intent(out) them !!
+c Output parameters
 c Traces
 
         real Tr_cart(3,maxsamp,maxtr)
         real Tr_ph(3,maxsamp,maxtr)
-Cf2py intent(out) :: Tr_cart, Tr_ph
+        integer phaselist(maxseg,2,maxph)
+        real travel_time(maxph,maxtr)
+        real amplitude(3,maxph,maxtr)
+Cf2py intent(out) :: Tr_cart, Tr_ph, travel_time, amplitude, phaselist
 
 c ==================
 c Internal variables
 c Scratch variables:
-        integer j, verb, il
-        real amp_in
+        integer j, verb, il, iph, itr
+        real amp_in, delta
         logical verbose
 
 c Phase parameters
-        integer phaselist(maxseg,2,maxph),nseg(maxph),numph,iphase
+        integer nseg(maxph),numph,iphase
 
-c Arrivals
-        real travel_time(maxph,maxtr),amplitude(3,maxph,maxtr)
-        
 c   aa is a list of rank-4 tensors (a_ijkl = c_ijkl/rho)
 c   rot is a list of rotator matrices, used to rotate into the local
 c   coordinate system of each interface.
@@ -179,20 +180,25 @@ c Assemble traces
         end if
         call make_traces(travel_time,amplitude,ntr,numph,nsamp,
      &                   dt,align,shift,verbose,Tr_cart)
-     
+
         if (out_rot .eq. 1) then
 c Rotate to RTZ
           if (verbose) then
             print *, 'Calling rot_traces...'
           end if
           call rot_traces(Tr_cart,baz,ntr,nsamp,Tr_ph)
+          call rot_traces(amplitude,baz,ntr,numph,amplitude)
         else
-c Rotate to wavevector coordinates
-          if (verbose) then
-            print *, 'Calling fs_traces...'
+          if (out_rot .eq. 2) then
+c   Rotate to wavevector coordinates
+            if (verbose) then
+              print *, 'Calling fs_traces...'
+            end if
+            call fs_traces(Tr_cart,baz,slow,alpha(1),beta(1),
+     &                     rho(1),ntr,nsamp,Tr_ph)
+            call fs_traces(amplitude,baz,slow,alpha(1),beta(1),
+     &                     rho(1),ntr,numph,amplitude)
+            end if
           end if
-          call fs_traces(Tr_cart,baz,slow,alpha(1),beta(1),
-     &                   rho(1),ntr,nsamp,Tr_ph)
-        end if
                 
       end subroutine

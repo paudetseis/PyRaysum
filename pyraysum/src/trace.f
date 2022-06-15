@@ -42,6 +42,8 @@ c        Max. time that fits. The first sample is at t=0.
           end if
           do iph=1,nph
             tt_s=tt(iph,itr)-delta
+c           shift output arrivals as well
+            tt(iph,itr)=tt_s
             if ((tt_s .lt. 0.) .or. (tt_s .gt. max_t)) then
               if (verbose) then
                 write (*,*) 'Phase ',iph,' cropped out of trace ',itr

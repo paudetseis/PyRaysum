@@ -34,6 +34,7 @@ from numpy.fft import fft, ifft, fftshift
 from pyraysum import wiggle
 import fraysum
 
+_phnames = {1: 'P', 2: 'S', 3: 'T', 4: 'p', 5: 's', 6: 't'}
 
 class Model(object):
     """
@@ -811,8 +812,14 @@ def read_geometry(geomfile, encoding=None):
         geometry: Ray geometry for current simulation
 
     """
-    values = np.genfromtxt(geomfile, dtype=None, encoding=encoding)
-    return Geometry(*zip(*values))
+    vals = np.genfromtxt(geomfile, dtype=None, encoding=encoding)
+    
+    try:
+        geom = Geometry(*zip(*vals))
+    except TypeError:
+        # *values contains single line, which is not iterable
+        geom = Geometry([vals[0]], [vals[1]], [vals[2]], [vals[3]])
+    return geom
 
 
 class RC(object):
@@ -947,11 +954,10 @@ class Seismogram(object):
             Instance of class :class:`~pyraysum.prs.Model`
         - geom (:class:`~pyraysum.prs.Geometry`): 
             Instance of class :class:`~pyraysum.prs.Geometry`
-        - streams (List): 
-            List of :class:`~obspy.core.Stream` objects.
         - rc (:class:`~pyraysum.prs.RC`): 
             Instance of class :class:`~pyraysum.prs.RC`
-
+        - streams (List): 
+            List of :class:`~obspy.core.Stream` objects.
     """
 
 
@@ -961,7 +967,6 @@ class Seismogram(object):
         self.geom = geom
         self.streams = streams
         self.rc = rc
-
 
     def calculate_rfs(self):
         """
@@ -1102,7 +1107,7 @@ class Seismogram(object):
             
 
 
-def read_traces(traces, geom, dt, rot, shift, npts, ntr):
+def read_traces(traces, geom, dt, rot, shift, npts, ntr, arrivals=None):
     """
     Extracts the traces produced by Raysum and stores them into a list
     of Stream objects
@@ -1121,8 +1126,10 @@ def read_traces(traces, geom, dt, rot, shift, npts, ntr):
             2 is PVH (parallel P-, SH-, SV-polarization [positive in ray direction])
         shift (float):
             Time shift in seconds
+        arrivals (list):
+            List of arrival times, amplitudes, and names
+            Output of read_arrivals
 
-    .. note::
         To interpret fraysum output, supply:``
             ntr (int):
                 Number of traces
@@ -1183,9 +1190,20 @@ def read_traces(traces, geom, dt, rot, shift, npts, ntr):
                     'taxis': taxis,
                     }
 
+            if arrivals:
+                stats.update(
+                    {
+                    'phase_times': arrivals[iitr][ic][0],
+                    'phase_amplitudes': arrivals[iitr][ic][1],
+                    'phase_descriptors': arrivals[iitr][ic][2],
+                    'phase_names': arrivals[iitr][ic][3],
+                    }
+                )
+
             if rot == 0 and component[ic] == 'Z':
                 # Raysum has z down, change here to z up
                 tr = Trace(data=-trs[ic][istr], header=stats)
+                tr.stats.phase_amplitudes *= -1
             else:
                 tr = Trace(data=trs[ic][istr], header=stats)
 
@@ -1195,6 +1213,87 @@ def read_traces(traces, geom, dt, rot, shift, npts, ntr):
         streams.append(stream)
 
     return streams
+
+
+def read_arrivals(ttimes, amplitudes, phaselist, geometry):
+    """
+    Convert the output of raysum's phaselist, amplitude and traveltime tables to
+    lists of phase arrival times, amplitudes, long names, and short names.
+
+    Input:
+        ttimes: Travel time array ...
+        amplitudes: Amplitude array ...
+        phaselist: Phase identifier array returned by call_seis_spread
+        geometry: ``prs.Geometry`` object
+    Returns:
+        tans:
+            list of 3 component phase arrivals:
+            0: times
+            1: amplitudes
+            2: long names
+            3: short names 
+    """
+
+    lphns = []
+    sphns = []
+    for iph in range(len(phaselist[0, 0, :])):
+        lphn = ''
+        sphn = ''
+
+        for iseg in range(len(phaselist[:, 0, 0])):
+            if phaselist[iseg, 0, iph] == 0:
+                # No more reflections / conversions
+                lphns.append(lphn)
+                sphns.append(sphn)
+                break
+
+            phid = phaselist[iseg, 1, iph]
+            ifid = phaselist[iseg, 0, iph]
+            
+            if phid > 3:
+                # downgoing wave, reflection / conversion from top interface
+                ifid -= 1
+
+            ifn = str(ifid)
+            if iseg == 0:
+                # incoming wave, no interface
+                ifn = ''
+
+            phn = _phnames[phid]
+            lphn += (ifn + phn)
+
+            # Omit not-converted phases
+            try:
+                if sphn[-1] == phn:
+                    phn = ''
+            except IndexError:
+                pass
+
+            sphn += phn
+
+        if phaselist[0, 0, iph+1] == 0:
+            break
+
+    nphs = len(lphns)
+
+    lphns = np.array(lphns)
+    sphns = np.array(sphns)
+
+    tanss = []
+    for itr in range(geometry.ntr):
+        tans = []
+        for comp in range(len(amplitudes[:, 0, 0])):
+            amps = amplitudes[comp, :nphs, itr]
+            isa = abs(amps) > 1e-6  # Dismiss 0 amplitude arrivals
+            tans.append(
+                np.array(
+                    [ttimes[:nphs, itr][isa], amps[isa], lphns[isa], sphns[isa]],
+                    dtype=object,
+                )
+            )
+        tanss.append(tans)
+
+    return tanss
 
 
 cached_coefficients = {}
@@ -1297,7 +1396,7 @@ def run(model, geometry, rc, rf=False):
     >>> geom = Geometry(0., 0.06) # baz = 0 deg; slow = 0.06 x/km
     >>> npts = 1500
     >>> dt = 0.025      # s
-    >>> streamlist = prs.run_frs(model, geom, npts=npts, dt=dt)
+    >>> streamlist = prs.run(model, geom, npts=npts, dt=dt)
     >>> type(streamlist[0])
     <class 'obspy.core.stream.Stream'>
     >>> print(st)
@@ -1315,19 +1414,21 @@ def run(model, geometry, rc, rf=False):
         msg += "i.e. in rc, 'rot' must not be '0'"
         raise(ValueError(msg))
 
-    tr_ph, tr_cart = fraysum.call_seis_spread(
+    tr_ph, tr_cart, tt, amp, phl = fraysum.call_seis_spread(
         *model.parameters, *geometry.parameters, *rc.parameters,
         )
+
+    arrivals = read_arrivals(tt, amp, phl, geometry)
 
     # Read all traces and store them into a list of :class:`~obspy.core.Stream`
     if rc.rot == 0:
         streams = read_traces(
             tr_cart, geom=geometry.geom, dt=rc.dt, rot=rc.rot, shift=rc.shift,
-            npts=rc.npts, ntr=geometry.ntr)
+            npts=rc.npts, ntr=geometry.ntr, arrivals=arrivals)
     else:
         streams = read_traces(
-            tr_ph, geom=geometry.geom, dt=rc.dt, rot=rc.rot,
-            shift=rc.shift, npts=rc.npts, ntr=geometry.ntr)
+            tr_ph, geom=geometry.geom, dt=rc.dt, rot=rc.rot, shift=rc.shift,
+            npts=rc.npts, ntr=geometry.ntr, arrivals=arrivals)
 
     # Store everything into Seismogram object
     seismogram = Seismogram(model=model, geom=geometry.geom, rc=rc, streams=streams)
