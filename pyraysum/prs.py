@@ -35,6 +35,7 @@ from pyraysum import wiggle
 import fraysum
 
 _phnames = {1: 'P', 2: 'S', 3: 'T', 4: 'p', 5: 's', 6: 't'}
+_phids = {_phnames[k]: k for k in _phnames}  # inverse dictionary
 
 class Model(object):
     """
@@ -831,7 +832,10 @@ class RC(object):
             Wave type of incoming wavefield ('P', 'SV', or 'SH')
         mults (int):
             ID for calculating free surface multiples
-            ('0': no multiples, '1': Moho only, '2': all first-order)
+            0: no multiples
+            1: First interface multiples only
+            2: all first-order multiple (once reflected from the surface)
+            3: supply phases to be computed via rc.set_phaselist()
         npts (int):
             Number of samples in time series
         dt (float):
@@ -853,6 +857,10 @@ class RC(object):
             2 is PVH (parallel P-, SH-, SV-polarization [positive in ray direction])
         verbose (int):
             Verbosity. 0 - silent; 1 - verbose
+        maxseg (int):
+            Maximum number of segments per ray, as defined in param.h
+        maxph (int):
+            Maximum number of phases per trace, as defined in param.h
 
     ``Attributes``:
         parameters (list):
@@ -860,18 +868,19 @@ class RC(object):
     """
 
     def __init__(self, verbose=1, wvtype='P', mults=0,
-                 npts=300, dt=0.025, align=1, shift=None, rot=1):
+                 npts=300, dt=0.025, align=1, shift=None, rot=1,
+                 maxseg=45, maxph=40000):
 
         if wvtype not in ['P', 'SV', 'SH']:
-            msg = "wvtype must be 'P', 'SV', or 'SH', not: " + wvtype
+            msg = "wvtype must be 'P', 'SV', or 'SH', not: " + str(wvtype)
             raise ValueError(msg)
 
-        if mults not in [0, 1, 2, '0', '1', '2']:
-            msg = "mults must be 0, 1, or 2, not: " + mults
+        if mults not in [0, 1, 2, 3, '0', '1', '2', '3']:
+            msg = "mults must be 0, 1, 2, or 3, not: " + str(mults)
             raise ValueError(msg)
 
         if align not in [0, 1, 2, 3, '0', '1', '2' ,'3']:
-            msg = "align must be 0, 1, 2, or 3, not: " + align
+            msg = "align must be 0, 1, 2, or 3, not: " + str(align)
             raise ValueError(msg)
 
         self.verbose = int(verbose)
@@ -881,6 +890,11 @@ class RC(object):
         self.dt = float(dt)
         self.align = int(align)
         self.rot = int(rot)
+        self.phaselist = np.asfortranarray(np.zeros((maxseg, 2, maxph), dtype=int))
+        self.nseg = np.asfortranarray(np.zeros(maxph))
+        self.numph = 0
+        self.maxseg = maxseg
+        self.maxph = maxph
         
         if shift is None:
             self.shift = self.dt
@@ -889,7 +903,6 @@ class RC(object):
 
         self.parameters = [self.wvtype, self.mults, self.npts, self.dt,
                            self.align, self.shift, self.rot, self.verbose]
-
 
     def __str__(self):
         out = "# Verbosity\n"
@@ -909,6 +922,60 @@ class RC(object):
         out += "# Rotation to output: 0 is ENZ, 1 is RTZ, 2 is PVH\n"
         out += "{:}\n".format(self.rot)
         return out
+
+    def null_phaselist(self, mults=2):
+        """
+        Do not use phaselist, but compute using mults keyword.
+
+        Args:
+            mults (int)
+                0 limit phases to direct conversions (mults=0)
+                1 first interface multiples
+        """
+
+        if mults > 2:
+            msg = "Invalid value : " + str(mults)
+            msg += ". To compute only specific phases, use set_phaselist()"
+            raise ValueError(msg)
+
+        self.phaselist = np.asfortranarray(
+            np.zeros((self.maxseg, 2, self.maxph), dtype=int))
+        self.mults = mults
+
+    def set_phaselist(self, descriptors):
+        """
+        Limit number of phases to be calculated.
+
+        Args:
+            descriptors: (list of str)
+            List of phase descriptors, where each discriptor is a string of consecutive
+            PHASE SEGMENT pairs, where
+            PHASE is P upgoin P-wave
+                     S upgoing fast S-wave
+                     T upgoing slow S-wave
+                     p downgoing P-wave
+                     s downgoing fast S-wave
+                     t downgoing slow S-wave
+            SEGMENT is the index of the model layer (Python indexing)
+
+        Example:
+            ['1P0P'] direct P-wave
+            ['1P0S'] P-to-S converted wave
+            ['1P0P0s0S'] P reflected s at the surface, reflected S at the first interface
+        """
+
+        self.mults = 3
+
+        self.numph = len(descriptors)
+        for iph, dscr in enumerate(descriptors):
+            self.nseg[iph] = len(dscr) // 2
+            for iseg, ix in enumerate(range(0, len(dscr), 2)):
+                layn = int(dscr[ix])
+                phid = _phids[dscr[ix+1]]
+
+                self.phaselist[iseg, 0, iph] = layn + 1  # Fortran indexing
+                self.phaselist[iseg, 1, iph] = phid
+
 
     def write(self, fname='raysum-param'):
         """
@@ -1230,54 +1297,45 @@ def read_arrivals(ttimes, amplitudes, phaselist, geometry):
             list of 3 component phase arrivals:
             0: times
             1: amplitudes
-            2: long names
-            3: short names 
+            2: (long) phase desciptors
+            3: (short) phse names
     """
 
-    lphns = []
-    sphns = []
+    dscrs = []
+    phnms = []
     for iph in range(len(phaselist[0, 0, :])):
-        lphn = ''
-        sphn = ''
+        dscr = ''
+        phnm = ''
 
         for iseg in range(len(phaselist[:, 0, 0])):
             if phaselist[iseg, 0, iph] == 0:
                 # No more reflections / conversions
-                lphns.append(lphn)
-                sphns.append(sphn)
+                dscrs.append(dscr)
+                phnms.append(phnm)
                 break
 
             phid = phaselist[iseg, 1, iph]
-            ifid = phaselist[iseg, 0, iph]
-            
-            if phid > 3:
-                # downgoing wave, reflection / conversion from top interface
-                ifid -= 1
-
-            ifn = str(ifid)
-            if iseg == 0:
-                # incoming wave, no interface
-                ifn = ''
+            layn = str(phaselist[iseg, 0, iph] - 1)  # Python indexing
 
             phn = _phnames[phid]
-            lphn += (ifn + phn)
+            dscr += (layn + phn)
 
             # Omit not-converted phases
             try:
-                if sphn[-1] == phn:
+                if phnm[-1] == phn:
                     phn = ''
             except IndexError:
                 pass
 
-            sphn += phn
+            phnm += phn
 
         if phaselist[0, 0, iph+1] == 0:
             break
 
-    nphs = len(lphns)
+    nphs = len(dscrs)
 
-    lphns = np.array(lphns)
-    sphns = np.array(sphns)
+    dscrs = np.array(dscrs)
+    phnms = np.array(phnms)
 
     tanss = []
     for itr in range(geometry.ntr):
@@ -1287,7 +1345,7 @@ def read_arrivals(ttimes, amplitudes, phaselist, geometry):
             isa = abs(amps) > 1e-6  # Dismiss 0 amplitude arrivals
             tans.append(
                 np.array(
-                    [ttimes[:nphs, itr][isa], amps[isa], lphns[isa], sphns[isa]],
+                    [ttimes[:nphs, itr][isa], amps[isa], dscrs[isa], phnms[isa]],
                     dtype=object,
                 )
             )
@@ -1414,11 +1472,11 @@ def run(model, geometry, rc, rf=False):
         msg += "i.e. in rc, 'rot' must not be '0'"
         raise(ValueError(msg))
 
-    tr_ph, tr_cart, tt, amp, phl = fraysum.call_seis_spread(
+    tr_ph, tr_cart, tt, amp, rc.phaselist, rc.nseg, rc.numph = fraysum.call_seis_spread(
         *model.parameters, *geometry.parameters, *rc.parameters,
-        )
+        rc.phaselist, rc.nseg, rc.numph)
 
-    arrivals = read_arrivals(tt, amp, phl, geometry)
+    arrivals = read_arrivals(tt, amp, rc.phaselist, geometry)
 
     # Read all traces and store them into a list of :class:`~obspy.core.Stream`
     if rc.rot == 0:

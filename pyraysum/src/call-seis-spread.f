@@ -10,7 +10,7 @@ c####&
      &                            iphname, mults, nsamp, dt, align,
      &                            shift, out_rot, verb,
      &                            Tr_ph, Tr_cart, travel_time,
-     &                            amplitude, phaselist)
+     &                            amplitude, phaselist, nseg, numph)
 
 c Anyone who fails to start a Fortran program with this line
 c should be severely beaten:
@@ -64,7 +64,9 @@ c Traces
         integer phaselist(maxseg,2,maxph)
         real travel_time(maxph,maxtr)
         real amplitude(3,maxph,maxtr)
-Cf2py intent(out) :: Tr_cart, Tr_ph, travel_time, amplitude, phaselist
+        integer nseg(maxph),numph
+Cf2py intent(out) :: Tr_cart, Tr_ph, travel_time, amplitude
+Cf2py intent(in, out) :: phaselist, nseg, numph
 
 c ==================
 c Internal variables
@@ -74,7 +76,7 @@ c Scratch variables:
         logical verbose
 
 c Phase parameters
-        integer nseg(maxph),numph,iphase
+        integer iphase
 
 c   aa is a list of rank-4 tensors (a_ijkl = c_ijkl/rho)
 c   rot is a list of rotator matrices, used to rotate into the local
@@ -137,20 +139,31 @@ c Return geometry for testing
         end if
         
 c Generate phase list
-        if (verbose) then
-          print *, 'Generating phaselist...'
-        end if
-        numph=0
+c Compute direct phases
         if (mults .ne. 3) then
+          numph=0
+          if (verbose) then
+            print *, 'Generating direct phases...'
+          end if
           call ph_direct(phaselist,nseg,numph,nlay,iphase)
         end if
+c Compute multiples
         if (mults .eq. 1) then
+          if (verbose) then
+            print *, 'Generating mutiples...'
+          end if
           call ph_fsmults(phaselist,nseg,numph,nlay,1,iphase)
-        end if
-        if (mults .eq. 2) then
+        else if (mults .eq. 2) then
           do j=1,nlay-1
+            if (verbose) then
+              print *, 'Generating mutiples...'
+            end if
             call ph_fsmults(phaselist,nseg,numph,nlay,j,iphase)
           end do
+        else if (mults .eq. 3) then
+          if (verbose) then
+            print *, 'Using supplied phaselist...'
+          end if
         end if
         if (verbose) then
           call printphases(phaselist,nseg,numph)
