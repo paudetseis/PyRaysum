@@ -1,5 +1,5 @@
 from pyraysum import prs, Model, Geometry, RC
-from fraysum import call_seis_spread
+from fraysum import run_full, run_bare
 import numpy as np
 import pytest
 import matplotlib.pyplot as mp
@@ -75,8 +75,8 @@ def test_filtered_rf_array():
     slow = 0.06 
     dt = 0.05
     rot = 2
-    mults = 0
-    verbose = 0
+    mults = 1
+    verbose = False
     wvtype = 'P'
     align = 2
     npts = 1000
@@ -92,27 +92,27 @@ def test_filtered_rf_array():
     rfarray = np.zeros((geom.ntr, 2, npts))
 
     # To time this, do:
-    # print(timeit('_run_frs()', number=50, globals=globals()))
-    # >> 27.262143349274993
-    def _run_frs():
-        streams = prs.run(model, geom, rc, verbose=False)
+    # print(timeit('_run()', number=50, globals=globals()))
+    # >> 21.00839215517044
+    def _run():
+        streams = prs.run(model, geom, rc)
         streams.calculate_rfs()
         streams.filter('rfs', 'bandpass', freqmin=fmin, freqmax=fmax,
                        zerophase=True, corners=2)
         return streams
 
     # To time this, do:
-    # print(timeit('_run_sspread()', number=50, globals=globals()))
-    # >> 16.743131840601563
-    def _run_sspread():
-        ph_traces, _, _, _ = call_seis_spread(
+    # print(timeit('_run_bare()', number=50, globals=globals()))
+    # >> 9.778649725019932
+    def _run_bare():
+        ph_traces = run_bare(
             *model.parameters, *geom.parameters, *rc.parameters)
 
         prs.filtered_rf_array(ph_traces, rfarray, geom.ntr, rc.npts, rc.dt, fmin, fmax)
 
-    streams = _run_frs()
+    streams = _run()
 
-    _run_sspread()
+    _run_bare()
 
     fig, ax = mp.subplots(len(geom.geom), 2, tight_layout=True)
     for l, (stream, array)  in enumerate(zip(streams.rfs, rfarray)):

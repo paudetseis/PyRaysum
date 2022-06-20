@@ -25,6 +25,7 @@
 Functions to interact with ``Raysum`` software
 
 '''
+import re
 from datetime import datetime
 import numpy as np
 from scipy import signal
@@ -34,6 +35,7 @@ from numpy.fft import fft, ifft, fftshift
 from pyraysum import wiggle
 import fraysum
 
+_iphase = {'P': 1, 'SV': 2, 'SH': 3}
 _phnames = {1: 'P', 2: 'S', 3: 'T', 4: 'p', 5: 's', 6: 't'}
 _phids = {_phnames[k]: k for k in _phnames}  # inverse dictionary
 
@@ -899,21 +901,18 @@ class RC(object):
         else:
             self.shift = float(shift)
 
-        self._numph = 0
+        self.iphase = _iphase[self.wvtype]
+
+        self._numph = np.int32(0)
         self._maxseg = maxseg
         self._maxph = maxph
         self._maxtr = maxtr
         self._maxsamp= maxsamp
-        self._phaselist = np.asfortranarray(np.zeros((maxseg, 2, maxph), dtype=int))
-        self._nseg = np.asfortranarray(np.zeros(maxph))
-        self._traces = np.asfortranarray(np.zeros((3, maxsamp, maxtr)))
-        self._traces2 = np.asfortranarray(np.zeros((3, maxsamp, maxtr)))
-        self._traveltimes = np.asfortranarray(np.zeros((maxph, maxtr)))
-        self._amplitudes = np.asfortranarray(np.zeros((3, maxph, maxtr)))
+        self._phaselist = np.asfortranarray(
+            np.zeros((maxseg, 2, maxph), dtype=np.int32))
+        self._nseg = np.asfortranarray(np.zeros(maxph), dtype=np.int32)
+        self.update()
 
-        self.parameters = [self.wvtype, self.mults, self.npts, self.dt,
-                           self.align, self.shift, self.rot, self.verbose,
-                           self._nseg, self._numph, self._phaselist]
     def __str__(self):
         out = "# Verbosity\n"
         out += "{:}\n".format(int(self.verbose))
@@ -948,8 +947,8 @@ class RC(object):
             msg += ". To compute only specific phases, use set_phaselist()"
             raise ValueError(msg)
 
-        self.phaselist = np.asfortranarray(
-            np.zeros((self.maxseg, 2, self.maxph), dtype=int))
+        self._phaselist = np.asfortranarray(
+            np.zeros((self.maxseg, 2, self.maxph), dtype=np.int32))
         self.mults = mults
 
     def set_phaselist(self, descriptors):
@@ -975,16 +974,29 @@ class RC(object):
         """
 
         self.mults = 3
+        phre = '[' + ''.join(_phids.keys()) + ']'
 
-        self.numph = len(descriptors)
+        self._numph = np.int32(len(descriptors))
         for iph, dscr in enumerate(descriptors):
-            self.nseg[iph] = len(dscr) // 2
-            for iseg, ix in enumerate(range(0, len(dscr), 2)):
-                layn = int(dscr[ix])
-                phid = _phids[dscr[ix+1]]
+            self._nseg[iph] = sum([dscr.count(c) for c in ''.join(_phids.keys())])
+            for iseg, (mlay, mphs) in enumerate(zip(
+                re.finditer('\d+', dscr), re.finditer(phre, dscr)
+            )):
+                layn = int(mlay.group(0))
+                phid = _phids[mphs.group(0)]
 
-                self.phaselist[iseg, 0, iph] = layn + 1  # Fortran indexing
-                self.phaselist[iseg, 1, iph] = phid
+                self._phaselist[iseg, 0, iph] = layn + 1  # Fortran indexing
+                self._phaselist[iseg, 1, iph] = phid
+
+        self.update()
+
+    def update(self):
+        """
+        Explicitly update parameters attribute
+        """
+        self.parameters = [self.iphase, self.mults, self.npts, self.dt,
+                           self.align, self.shift, self.rot, self.verbose,
+                           self._nseg, self._numph, self._phaselist]
 
 
     def write(self, fname='raysum-param'):
@@ -1436,7 +1448,7 @@ def filtered_rf_array(sspread_arr, arr_out, ntr, npts, dt, fmin, fmax):
             fftshift(np.real(ifft(np.divide(ft_rft, ft_ztr)))))
 
 
-def run(model, geometry, rc, rf=False):
+def run(model, geometry, rc, mode='full', rf=False):
     """
     Run Fortran Raysum
 
@@ -1450,6 +1462,9 @@ def run(model, geometry, rc, rf=False):
             Recording geometry
         rc (:class:`~pyraysum.prs.RC`):
             Computation options
+        mode (str):
+            'full': Compute named phase arrivals and descriptors on the way (slower)
+            'bare': Only compute traces (faster)
         rf (bool):
             Whether or not to calculate RFs
 
@@ -1480,18 +1495,25 @@ def run(model, geometry, rc, rf=False):
     if rf and rc.rot == 0:
         msg = "Receiver functions cannot be calculated in ZNE coordinates, "
         msg += "i.e. in rc, 'rot' must not be '0'"
-        raise(ValueError(msg))
+        raise ValueError(msg)
 
-    (
-        traces,
-        traveltimes,
-        amplitudes,
-        phaselist,
-    ) = fraysum.call_seis_spread(
-        *model.parameters, *geometry.parameters, *rc.parameters
-    )
 
-    arrivals = read_arrivals(rc._traveltimes, rc._amplitudes, rc._phaselist, geometry)
+    if mode == 'full':
+        traces, traveltimes, amplitudes, phaselist = fraysum.run_full(
+            *model.parameters, *geometry.parameters, *rc.parameters
+        )
+
+        arrivals = read_arrivals(traveltimes, amplitudes, phaselist, geometry)
+
+    elif mode == 'bare':
+        traces = fraysum.run_bare(
+            *model.parameters, *geometry.parameters, *rc.parameters
+        )
+
+        arrivals = None
+
+    else:
+        raise ValueError("Unknown mode: " + str(mode))
 
     # Read all traces and store them into a list of :class:`~obspy.core.Stream`
     streams = read_traces(

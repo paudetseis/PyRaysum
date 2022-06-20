@@ -12,7 +12,7 @@ ext = Extension(name='fraysum',
                            'pyraysum/src/phaselist.f',
                            'pyraysum/src/raysum.f',
                            'pyraysum/src/readwrite.f',
-                           'pyraysum/src/call-seis-spread.f',
+                           'pyraysum/src/seis-spread.f',
                            'pyraysum/src/trace.f'],
                 extra_compile_args=['-O3'])
 
