@@ -859,8 +859,12 @@ class RC(object):
             Verbosity. 0 - silent; 1 - verbose
         maxseg (int):
             Maximum number of segments per ray, as defined in param.h
+        maxtr (int):
+            Maximum number of traces, as defined in param.h
         maxph (int):
             Maximum number of phases per trace, as defined in param.h
+        maxsamp (int):
+            Maximum number of samples per trace, as defined in param.h
 
     ``Attributes``:
         parameters (list):
@@ -869,7 +873,7 @@ class RC(object):
 
     def __init__(self, verbose=1, wvtype='P', mults=0,
                  npts=300, dt=0.025, align=1, shift=None, rot=1,
-                 maxseg=45, maxph=40000):
+                 maxseg=45, maxtr=500, maxph=40000, maxsamp=100000):
 
         if wvtype not in ['P', 'SV', 'SH']:
             msg = "wvtype must be 'P', 'SV', or 'SH', not: " + str(wvtype)
@@ -890,20 +894,26 @@ class RC(object):
         self.dt = float(dt)
         self.align = int(align)
         self.rot = int(rot)
-        self.phaselist = np.asfortranarray(np.zeros((maxseg, 2, maxph), dtype=int))
-        self.nseg = np.asfortranarray(np.zeros(maxph))
-        self.numph = 0
-        self.maxseg = maxseg
-        self.maxph = maxph
-        
         if shift is None:
             self.shift = self.dt
         else:
             self.shift = float(shift)
 
-        self.parameters = [self.wvtype, self.mults, self.npts, self.dt,
-                           self.align, self.shift, self.rot, self.verbose]
+        self._numph = 0
+        self._maxseg = maxseg
+        self._maxph = maxph
+        self._maxtr = maxtr
+        self._maxsamp= maxsamp
+        self._phaselist = np.asfortranarray(np.zeros((maxseg, 2, maxph), dtype=int))
+        self._nseg = np.asfortranarray(np.zeros(maxph))
+        self._traces = np.asfortranarray(np.zeros((3, maxsamp, maxtr)))
+        self._traces2 = np.asfortranarray(np.zeros((3, maxsamp, maxtr)))
+        self._traveltimes = np.asfortranarray(np.zeros((maxph, maxtr)))
+        self._amplitudes = np.asfortranarray(np.zeros((3, maxph, maxtr)))
 
+        self.parameters = [self.wvtype, self.mults, self.npts, self.dt,
+                           self.align, self.shift, self.rot, self.verbose,
+                           self._nseg, self._numph, self._phaselist]
     def __str__(self):
         out = "# Verbosity\n"
         out += "{:}\n".format(int(self.verbose))
@@ -1472,21 +1482,21 @@ def run(model, geometry, rc, rf=False):
         msg += "i.e. in rc, 'rot' must not be '0'"
         raise(ValueError(msg))
 
-    tr_ph, tr_cart, tt, amp, rc.phaselist, rc.nseg, rc.numph = fraysum.call_seis_spread(
-        *model.parameters, *geometry.parameters, *rc.parameters,
-        rc.phaselist, rc.nseg, rc.numph)
+    (
+        traces,
+        traveltimes,
+        amplitudes,
+        phaselist,
+    ) = fraysum.call_seis_spread(
+        *model.parameters, *geometry.parameters, *rc.parameters
+    )
 
-    arrivals = read_arrivals(tt, amp, rc.phaselist, geometry)
+    arrivals = read_arrivals(rc._traveltimes, rc._amplitudes, rc._phaselist, geometry)
 
     # Read all traces and store them into a list of :class:`~obspy.core.Stream`
-    if rc.rot == 0:
-        streams = read_traces(
-            tr_cart, geom=geometry.geom, dt=rc.dt, rot=rc.rot, shift=rc.shift,
-            npts=rc.npts, ntr=geometry.ntr, arrivals=arrivals)
-    else:
-        streams = read_traces(
-            tr_ph, geom=geometry.geom, dt=rc.dt, rot=rc.rot, shift=rc.shift,
-            npts=rc.npts, ntr=geometry.ntr, arrivals=arrivals)
+    streams = read_traces(
+        traces, geom=geometry.geom, dt=rc.dt, rot=rc.rot, shift=rc.shift,
+        npts=rc.npts, ntr=geometry.ntr, arrivals=arrivals)
 
     # Store everything into Seismogram object
     seismogram = Seismogram(model=model, geom=geometry.geom, rc=rc, streams=streams)

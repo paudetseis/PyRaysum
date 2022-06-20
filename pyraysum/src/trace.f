@@ -91,6 +91,27 @@ c        write (*,*) 'putgauss:',mu,amp
       
 c ---------------------------
 
+c  Copy traces from Tr_cart to Tr_ph
+      subroutine copy_traces(Tr_cart,ntr,nsamp,Tr_ph)
+      
+        implicit none 
+        include 'params.h'
+        
+        real Tr_cart(3,maxsamp,maxtr),Tr_ph(3,maxsamp,maxtr)
+        integer ntr,itr,isamp,nsamp
+        
+        do itr=1,ntr
+          do isamp=1,nsamp
+            Tr_ph(1,isamp,itr)=Tr_cart(1,isamp,itr)
+            Tr_ph(2,isamp,itr)=Tr_cart(2,isamp,itr)
+            Tr_ph(3,isamp,itr)=Tr_cart(3,isamp,itr)
+          end do
+        end do
+        
+      end
+
+c ---------------------------
+
 c  Rotate traces into R-T-Z system. Tr_cart and Tr_ph can be the same
 c  variable.
       subroutine rot_traces(Tr_cart,baz,ntr,nsamp,Tr_ph)

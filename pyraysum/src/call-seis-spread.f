@@ -8,9 +8,9 @@ c####&
      &                            trend, plunge, strike, dip, nlay,
      &                            baz, slow, sta_dx, sta_dy, ntr,
      &                            iphname, mults, nsamp, dt, align,
-     &                            shift, out_rot, verb,
-     &                            Tr_ph, Tr_cart, travel_time,
-     &                            amplitude, phaselist, nseg, numph)
+     &                            shift, out_rot, verb, nsegin, numphin,
+     &                            phaselistin, Tr_ph, travel_time,
+     &                            amplitude, phaselist)
 
 c Anyone who fails to start a Fortran program with this line
 c should be severely beaten:
@@ -43,7 +43,7 @@ c model parameters
         real pct(maxlay), trend(maxlay), plunge(maxlay)
         real strike(maxlay), dip(maxlay)
         logical isoflag(maxlay)
-Cf2py   integer intent(in) :: nlay
+Cf2py   intent(in) :: nlay
 Cf2py   intent(in) :: thick, rho, alpha, beta
 Cf2py   intent(in) :: pct, trend, plunge
 Cf2py   intent(in) :: strike, dip
@@ -52,21 +52,23 @@ Cf2py   intent(in) :: isoflag
 c Geometry parameters
         real baz(maxtr), slow(maxtr), sta_dx(maxtr), sta_dy(maxtr)
         integer ntr
-Cf2py   integer intent(in) :: ntr
+Cf2py   intent(in) :: ntr
 Cf2py   intent(in) :: baz, slow, sta_dx, sta_dy
-        
+
+        integer phaselistin(maxseg,2,maxph)
+        integer nsegin(maxph),numphin
+Cf2py intent(in) :: phaselistin, nsegin, numphin
+
 c ========================================
 c Output parameters
 c Traces
 
-        real Tr_cart(3,maxsamp,maxtr)
         real Tr_ph(3,maxsamp,maxtr)
         integer phaselist(maxseg,2,maxph)
         real travel_time(maxph,maxtr)
         real amplitude(3,maxph,maxtr)
-        integer nseg(maxph),numph
-Cf2py intent(out) :: Tr_cart, Tr_ph, travel_time, amplitude
-Cf2py intent(in, out) :: phaselist, nseg, numph
+Cf2py intent(out) :: Tr_ph, travel_time, amplitude
+Cf2py intent(out) :: phaselist
 
 c ==================
 c Internal variables
@@ -76,7 +78,8 @@ c Scratch variables:
         logical verbose
 
 c Phase parameters
-        integer iphase
+        real Tr_cart(3,maxsamp,maxtr)
+        integer iphase, nseg(maxph), numph
 
 c   aa is a list of rank-4 tensors (a_ijkl = c_ijkl/rho)
 c   rot is a list of rotator matrices, used to rotate into the local
@@ -160,10 +163,6 @@ c Compute multiples
             end if
             call ph_fsmults(phaselist,nseg,numph,nlay,j,iphase)
           end do
-        else if (mults .eq. 3) then
-          if (verbose) then
-            print *, 'Using supplied phaselist...'
-          end if
         end if
         if (verbose) then
           call printphases(phaselist,nseg,numph)
@@ -174,9 +173,18 @@ c Perform calculation
           print *, 'Calling get_arrivals...'
         end if
         amp_in=1.
-        call get_arrivals(travel_time,amplitude,thick,rho,isoflag,
-     &       strike,dip,aa,ar_list,rot,baz,slow,sta_dx,sta_dy,
-     &       phaselist,ntr,nseg,numph,nlay,amp_in)
+        if (mults .eq. 3) then
+          if (verbose) then
+            print *, 'Using supplied phaselist...'
+          end if
+          call get_arrivals(travel_time,amplitude,thick,rho,isoflag,
+     &         strike,dip,aa,ar_list,rot,baz,slow,sta_dx,sta_dy,
+     &         phaselistin,ntr,nsegin,numphin,nlay,amp_in)
+        else
+          call get_arrivals(travel_time,amplitude,thick,rho,isoflag,
+     &         strike,dip,aa,ar_list,rot,baz,slow,sta_dx,sta_dy,
+     &         phaselist,ntr,nseg,numph,nlay,amp_in)
+        end if
      
 c Normalize arrivals
         if (iphase .eq. 1) then 
@@ -194,15 +202,19 @@ c Assemble traces
         call make_traces(travel_time,amplitude,ntr,numph,nsamp,
      &                   dt,align,shift,verbose,Tr_cart)
 
-        if (out_rot .eq. 1) then
+        if (out_rot .eq. 0) then
+c Write cartesian traces to output
+          call copy_traces(Tr_cart,ntr,nsamp,Tr_ph)
+
+        else if (out_rot .eq. 1) then
 c Rotate to RTZ
           if (verbose) then
             print *, 'Calling rot_traces...'
           end if
           call rot_traces(Tr_cart,baz,ntr,nsamp,Tr_ph)
           call rot_traces(amplitude,baz,ntr,numph,amplitude)
-        else
-          if (out_rot .eq. 2) then
+
+        else if (out_rot .eq. 2) then
 c   Rotate to wavevector coordinates
             if (verbose) then
               print *, 'Calling fs_traces...'
@@ -211,7 +223,6 @@ c   Rotate to wavevector coordinates
      &                     rho(1),ntr,nsamp,Tr_ph)
             call fs_traces(amplitude,baz,slow,alpha(1),beta(1),
      &                     rho(1),ntr,numph,amplitude)
-            end if
-          end if
+        end if
                 
       end subroutine

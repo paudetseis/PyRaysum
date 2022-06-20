@@ -95,7 +95,7 @@ def test_filtered_rf_array():
     # print(timeit('_run_frs()', number=50, globals=globals()))
     # >> 27.262143349274993
     def _run_frs():
-        streams = prs.run(model, geom, rc)
+        streams = prs.run(model, geom, rc, verbose=False)
         streams.calculate_rfs()
         streams.filter('rfs', 'bandpass', freqmin=fmin, freqmax=fmax,
                        zerophase=True, corners=2)
@@ -105,15 +105,10 @@ def test_filtered_rf_array():
     # print(timeit('_run_sspread()', number=50, globals=globals()))
     # >> 16.743131840601563
     def _run_sspread():
-        tr_ph, _ = call_seis_spread(
-                model.fthickn, model.frho, model.fvp, model.fvs, model.fflag,
-                model.fani, model.ftrend, model.fplunge, model.fstrike, model.fdip,
-                model.nlay,
-                geom.fbaz, geom.fslow, geom.fdn, geom.fde, geom.ntr,
-                rc.wvtype, rc.mults, rc.npts, rc.dt, rc.align, rc.dt, rc.rot,
-                rc.verbose)
+        ph_traces, _, _, _ = call_seis_spread(
+            *model.parameters, *geom.parameters, *rc.parameters)
 
-        prs.filtered_rf_array(tr_ph, rfarray, geom.ntr, rc.npts, rc.dt, fmin, fmax)
+        prs.filtered_rf_array(ph_traces, rfarray, geom.ntr, rc.npts, rc.dt, fmin, fmax)
 
     streams = _run_frs()
 
