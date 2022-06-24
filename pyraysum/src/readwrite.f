@@ -63,8 +63,10 @@ c ----------------------------------
         integer iseg,iph
         
         do iph=1,numph
+          write(*,*) 'phase: ', iph
+          write(*,*) 'layer: type:'
           do iseg=1,nseg(iph)
-            write(*,'(1X,I2,1X,I1)') phaselist(iseg,1,iph),
+            write(*,'(5X,I2,5X,I1)') phaselist(iseg,1,iph),
      &                                  phaselist(iseg,2,iph)
           end do
           write(*,*)

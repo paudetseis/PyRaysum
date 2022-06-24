@@ -99,7 +99,7 @@ c Read in parameters from file 'raysum-params'
         verbose=.false.
         if (verb .eq. 1) then
           verbose=.true.
-          print *, 'This is call-seis-spread.'
+          print *, 'This is run_full.'
           print *, 'Running verbose.'
         end if
 
@@ -148,15 +148,21 @@ c Compute multiples
             call printphases(phaselist,nseg,numph)
           end if
         else if (mults .eq. 2) then
+          if (verbose) then
+            print *, 'Generating mutiples...'
+          end if
           do j=1,nlay-1
-            if (verbose) then
-              print *, 'Generating mutiples...'
-            end if
             call ph_fsmults(phaselist,nseg,numph,nlay,j,iphase)
-            if (verbose) then
-              call printphases(phaselist,nseg,numph)
+            if (numph .gt. maxph/2) then
+               print *, 'Warning: Approaching maximum number of phases!'
+               write (*,*) 'Currently: ', numph
+               print *, 'Avoid segmentation faults by setting:'
+               print *, 'mults to 0, 1, or 3'
             end if
           end do
+          if (verbose) then
+            call printphases(phaselist,nseg,numph)
+          end if
         end if
         
 c Perform calculation                   
@@ -229,9 +235,9 @@ c   Rotate to wavevector coordinates
      &                     rho(1),ntr,nsamp,Tr_ph)
             if (mults .eq. 3) then
               call fs_traces(amplitude,baz,slow,alpha(1),beta(1),
-     &                     rho(1),ntr,numphin,amplitude)
+     &                       rho(1),ntr,numphin,amplitude)
             else
-                call fs_traces(amplitude,baz,slow,alpha(1),beta(1),
+              call fs_traces(amplitude,baz,slow,alpha(1),beta(1),
      &                       rho(1),ntr,numph,amplitude)
           end if
         end if
@@ -370,15 +376,15 @@ c Compute multiples
             call printphases(phaselist,nseg,numph)
           end if
         else if (mults .eq. 2) then
+          if (verbose) then
+            print *, 'Generating mutiples...'
+          end if
           do j=1,nlay-1
-            if (verbose) then
-              print *, 'Generating mutiples...'
-            end if
             call ph_fsmults(phaselist,nseg,numph,nlay,j,iphase)
-            if (verbose) then
-              call printphases(phaselist,nseg,numph)
-            end if
           end do
+          if (verbose) then
+            call printphases(phaselist,nseg,numph)
+          end if
         end if
         
 c Perform calculation                   
