@@ -405,14 +405,6 @@ class Model(object):
         self.nlay -= bottom - top - 1
         self.update()
 
-    def times(self):
-        """
-        Arrival times (seconds) of the direct conversions for vertically
-        propagating tays.
-        """
-        # TODO: Supply Geometry object to calculate for a given ray geometry
-        return np.cumsum(self.thickn/self.vs - self.thickn/self.vp)[:-1]
-
     def write(self, fname='sample.mod', comment=''):
         """
         Write seismic velocity model to disk as raysum ascii model file
@@ -639,10 +631,12 @@ class Model(object):
                 ax.text(xs[-1], zs[-1], '>{:.0f}°'.format(dipdir),
                         ha='left', va='center')
 
-            info = ('$V_P = {:.1f}$km/s, '
-                    '$V_S = {:.1f}$km/s, '
-                    '$V_P/V_S = {:.2f}$, '
-                    '$\\rho = {:.1f}$kg/m$^3$').format(
+            info = ('{: 2d}: '
+                    '$V_P={:.1f}$km/s, '
+                    '$V_S={:.1f}$km/s, '
+                    '$V_P/V_S={:.2f}$, '
+                    '$\\rho={:.1f}$kg/m$^3$').format(
+                        i,
                         self.vp[i]/1000, self.vs[i]/1000,
                         self.vpvs[i], self.rho[i]/1000)
             ax.text(0, depth + 1, info,
@@ -797,8 +791,12 @@ class Geometry(object):
         fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
         ax.set_theta_zero_location('N')
         ax.set_theta_direction('clockwise')
-        ax.scatter(self.baz * np.pi / 180, self.slow, color='black')
-        ax.set_title('Ray Backazimuth and Slowness')
+        ax.scatter(self.baz * np.pi / 180, self.slow, s=200, color='black', zorder=10)
+        for n, (b, s) in enumerate(zip(self.baz, self.slow)):
+            t = "{:d}".format(n)
+            b *= np.pi / 180
+            ax.text(b, s, t, color="white", ha="center", va="center", zorder=12)
+        ax.set_title('Ray Backazimuth and Slowness indices')
 
         if show:
             fig.show()
@@ -1271,11 +1269,11 @@ def read_traces(traces, geom, dt, rot, shift, npts, ntr, arrivals=None):
             stats = {
                     'baz': geom[iitr][0],
                     'slow': geom[iitr][1],
-                    'station': 'syn',
+                    'station': 'prs',
                     'network': '',
-                    'starttime': UTCDateTime(),
+                    'starttime': UTCDateTime(0),
                     'delta': dt,
-                    'channel': 'BH'+component[ic],
+                    'channel': component[ic],
                     'taxis': taxis,
                     }
 
@@ -1376,6 +1374,20 @@ def read_arrivals(ttimes, amplitudes, phaselist, geometry):
     return tanss
 
 
+def rfarray(geometry, rc):
+    """
+    Returns numpy.zeros((geometry.ntr, 2, rc.npts)), which in shape to be used by
+    ``filterd_rf_array`` and ``filtered_array``.
+
+    Args:
+        geometry : (``prs.Geometry``)
+            Geometry of the problem
+        rc : (``prs.RC``)
+            RC parameters
+    """
+    return np.zeros((geometry.ntr, 2, rc.npts))
+
+
 cached_coefficients = {}
 
 
@@ -1389,21 +1401,23 @@ def _get_cached_bandpass_coefs(order, corners):
     return cached_coefficients[ck]
 
 
-def filtered_rf_array(sspread_arr, arr_out, ntr, npts, dt, fmin, fmax):
+def filtered_rf_array(traces, rfarray, ntr, npts, dt, fmin, fmax):
     """
-    Reads the traces produced by seis_spread and returns array of filtered
-    receiver functions. Roughly equivalent to subsequent calls to
-    ``read_traces()``, ``Seismogram.calculate_rfs()``, and ``Seismogram.filter()``,
-    stripped down for inversion purposes.
+    Reads the traces produced by seis_spread and returns array of filtered receiver
+    functions. Roughly equivalent to subsequent calls to ``read_traces()``,
+    ``Seismogram.calculate_rfs()``, and ``Seismogram.filter()``, stripped down for
+    inversion purposes. Assumes traces is aligned PVH (ray-polarization) axes, i.e.
+    rc.rot=2.
+
 
     - Reshapes them to [traces[components[amplitudes]] order
     - Performs spectral division to get receiver functions
     - Filters them
 
     Args:
-        sspread_arr (np.array):
+        traces (np.array):
             Output of call_seis_spread
-        arr_out (np.array):
+        rfarray (np.array):
             Initialized array of shape (ntr, 2, npts) to store output
         ntr (int):
             Number of traces (seis_spread parameter)
@@ -1418,7 +1432,7 @@ def filtered_rf_array(sspread_arr, arr_out, ntr, npts, dt, fmin, fmax):
 
     Returns:
         None:
-            Output is written to arrout (np.ndarray)
+            Output is written to rfarray (np.ndarray)
 
     """
 
@@ -1432,9 +1446,9 @@ def filtered_rf_array(sspread_arr, arr_out, ntr, npts, dt, fmin, fmax):
 
     # Crop unused overhang of oversized fortran arrays and transpose to
     # [traces[components[samples]]] order
-    data = np.array([sspread_arr[0, :npts, :ntr],
-                     sspread_arr[1, :npts, :ntr],
-                     sspread_arr[2, :npts, :ntr]]).transpose(2, 0, 1)
+    data = np.array([traces[0, :npts, :ntr],
+                     traces[1, :npts, :ntr],
+                     traces[2, :npts, :ntr]]).transpose(2, 0, 1)
 
     for n, trace in enumerate(data):
         ft_ztr = fft(trace[0])  # P or R or N
@@ -1442,11 +1456,64 @@ def filtered_rf_array(sspread_arr, arr_out, ntr, npts, dt, fmin, fmax):
         ft_rft = fft(trace[2])  # H or Z or Z
 
         # assuming PVH:
-        arr_out[n, 0, :] = _bandpass(
+        rfarray[n, 0, :] = _bandpass(
             fftshift(np.real(ifft(np.divide(ft_rfr, ft_ztr)))))
-        arr_out[n, 1, :] = _bandpass(
+        rfarray[n, 1, :] = _bandpass(
             fftshift(np.real(ifft(np.divide(ft_rft, ft_ztr)))))
 
+
+def filtered_array(traces, rfarray, ntr, npts, dt, fmin, fmax):
+    """
+    Reads the traces produced by seis_spread and returns array of filtered traces.
+    Roughly equivalent to subsequent calls to ``read_traces()``, and
+    ``Seismogram.filter()``, stripped down for inversion purposes. Assumes traces is
+    aligned PVH (ray-polarization) axes, i.e. rc.rot=2.
+
+    - Reshapes array to [traces[components[amplitudes]] order
+    - Filters it
+
+    Args:
+        traces (np.array):
+            Output of call_seis_spread
+        rfarray (np.array):
+            Initialized array of shape (ntr, 2, npts) to store output
+        ntr (int):
+            Number of traces (seis_spread parameter)
+        npts (int):
+            Number of points per trace (seis_spread parameter)
+        dt (float):
+            Sampling intervall (seis_spread parameter)
+        fmin (float):
+            Lower filter corner
+        fmax (float):
+            Upper filter corner
+
+    Returns:
+        None:
+            Output is written to rfarray (np.ndarray)
+
+    """
+    npts2 = npts//2
+    rem = npts%2
+
+    order = 2
+    def _bandpass(arr):
+        # from pyrocko.Trace.filter
+        (b, a) = _get_cached_bandpass_coefs(order, (2*dt*fmin, 2*dt*fmax))
+        arr -= np.mean(arr)
+        firstpass = signal.lfilter(b, a, arr)
+        return signal.lfilter(b, a, firstpass[::-1])[::-1]
+
+    # Crop unused overhang of oversized fortran arrays and transpose to
+    # [traces[components[samples]]] order
+    data = np.array([traces[0, :npts, :ntr],
+                     traces[1, :npts, :ntr],
+                     traces[2, :npts, :ntr]]).transpose(2, 0, 1)
+  
+    for n, trace in enumerate(data):
+        # assuming PVH:
+        rfarray[n, 0, npts2:] = _bandpass(trace[1][:npts2+rem])  # SV
+        rfarray[n, 1, npts2:] = _bandpass(trace[2][:npts2+rem])  # SH
 
 def run(model, geometry, rc, mode='full', rf=False):
     """
