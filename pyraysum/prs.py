@@ -32,7 +32,7 @@ from scipy import signal
 import matplotlib.pyplot as plt
 from obspy import Trace, Stream, UTCDateTime
 from numpy.fft import fft, ifft, fftshift
-from pyraysum import wiggle
+from pyraysum import plot
 import fraysum
 
 _iphase = {'P': 1, 'SV': 2, 'SH': 3}
@@ -1181,10 +1181,10 @@ class Seismogram(object):
             raise(TypeError(msg))
 
     def plot_streams(self, scale=1.e3, tmin=-5., tmax=20.):
-        wiggle.stream_wiggles(self.streams, scale=scale, tmin=tmin, tmax=tmax)
+        plot.stream_wiggles(self.streams, scale=scale, tmin=tmin, tmax=tmax)
 
     def plot_rfs(self, scale=1.e3, tmin=-5., tmax=20.):
-        wiggle.rf_wiggles(self.rfs, scale=scale, tmin=tmin, tmax=tmax)
+        plot.rf_wiggles(self.rfs, scale=scale, tmin=tmin, tmax=tmax)
 
     def filter_streams(self, ftype, **kwargs):
         [stream.filter(ftype, **kwargs) for stream in self.streams]
