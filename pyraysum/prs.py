@@ -1503,6 +1503,10 @@ def run(model, geometry, rc, mode='full', rf=False):
             *model.parameters, *geometry.parameters, *rc.parameters
         )
 
+        if rc.mults == 3:
+            #  phaselist has not been populated by fraysum
+            phaselist = rc._phaselist
+
         arrivals = read_arrivals(traveltimes, amplitudes, phaselist, geometry)
 
     elif mode == 'bare':
