@@ -802,7 +802,7 @@ class Geometry(object):
         ax.set_title('Ray Backazimuth and Slowness indices')
 
         if show:
-            fig.show()
+            plt.show()
 
         return ax
 
@@ -1065,10 +1065,6 @@ class Seismogram(object):
         stores ``rflist`` as attribute of the :class:`~pyraysum.prs.Seismogram`
         object.
 
-        Returns:
-            (list):
-                rflist: Stream containing Radial and Transverse receiver
-                functions
         """
 
         if self.rc.rot == 0:
@@ -1128,7 +1124,7 @@ class Seismogram(object):
 
         self.rfs = rflist
 
-        return rflist
+        return
 
     def plot(self, typ, **kwargs):
         """
