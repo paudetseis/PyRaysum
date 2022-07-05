@@ -1157,8 +1157,8 @@ class Seismogram(object):
     def filter(self, typ, ftype, **kwargs):
         """
 
-        Filters the displacement seismograms and/or receiver functions stored in
-        :class:`~pyraysum.prs.Seismogram` streams.
+        Filters the displacement seismograms and/or receiver functions stored
+        in :class:`~pyraysum.prs.Seismogram` streams.
 
         Args:
             typ (str):
@@ -1208,25 +1208,26 @@ def read_traces(traces, geom, dt, rot, shift, npts, ntr, arrivals=None):
             Array of [baz, slow] values
         dt (float):
             Sample distance in seconds
-        rot (int):
-            ID for rotation:
-            0 is ENZ (east, north, up)
-            1 is RTZ (radial, transverse, down [positive towards source])
-            2 is PVH (P-, SH-, SV-polarization [positive in ray direction])
+        rot (int): ID for rotation:
+                ``0`` is ENZ (east, north, up); ``1`` is RTZ (radial,
+                transverse, down [positive towards source]), ``2`` is PVH
+                (P-, SH-, SV-polarization [positive in ray direction])
         shift (float):
             Time shift in seconds
         arrivals (list):
             List of arrival times, amplitudes, and names
             Output of read_arrivals
 
-        To interpret fraysum output, supply:``
-            ntr (int):
-                Number of traces
-            npts (int):
-                Number of points per trace``
-
     Returns:
         (:class:`~pyraysum.prs.Seismogram`): streamlist: List of Stream objects
+
+    Note:
+        To interpret fraysum output, supply:
+
+        - ntr (int):
+            Number of traces
+        - npts (int):
+            Number of points per trace
 
     """
 
@@ -1307,18 +1308,19 @@ def read_arrivals(ttimes, amplitudes, phaselist, geometry):
     Convert the output of raysum's phaselist, amplitude and traveltime tables
     to lists of phase arrival times, amplitudes, long names, and short names.
 
-    Input:
+    Args:
         ttimes: Travel time array ...
         amplitudes: Amplitude array ...
         phaselist: Phase identifier array returned by call_seis_spread
         geometry: ``prs.Geometry`` object
+
     Returns:
         tans:
             list of 3 component phase arrivals:
-            0: times
-            1: amplitudes
-            2: (long) phase desciptors
-            3: (short) phse names
+            ``0``: times
+            ``1``: amplitudes
+            ``2``: (long) phase desciptors
+            ``3``: (short) phase names
     """
 
     dscrs = []
@@ -1376,8 +1378,8 @@ def read_arrivals(ttimes, amplitudes, phaselist, geometry):
 
 def rfarray(geometry, rc):
     """
-    Returns numpy.zeros((geometry.ntr, 2, rc.npts)), which in shape to be used
-    by ``filterd_rf_array`` and ``filtered_array``.
+    Returns ``numpy.zeros((geometry.ntr, 2, rc.npts))``, which in the correct
+    shape to be used by ``filterd_rf_array`` and ``filtered_array``.
 
     Args:
         geometry : (``prs.Geometry``)
@@ -1415,9 +1417,9 @@ def filtered_rf_array(traces, rfarray, ntr, npts, dt, fmin, fmax):
     - Filters them
 
     Args:
-        traces (np.array):
+        traces (np.ndarray):
             Output of call_seis_spread
-        rfarray (np.array):
+        rfarray (np.ndarray):
             Initialized array of shape (ntr, 2, npts) to store output
         ntr (int):
             Number of traces (seis_spread parameter)
@@ -1474,9 +1476,9 @@ def filtered_array(traces, rfarray, ntr, npts, dt, fmin, fmax):
     - Filters it
 
     Args:
-        traces (np.array):
+        traces (np.ndarray):
             Output of call_seis_spread
-        rfarray (np.array):
+        rfarray (np.ndarray):
             Initialized array of shape (ntr, 2, npts) to store output
         ntr (int):
             Number of traces (seis_spread parameter)

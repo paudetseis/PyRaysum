@@ -22,10 +22,10 @@ Geometry
 .. autoclass:: pyraysum.prs.Geometry
    :members:
 
-StreamList
+Seismogram
 ----------
 
-.. autoclass:: pyraysum.prs.StreamList
+.. autoclass:: pyraysum.prs.Seismogram
    :members:
 
 Modules
@@ -35,11 +35,10 @@ Module ``prs``
 --------------
 
 .. automodule:: pyraysum.prs
-   :members: read_model, read_traces, filtered_rf_array, run_frs
+   :members: read_model, read_traces, read_arrivals, rfarray, filtered_rf_array, filtered_array, run
 
-
-Module ``wiggle``
+Module ``plot``
 -----------------
 
-.. automodule:: pyraysum.wiggle
+.. automodule:: pyraysum.plot
 	:members:
