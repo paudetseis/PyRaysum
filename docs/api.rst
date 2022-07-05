@@ -9,6 +9,7 @@ Classes
 - :class:`~pyraysum.prs.Model`
 - :class:`~pyraysum.prs.Geometry`
 - :class:`~pyraysum.prs.StreamList`
+- :class:`~pyraysum.prs.RC`
 
 Model
 -----
@@ -26,6 +27,12 @@ Seismogram
 ----------
 
 .. autoclass:: pyraysum.prs.Seismogram
+   :members:
+
+RC
+---
+
+.. autoclass:: pyraysum.prs.RC
    :members:
 
 Modules
