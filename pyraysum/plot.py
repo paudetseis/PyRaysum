@@ -276,9 +276,9 @@ def stream_wiggles(streamlist, btyp='baz', wvtype='P', tmin=-5., tmax=20.,
         raise ValueError(msg)
 
     # Re-order streams in list
-    str1 = Stream(traces=[st[0] for st in streamlist])
-    str2 = Stream(traces=[st[1] for st in streamlist])
-    str3 = Stream(traces=[st[2] for st in streamlist])
+    str1 = Stream(traces=[st[0] for st in streamlist.streams])
+    str2 = Stream(traces=[st[1] for st in streamlist.streams])
+    str3 = Stream(traces=[st[2] for st in streamlist.streams])
 
     # Time axis
     time = str1[0].stats.taxis
