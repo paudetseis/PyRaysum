@@ -331,7 +331,7 @@ Here we model P waveforms from a single event, characterized by a back-azimuth o
    >>> model = Model([30000., 0], [2800., 3300.], [6000., 8000.], [3600., 4500.])
    >>> geom = Geometry(30., 0.05) # baz = 30 deg; slow = 0.05 s/km
    >>> rc = RC(dt=0.025, npts=1500, mults=1, rot=0)
-   >>> streamlist = prs.run(model, geom, rc=rc)
+   >>> streamlist = prs.run(model, geom, rc)
 
    >>> st = streamlist.streams[0]
    >>> type(st)
@@ -355,7 +355,11 @@ Filter streams using a lowpass filter and plot using the ``obspy`` function.
 Modeling multiple events
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-We again model P waveforms but this time for multiple event origins. The example above can be slightly modified to use an array of back-azimuth values (and/or array of slowness vectors). Let's examine both options. Here we only modified the lines ``geom = `` and keep the rest of the code snippet unchanged. We also modify the time limits in the plot of amplitude versus slowness to emphasize the effect on delay times.
+We again model P waveforms but this time for multiple event origins. The example above 
+can be slightly modified to use an array of back-azimuth values (and/or array of slowness
+vectors). Let's examine both options. Here we only modified the lines ``geom =`` and 
+keep the rest of the code snippet unchanged. We also modify the time limits in the plot
+of amplitude versus slowness to emphasize the effect on delay times.
 
 Array of back-azimuth values
 ****************************
@@ -363,9 +367,15 @@ Array of back-azimuth values
 .. sourcecode:: python
 
    >>> geom = Geometry(np.arange(0., 360., 10.), 0.05) # baz from 0 to 360 deg; slow = 0.05 s/km
-   >>> streamlist = prs.run(model, geom, rc=rc)
+   >>> streamlist = prs.run(model, geom, rc)
    >>> streamlist.filter('streams', 'lowpass', freq=1., corners=2, zerophase=True)
    >>> prs.plot.stream_wiggles(streamlist)
+
+Note that the same figure could be obtained with:
+
+.. sourcecode:: python
+
+   >>> streamlist.plot('streams')
 
 Array of slowness values
 ************************
@@ -373,9 +383,15 @@ Array of slowness values
 .. sourcecode:: python
 
    >>> geom = Geometry(30., np.arange(0.04, 0.08, 0.002)) # baz = 30 deg; slow from 0.04 to 0.08 s/km
-   >>> streamlist = prs.run(model, geom, rc=rc)
+   >>> streamlist = prs.run(model, geom, rc)
    >>> streamlist.filter('streams', 'lowpass', freq=1., corners=2, zerophase=True)
    >>> prs.plot.stream_wiggles(streamlist, btyp='slow', tmin=0., tmax=10.)
+
+Note that the same figure could be obtained with:
+
+.. sourcecode:: python
+
+   >>> streamlist.plot('streams', btyp='slow', tmin=0., tmax=10.)
 
 Modeling receiver functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -400,7 +416,7 @@ Method 1
 
 .. sourcecode:: python
 
-   >>> streamlist1 = prs.run(model, geom, rc=rc, rf=True)
+   >>> streamlist1 = prs.run(model, geom, rc, rf=True)
    
    >>> print(streamlist1.rfs[0])
    2 Trace(s) in Stream:
@@ -415,7 +431,7 @@ Method 2
 
 .. sourcecode:: python
 
-   >>> streamlist2 = prs.run(model, geom, rc=rc)
+   >>> streamlist2 = prs.run(model, geom, rc)
    >>> streamlist2.calculate_rfs()
 
    >>> print(streamlist2.rfs[0])
