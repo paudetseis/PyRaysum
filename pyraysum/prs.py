@@ -541,12 +541,13 @@ class Model(object):
             (plt.axis):
                 ax: Axis handle for plotting
 
-        .. note::
+        Note:
 
-            Change current routine for painting approach
-            - [ ] paint background with top layer
-            - [ ] paint layer 1 from top to bottom (incl. dip layer)
-            - [ ] continue until bottom of model
+            To-do for this method:
+
+            - paint background with top layer
+            - paint layer 1 from top to bottom (incl. dip layer)
+            - continue until bottom of model
         """
 
         # Defaults to not show the plot
@@ -1131,6 +1132,12 @@ class Seismogram(object):
 
         Plots the displacement seismograms and/or receiver functions stored in
         :class:`~pyraysum.prs.Seismogram` streams.
+
+        Warning:
+            If the ``Seismogram`` object contains only one event
+            (i.e., single baz and slowness values), it is more appropriate
+            to plot the waveforms using the default ``Stream.plot()`` method
+            on the ``Seismogram.streams[0]`` attribute.
 
         Args:
             typ (str):
