@@ -1545,9 +1545,8 @@ def run(model, geometry, rc, mode='full', rf=False):
     >>> # Define two-layer model with isotropic crust over isotropic half-space
     >>> model = Model([30000., 0], [2800., 3300.], [6000., 8000.], [3600., 4500.])
     >>> geom = Geometry(0., 0.06) # baz = 0 deg; slow = 0.06 x/km
-    >>> npts = 1500
-    >>> dt = 0.025      # s
-    >>> streamlist = prs.run(model, geom, npts=npts, dt=dt)
+    >>> rc = RC(npts=1500, dt=0.025)
+    >>> streamlist = prs.run(model, geom, rc)
     >>> type(streamlist[0])
     <class 'obspy.core.stream.Stream'>
     >>> print(st)
