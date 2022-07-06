@@ -876,9 +876,13 @@ class RC(object):
             parameters in order expected by ``call_seis_spread()``
     """
 
-    def __init__(self, verbose=1, wvtype='P', mults=0,
+    def __init__(self, verbose=0, wvtype='P', mults=0,
                  npts=300, dt=0.025, align=1, shift=None, rot=1,
                  maxseg=45, maxtr=500, maxph=40000, maxsamp=100000):
+
+        if verbose not in [0, 1, '0', '1']:
+            msg = "verbose must be 0 or 1, not: " + str(verbose)
+            raise ValueError(msg)
 
         if wvtype not in ['P', 'SV', 'SH']:
             msg = "wvtype must be 'P', 'SV', or 'SH', not: " + str(wvtype)
@@ -890,6 +894,10 @@ class RC(object):
 
         if align not in [0, 1, 2, 3, '0', '1', '2', '3']:
             msg = "align must be 0, 1, 2, or 3, not: " + str(align)
+            raise ValueError(msg)
+
+        if rot not in [0, 1, 2, '0', '1', '2']:
+            msg = "align must be 0, 1, or 2, not: " + str(rot)
             raise ValueError(msg)
 
         self.verbose = int(verbose)
