@@ -36,5 +36,9 @@ Documentation
    :maxdepth: 1
    :caption: Jupyter Notebooks
 
-   Example 1: Reproducing Figure 2 in Porter et al. (2011) <https://nbviewer.jupyter.org/github/paudetseis/PyRaysum/blob/main/pyraysum/examples/notebooks/sim_Porter2011.ipynb>
+   Example 1: Compare PyRaysum with other synthetic and real data <https://nbviewer.jupyter.org/github/paudetseis/PyRaysum/blob/main/pyraysum/examples/notebooks/1_make_seismograms.ipynb>
+
+   Example 2: Reproducing Figure 2 in Porter et al. (2011) <https://nbviewer.jupyter.org/github/paudetseis/PyRaysum/blob/main/pyraysum/examples/notebooks/2_reproduce_Porter-2011.ipynb>
+
+   Example 3: Invert a receiver function <https://nbviewer.jupyter.org/github/paudetseis/PyRaysum/blob/main/pyraysum/examples/notebooks/3_invert_rf.ipynb>   
 

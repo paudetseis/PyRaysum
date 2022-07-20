@@ -110,8 +110,8 @@ Jupyter Notebooks
 Included in this package is a set of Jupyter Notebooks (see Table of Content),
 which give examples on how to call the various routines and obtain plane wave
 seismograms and receiver functions.
-The Notebooks describe how to reproduce published examples of synthetic data
-from `Porter et al. (2011) <https://doi.org/10.1130/L126.1>`_.
+In particular, the Notebooks describe how to reproduce published examples 
+of synthetic data from `Porter et al. (2011) <https://doi.org/10.1130/L126.1>`_.
 
 
 After ``pyraysum`` is installed, these notebooks can be locally installed
@@ -185,8 +185,8 @@ looks like:
 
 The header is not required and can be deleted when you become familiar
 with the various definitions. Note that the code requires 10 entries per
-layer, regardless of whether or not the variable is required (it will
-simply be ignored if it's not).
+layer (i.e., per line), regardless of whether or not the variable is required 
+(it will simply be ignored if it's not).
 
 Let us break down each line, depending on how you set ``Layer flag``:
 
@@ -250,14 +250,40 @@ Examples
 
 .. note::
 
-   In this example all entries for the first layer are required. Here the anisotropy is
-   set to 5% (i.e., fast axis of symmetry; for slow axis the user should input ``-5.``)
-   and the axis of symmetry has a trend of 30 degrees and a plunge of 10 degrees.
+   In this example all entries for the first layer are required. Here the 
+   anisotropy is set to 5% (i.e., fast axis of symmetry; for slow axis the 
+   user should input ``-5.``) and the axis of symmetry has a trend of 30 
+   degrees and a plunge of 10 degrees.
+
+An important note on dipping layers
+***********************************
+
+In the model setup, it is more appropriate to think of the layer strike and 
+dip angles as the angles of the *top interface*. For a truly dipping 
+*layer*, bounded above and below by dipping interfaces, the strike and dip 
+angles should also be applied to the top interface of the *underlying* 
+layer. Note that if those angles are not the across the layers, dipping 
+layer thickness is not conserved and the code may produce 
+aberrant results. For instance, the dipping layer model of `Porter et al. 
+(2011) <https://doi.org/10.1130/L126.1>`_ where a lower-crustal 
+low-velocity layer has a strike of 90 degrees and dip angle of 20 degrees, 
+is specified in `pyraysum` as:
+
+.. sourcecode:: python
+
+   >>> # Example of dipping layer from Porter et al. (2011)
+   >>> thick = [20000., 5000., 0.]
+   >>> rho = [2800., 2800., 2800.]
+   >>> vp = [6400., 5800., 7800.]
+   >>> vs = [3660., 3314., 4480.]
+   >>> strike = [0., 90., 90.]
+   >>> dip = [0., 20., 20.]
+   >>> model = Model(thick, rho, vp, vs, strike=strike, dip=dip)
 
 Plotting a model
 ~~~~~~~~~~~~~~~~
 
-When a :class:`~pyraysum.prs.Model` is created (from either method detailed above), the ``model`` instance has methods to generate plots of the seismic velocity model that it contains. The simplest option is to use the ``plot()`` method, which will produce a figure with two subplots: 1) a stair-case plot of the seismic velocity and density profiles, and 2) a layered (stratigraphic-like) representation of the model. These subplots can be created separately using the ``plot_profile()`` and ``plot_layers()`` methods directly.
+When a :class:`~pyraysum.prs.Model` is created (from either method detailed above), the ``model`` instance has methods to generate plots of the seismic velocity model that it contains. The simplest option is to use the ``plot()`` method, which will produce a figure with three subplots: 1) a stair-case plot of the seismic velocity and density profiles, 2) a layered (stratigraphic-like) representation of the model, and 3) a geometric representation of layer angles. These subplots can be created separately using the ``plot_profile()``, ``plot_layers()`` and ``plot_interfaces()`` methods directly.
 
 Example
 *******
@@ -268,19 +294,17 @@ Example
 
 - Define a four-layer model with a mix of isotropic and transverse isotopic properties. 
 
-.. note::
-
-	Note here we do not specify the trend and plunge of the symmetry axis since this information is not (yet) used in the plot. Default values will apply (``0.`` for both parameters).
-
 .. sourcecode:: python
 
    >>> thick = [15000., 20000., 15000.,  0.]
    >>> rho = [2750.,  2800., 3300., 3250.]
    >>> vp = [4300., 4600., 5600., 6000.]
    >>> vs = [2400., 2600., 3300., 3600.]
-   >>> isoflg = [1, 1, 0, 1]
+   >>> flag = [1, 1, 0, 1]
    >>> ani = [0., 0., 5., 0.]
-   >>> model = Model(thick, rho, vp, vs, isoflg=isoflg, ani=ani)
+   >>> trend = [0., 0., 30., 0.]
+   >>> plunge = [0., 0., 20., 0.]
+   >>> model = Model(thick, rho, vp, vs, flag=flag, ani=ani, trend=trend, plunge=plunge)
 
    >>> model.plot()
 
@@ -291,37 +315,32 @@ Example
 Basic usage
 +++++++++++
 
-These examples are extracted from the :func:`~pyraysum.prs.run_prs` function.
+These examples are extracted from the :func:`~pyraysum.prs.run` function.
 
-For anisotropic velocity models, users need to specify the back-azimuth
-value in degrees. Furthermore, the default type of the incoming
-teleseismic body wave is ``'P'`` for compressional wave. Other options are
-``'SV'`` or ``'SH'`` for vertically-polarized shear wave or
-horizontally-polarized shear wave, respectively.
-Wave modes cannot be mixed.
-
+The default type of the incoming teleseismic body wave is ``'P'`` for compressional wave. Other options are ``'SV'`` or ``'SH'`` for vertically-polarized shear wave or horizontally-polarized shear wave, respectively. Incident wave modes cannot be mixed.
 
 Modeling a single event
 ~~~~~~~~~~~~~~~~~~~~~~~
 
+Here we model P waveforms from a single event, characterized by a back-azimuth of 30 degrees and slowness of 0.05 s/km. Let's examine the synthetic waveforms that would be recorded in a Z-N-E coordinate system (``rot=0``) from the P wave propagating through a simple homogeneous crust over a mantle half-space:
+
 .. sourcecode:: python
 
-   >>> from pyraysum import prs, Model, Geometry
+   >>> from pyraysum import prs, Model, Geometry, RC
    >>> # Define two-layer model with isotropic crust over isotropic half-space
    >>> model = Model([30000., 0], [2800., 3300.], [6000., 8000.], [3600., 4500.])
-   >>> geom = Geometry(0., 0.06) # baz = 0 deg; slow = 0.06 x/km
-   >>> npts = 1500
-   >>> dt = 0.025      # s
-   >>> streamlist = prs.run_frs(model, geom, npts=npts, dt=dt)
+   >>> geom = Geometry(30., 0.05) # baz = 30 deg; slow = 0.05 s/km
+   >>> rc = RC(dt=0.025, npts=1500, mults=1, rot=0)
+   >>> streamlist = prs.run(model, geom, rc)
 
-   >>> type(streamlist[0])
+   >>> st = streamlist.streams[0]
+   >>> type(st)
    <class 'obspy.core.stream.Stream'>
    >>> print(st)
    3 Trace(s) in Stream:
-   3 Trace(s) in Stream:
-   .synt..BHN | 2020-11-30T21:04:43.890339Z - 2020-11-30T21:05:21.365339Z | 40.0 Hz, 1500 samples
-   .synt..BHE | 2020-11-30T21:04:43.891418Z - 2020-11-30T21:05:21.366418Z | 40.0 Hz, 1500 samples
-   .synt..BHZ | 2020-11-30T21:04:43.891692Z - 2020-11-30T21:05:21.366692Z | 40.0 Hz, 1500 samples   >>> st.plot(size=(600, 450))
+   .prs..R | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples
+   .prs..T | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples
+   .prs..Z | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples
 
 Filter streams using a lowpass filter and plot using the ``obspy`` function.
 
@@ -330,61 +349,101 @@ Filter streams using a lowpass filter and plot using the ``obspy`` function.
    >>> streamlist.filter('streams', 'lowpass', freq=1., corners=2, zerophase=True)
    >>> streamlist.streams[0].plot()
 
-
 .. figure:: ../pyraysum/examples/picture/Figure_Moho.png
    :align: center
+
+Modeling multiple events
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+We again model P waveforms but this time for multiple event origins. The example above 
+can be slightly modified to use an array of back-azimuth values (and/or array of slowness
+vectors). Let's examine both options. Here we only modified the lines ``geom =`` and 
+keep the rest of the code snippet unchanged. We also modify the time limits in the plot
+of amplitude versus slowness to emphasize the effect on delay times.
+
+Array of back-azimuth values
+****************************
+
+.. sourcecode:: python
+
+   >>> geom = Geometry(np.arange(0., 360., 10.), 0.05) # baz from 0 to 360 deg; slow = 0.05 s/km
+   >>> streamlist = prs.run(model, geom, rc)
+   >>> streamlist.filter('streams', 'lowpass', freq=1., corners=2, zerophase=True)
+   >>> prs.plot.stream_wiggles(streamlist)
+
+Note that the same figure could be obtained with:
+
+.. sourcecode:: python
+
+   >>> streamlist.plot('streams')
+
+Array of slowness values
+************************
+
+.. sourcecode:: python
+
+   >>> geom = Geometry(30., np.arange(0.04, 0.08, 0.002)) # baz = 30 deg; slow from 0.04 to 0.08 s/km
+   >>> streamlist = prs.run(model, geom, rc)
+   >>> streamlist.filter('streams', 'lowpass', freq=1., corners=2, zerophase=True)
+   >>> prs.plot.stream_wiggles(streamlist, btyp='slow', tmin=0., tmax=10.)
+
+Note that the same figure could be obtained with:
+
+.. sourcecode:: python
+
+   >>> streamlist.plot('streams', btyp='slow', tmin=0., tmax=10.)
 
 Modeling receiver functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Receiver functions can only be calculated for component rotation equals to '1' (R-T-Z system)
+Receiver functions can only be calculated for component rotation equal to '1' (R-T-Z system)
 or '2' (P-SV-SH system). There are two ways to calculate receiver functions - either directly
-from the function ``run_prs`` with the argument ``rf=True`` (default is False), or after
-you have obtained the 3-component seismograms from ``run_prs`` with ``rot=1`` or ``rot=2``.
+from the function ``run()`` with the argument ``rf=True`` (default is ``rf=False``), or after
+you have obtained the 3-component seismograms from ``run()`` with ``rot=1`` or ``rot=2``. Here we calculate receiver functions for a single event. Other examples that include receiver function calculation for multiple events are included in the accompanying Jupyter notebook tutorials.
 
 Let's first define a simple 2-layer model:
 
 .. sourcecode:: python
 
-   >>> from pyraysum import prs, Model, Geometry
+   >>> from pyraysum import prs, Model, Geometry, RC
    >>> # Define two-layer model with isotropic crust over isotropic half-space
    >>> model = Model([30000., 0], [2800., 3300.], [6000., 8000.], [3600., 4500.])
-   >>> geom = Geometry(0., 0.06) # baz = 0 deg; slow = 0.06 x/km
-   >>> npts = 1500
-   >>> dt = 0.025      # s
+   >>> geom = Geometry(0., 0.06) # baz = 0 deg; slow = 0.06 s/km
+   >>> rc = RC(dt=0.025, npts=1500, mults=1, rot=1)
 
 Method 1
 ********
 
 .. sourcecode:: python
 
-   >>> streamlist = prs.run_frs(model, geom, npts=npts, dt=dt, rot=1, rf=True)
+   >>> streamlist1 = prs.run(model, geom, rc, rf=True)
    
-   >>> print(streamlist.rfs[0])
+   >>> print(streamlist1.rfs[0])
    2 Trace(s) in Stream:
-   .synt..RFR | 2020-12-12T21:43:39.788002Z - 2020-12-12T21:44:17.263002Z | 40.0 Hz, 1500 samples
-   .synt..RFT | 2020-12-12T21:43:39.788682Z - 2020-12-12T21:44:17.263682Z | 40.0 Hz, 1500 samples
+   .prs..RFR | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples
+   .prs..RFT | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples
 
-   >>> streamlist.filter('rfs', 'lowpass', freq=1., corners=2, zerophase=True)
-   >>> streamlist.rfs[0].plot()
+   >>> streamlist1.filter('rfs', 'lowpass', freq=1., corners=2, zerophase=True)
+   >>> streamlist1.rfs[0].plot()
 
 Method 2
 ********
 
 .. sourcecode:: python
 
-   >>> streamlist = prs.run_frs(model, geom, npts=npts, dt=dt, rot=1)
-   >>> rflist = streamlist.calculate_rfs()
+   >>> streamlist2 = prs.run(model, geom, rc)
+   >>> streamlist2.calculate_rfs()
 
-   >>> print(rflist[0])
+   >>> print(streamlist2.rfs[0])
    2 Trace(s) in Stream:
-   .synt..RFR | 2020-12-12T21:44:13.539484Z - 2020-12-12T21:44:51.014484Z | 40.0 Hz, 1500 samples
-   .synt..RFT | 2020-12-12T21:44:13.540241Z - 2020-12-12T21:44:51.015241Z | 40.0 Hz, 1500 samples
+   .prs..RFR | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples
+   .prs..RFT | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples
 
-   >>> [rf.filter('lowpass', freq=1., corners=2, zerophase=True) for rf in rflist]
-   >>> rflist[0].plot()
+   >>> streamlist2.filter('rfs', 'lowpass', freq=1., corners=2, zerophase=True)
+   >>> streamlist2.rfs[0].plot()
 
-Both methods will produce the same receiver function figure. Note that the zero lag time at the center of the time axis. You can also notice wrap-around effects (weak arrivals before zero-lag time). Be careful when selecting time-sampling parameters when running ``Raysum``.
+Both methods will produce the same receiver function figure. Notice the zero lag time is located at the center of the time axis. You can also observe wrap-around effects (weak arrivals before zero-lag time). Be careful when selecting time sampling parameters when running ``Raysum`` to minimize those.
 
 .. figure:: ../pyraysum/examples/picture/Figure_RF_Moho.png
    :align: center
+

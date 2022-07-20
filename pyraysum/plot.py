@@ -43,10 +43,8 @@ def stack_all(stream, pws=False):
             Enables Phase-Weighted Stacking
 
     Returns:
-        (tuple): tuple containing:
-
-            stack (:class:`~obspy.core.Trace`):
-                Stacked trace
+        stack (:class:`~obspy.core.Trace`):
+            Stacked trace
 
     """
 
@@ -110,7 +108,8 @@ def rf_wiggles(rflist, btyp='baz', wvtype='P', pws=False, tmin=-5., tmax=20,
             Output format ('png', 'jpg', or 'eps', etc.)
 
     Returns:
-        None
+        fig (:class:`~matplotlib.pyplot`):
+            Figure handle
     """
 
     if not (btyp == 'baz' or btyp == 'slow' or btyp == 'dist'):
@@ -268,7 +267,8 @@ def stream_wiggles(streamlist, btyp='baz', wvtype='P', tmin=-5., tmax=20.,
             Output format ('png', 'jpg', or 'eps', etc.)
 
     Returns:
-        None
+        fig (:class:`~matplotlib.pyplot`):
+            Figure handle
     """
 
     if not (btyp == 'baz' or btyp == 'slow' or btyp == 'dist'):
@@ -276,9 +276,9 @@ def stream_wiggles(streamlist, btyp='baz', wvtype='P', tmin=-5., tmax=20.,
         raise ValueError(msg)
 
     # Re-order streams in list
-    str1 = Stream(traces=[st[0] for st in streamlist])
-    str2 = Stream(traces=[st[1] for st in streamlist])
-    str3 = Stream(traces=[st[2] for st in streamlist])
+    str1 = Stream(traces=[st[0] for st in streamlist.streams])
+    str2 = Stream(traces=[st[1] for st in streamlist.streams])
+    str3 = Stream(traces=[st[2] for st in streamlist.streams])
 
     # Time axis
     time = str1[0].stats.taxis
@@ -389,7 +389,8 @@ def seis_wiggles(stream, tmin=-5., tmax=20., save=False,
             Output format ('png', 'jpg', or 'eps', etc.)
 
     Returns:
-        None
+        fig (:class:`~matplotlib.pyplot`):
+            Figure handle
     """
 
     nt = stream[0].stats.npts
