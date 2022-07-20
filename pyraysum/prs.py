@@ -962,7 +962,7 @@ class RC(object):
             np.zeros((self.maxseg, 2, self.maxph), dtype=np.int32))
         self.mults = mults
 
-    def set_phaselist(self, descriptors):
+    def set_phaselist(self, descriptors, equivalent=False, kinematic=False):
         """
         Limit number of phases to be calculated.
 
@@ -978,6 +978,12 @@ class RC(object):
                      t downgoing slow S-wave
             SEGMENT is the index of the model layer (Python indexing)
 
+            equivalent: (boolean)
+            Augment phaselist by equivalent phases
+            
+            kinematic: (boolean)
+            Limit equivalent phases to those with same polarity as input phases
+
         Example:
             ['1P0P'] direct P-wave
             ['1P0S'] P-to-S converted wave
@@ -987,6 +993,10 @@ class RC(object):
 
         self.mults = 3
         phre = '[' + ''.join(_phids.keys()) + ']'
+        descriptors = list(descriptors)
+
+        if equivalent:
+            descriptors += equivalent_phases(descriptors, kinematic=kinematic)
 
         self._numph = np.int32(len(descriptors))
         for iph, dscr in enumerate(descriptors):
@@ -1022,6 +1032,100 @@ class RC(object):
 
         with open(fname, "w") as f:
             f.write(self.__str__())
+
+
+def equivalent_phases(descriptors, kinematic=False):
+    """
+    Return descriptors of equivalent phases, i.e. those arriving at the same time as
+    input phases
+
+    Args:
+        descriptors: (list of strings)
+        Phase descriptors as in ``RC.set_phaselist``
+
+        kinematic: (boolean)
+        If True, restrict to kinematically equivalent phases, i.e. those that have the
+        same polarization as input phases
+
+    Returns:
+        ndscr: (list of strings)
+        List of unique descriptors of equivalent phases
+    """
+
+    ndscrs = []
+
+    for dscr in descriptors:
+
+        lays = np.array([match.group(0) for match in re.finditer(r'\d+', dscr)])
+
+        starts = np.array(
+            [match.start() for match in re.finditer(r'\d+', dscr)]  + [len(dscr)])
+
+        nsegs = {lay: len(lays[lays==lay]) for lay in set(lays)}
+
+        for lay in lays:
+
+            if nsegs[lay] <= 1:
+                continue
+
+            for iseg, i0 in enumerate(starts[:-1]):
+
+                # phase is last char before next segment
+                iph = starts[iseg+1]-1
+
+                # the actural phase name
+                ipha = dscr[iph]
+
+                # layer is the chars before that
+                ilay = dscr[starts[iseg]:iph]
+
+                for jseg, j0 in enumerate(starts[:-1]):
+
+                    # See above comments
+                    jph = starts[jseg+1]-1
+                    jpha = dscr[jph]
+                    jlay = dscr[starts[jseg]:jph]
+
+                    # Only proceed for phases in same layer
+                    # but not for the same ray segment
+                    if ilay != lay or jlay != lay or iseg == jseg:
+                        continue
+
+                    ndscr = np.array(list(dscr))
+
+                    # Exchange wavetypes
+                    # preserve propagation direction
+                    if ipha.isupper():
+                        kpha = jpha.upper()
+                    else:
+                        kpha = jpha.lower()
+
+                    if jpha.isupper():
+                        lpha = ipha.upper()
+                    else:
+                        lpha = ipha.lower()
+
+                    ndscr[iph] = kpha
+                    ndscr[jph] = lpha
+
+                    ndscr = ''.join(ndscr)
+
+                    if ndscr in descriptors:
+                        # Bail out solution already in input
+                        continue
+
+                    if kinematic:
+                        # Bail out dissimilar last phase
+                        lpin = dscr[-1]
+                        lpout = ndscr[-1]
+                        if lpin == 'P' and (lpout == 'S' or lpout == 'T'):
+                            continue
+                        if (lpin == 'S' or lpin == 'T') and lpout == 'P':
+                            continue
+
+                    ndscrs.append(ndscr)
+
+    return list(set(ndscrs))
 
 
 def read_rc(paramfile):
