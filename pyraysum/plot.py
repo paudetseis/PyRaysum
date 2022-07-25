@@ -119,8 +119,8 @@ def rf_wiggles(rflist, btyp='baz', wvtype='P', pws=False, tmin=-5., tmax=20,
         raise ValueError("'fmt' has to be one of 'png', 'jpg', 'eps', 'pdf'")
 
     # Re-order streams in list
-    str1 = Stream(traces=[st[0] for st in rflist])
-    str2 = Stream(traces=[st[1] for st in rflist])
+    str1 = Stream(traces=[st[0] for st in rflist.rfs])
+    str2 = Stream(traces=[st[1] for st in rflist.rfs])
 
     # Get stacked traces
     tr1 = stack_all(str1, pws=pws)

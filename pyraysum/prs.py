@@ -1299,10 +1299,10 @@ class Seismogram(object):
             raise(TypeError(msg))
 
     def plot_streams(self, scale=1.e3, tmin=-5., tmax=20.):
-        plot.stream_wiggles(self.streams, scale=scale, tmin=tmin, tmax=tmax)
+        plot.stream_wiggles(self, scale=scale, tmin=tmin, tmax=tmax)
 
     def plot_rfs(self, scale=1.e3, tmin=-5., tmax=20.):
-        plot.rf_wiggles(self.rfs, scale=scale, tmin=tmin, tmax=tmax)
+        plot.rf_wiggles(self, scale=scale, tmin=tmin, tmax=tmax)
 
     def filter_streams(self, ftype, **kwargs):
         [stream.filter(ftype, **kwargs) for stream in self.streams]
@@ -1457,7 +1457,7 @@ def read_arrivals(ttimes, amplitudes, phaselist, geometry):
             phn = _phnames[phid]
             dscr += (layn + phn)
 
-            # Omit not-converted phases
+            # Omit not-converted segment from phase name
             try:
                 if phnm[-1] == phn:
                     phn = ''
