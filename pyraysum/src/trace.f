@@ -110,6 +110,29 @@ c  Copy traces from Tr_cart to Tr_ph
         
       end
 
+
+c ---------------------------
+
+c  Copy amplitudes from amp_cart to amp_ph
+      subroutine copy_amplitudes(amp_cart,ntr,npha,amp_ph)
+      
+        implicit none 
+        include 'params.h'
+        
+        real amp_cart(3,maxph,maxtr),amp_ph(3,maxph,maxtr)
+        integer ntr,itr,ipha,npha
+        
+        do itr=1,ntr
+          do ipha=1,npha
+            amp_ph(1,ipha,itr)=amp_cart(1,ipha,itr)
+            amp_ph(2,ipha,itr)=amp_cart(2,ipha,itr)
+            amp_ph(3,ipha,itr)=amp_cart(3,ipha,itr)
+          end do
+        end do
+        
+      end
+
+
 c ---------------------------
 
 c  Rotate traces into R-T-Z system. Tr_cart and Tr_ph can be the same
@@ -137,6 +160,34 @@ c  variable.
         end do
         
       end
+
+c ---------------------------
+
+c  Rotate amplitudes into R-T-Z system.
+      subroutine rot_amplitudes(amp_cart,baz,ntr,npha,amp_ph)
+      
+        implicit none 
+        include 'params.h'
+        
+        real amp_cart(3,maxph,maxtr),baz(maxtr),amp_ph(3,maxph,maxtr)
+        real ct,st,dr,dt,dz
+        integer ntr,itr,ipha,npha
+        
+        do itr=1,ntr
+          ct=cos(baz(itr))
+          st=sin(baz(itr))
+          do ipha=1,npha
+            dr=ct*amp_cart(1,ipha,itr)+st*amp_cart(2,ipha,itr)
+            dt=-st*amp_cart(1,ipha,itr)+ct*amp_cart(2,ipha,itr)
+            dz=amp_cart(3,ipha,itr)
+            amp_ph(1,ipha,itr)=dr
+            amp_ph(2,ipha,itr)=dt
+            amp_ph(3,ipha,itr)=dz
+          end do
+        end do
+        
+      end
+
 
 
 c ---------------------------
@@ -189,6 +240,57 @@ c Tr_cart and Tr_ph can be the same variable.
         end do
         
       end
+      
+c ---------------------------
+
+c Rotate amplitudes from NS-EW-Z coordinates to P-SV-SH system.
+      subroutine fs_amplitudes(amp_cart,baz,slow,alpha,beta,rho,ntr,
+     &                     npha,amp_ph)
+      
+        implicit none
+        include 'params.h'
+        
+        real amp_cart(3,maxph,maxtr),baz(maxtr),slow(maxtr),alpha,beta
+        real rho,amp_ph(3,maxph,maxtr)
+        integer ntr,npha
+        
+        integer itr,ipha,j
+        real p1,p2,a(3,3,3,3)
+        complex eval(6),evec(6,6),Md(3,3),Mu(3,3),Nd(3,3),Nu(3,3)
+        complex wrk(3,3),invop(3,3),u(3),v(3)
+        
+        a(3,3,3,3)=alpha**2
+        a(2,3,2,3)=beta**2
+                
+        do itr = 1,ntr
+        
+          p1=-slow(itr)*cos(baz(itr))
+          p2=-slow(itr)*sin(baz(itr))
+          call isotroc(a,rho,p1,p2,eval,evec)
+          call cextractblock(evec,Md,1,3,1,3,6,6)
+          call cextractblock(evec,Mu,1,3,4,6,6,6)
+          call cextractblock(evec,Nd,4,6,1,3,6,6)
+          call cextractblock(evec,Nu,4,6,4,6,6,6)
+          call cmatinv3(Nd,invop)        
+          call cmatmul3(invop,Nu,wrk)
+          call cmatmul3(Md,wrk,invop)
+          call cmatlincomb3((1.,0),Mu,(-1.,0),invop,wrk)
+          call cmatinv3(wrk,invop)
+          
+          do ipha=1,npha
+            do j=1,3
+              u(j)=amp_cart(j,ipha,itr)
+            end do
+            call cmatvec3(invop,u,v)
+            amp_ph(1,ipha,itr)=-real(v(1))
+            amp_ph(2,ipha,itr)=-real(v(2))
+            amp_ph(3,ipha,itr)=-real(v(3))
+          end do
+          
+        end do
+        
+      end
+      
       
       
 c ----------------------------------------------------

@@ -15,7 +15,7 @@ c ===================================================================
      &                    iphase, mults, nsamp, dt, align,
      &                    shift, out_rot, verb, nsegin, numphin,
      &                    phaselistin, Tr_ph, travel_time,
-     &                    amplitude, phaselist)
+     &                    amplitudeout, phaselist)
 
 c Always start a Fortran program with this line
         implicit none
@@ -58,7 +58,6 @@ c Geometry parameters
         integer ntr
 Cf2py   intent(in) :: ntr
 Cf2py   intent(in) :: baz, slow, sta_dx, sta_dy
-
         integer phaselistin(maxseg,2,maxph)
         integer nsegin(maxph),numphin
 Cf2py intent(in) :: nsegin, numphin, phaselistin
@@ -70,8 +69,8 @@ c Traces
         real Tr_ph(3,maxsamp,maxtr)
         integer phaselist(maxseg,2,maxph)
         real travel_time(maxph,maxtr)
-        real amplitude(3,maxph,maxtr)
-Cf2py intent(out) :: Tr_ph, travel_time, amplitude
+        real amplitudeout(3,maxph,maxtr)
+Cf2py intent(out) :: Tr_ph, travel_time, amplitudeout
 Cf2py intent(out) :: phaselist
 
 c ==================
@@ -83,6 +82,7 @@ c Scratch variables:
 
 c Phase parameters
         real Tr_cart(3,maxsamp,maxtr)
+        real amplitude(3,maxph,maxtr)
         integer nseg(maxph), numph
 
 c   aa is a list of rank-4 tensors (a_ijkl = c_ijkl/rho)
@@ -213,6 +213,11 @@ c Assemble traces
         if (out_rot .eq. 0) then
 c Write cartesian traces to output
           call copy_traces(Tr_cart,ntr,nsamp,Tr_ph)
+          if (mults .eq. 3) then
+            call copy_amplitudes(amplitude,ntr,numphin,amplitudeout)
+          else
+            call copy_amplitudes(amplitude,ntr,numph,amplitudeout)
+          end if
 
         else if (out_rot .eq. 1) then
 c Rotate to RTZ
@@ -221,9 +226,9 @@ c Rotate to RTZ
           end if
           call rot_traces(Tr_cart,baz,ntr,nsamp,Tr_ph)
           if (mults .eq. 3) then
-            call rot_traces(amplitude,baz,ntr,numphin,amplitude)
+            call rot_amplitudes(amplitude,baz,ntr,numphin,amplitudeout)
           else
-            call rot_traces(amplitude,baz,ntr,numph,amplitude)
+            call rot_amplitudes(amplitude,baz,ntr,numph,amplitudeout)
           end if
 
         else if (out_rot .eq. 2) then
@@ -234,11 +239,11 @@ c   Rotate to wavevector coordinates
             call fs_traces(Tr_cart,baz,slow,alpha(1),beta(1),
      &                     rho(1),ntr,nsamp,Tr_ph)
             if (mults .eq. 3) then
-              call fs_traces(amplitude,baz,slow,alpha(1),beta(1),
-     &                       rho(1),ntr,numphin,amplitude)
+              call fs_amplitudes(amplitude,baz,slow,alpha(1),beta(1),
+     &                       rho(1),ntr,numphin,amplitudeout)
             else
-              call fs_traces(amplitude,baz,slow,alpha(1),beta(1),
-     &                       rho(1),ntr,numph,amplitude)
+              call fs_amplitudes(amplitude,baz,slow,alpha(1),beta(1),
+     &                       rho(1),ntr,numph,amplitudeout)
           end if
         end if
                 
