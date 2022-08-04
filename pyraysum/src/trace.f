@@ -52,7 +52,7 @@ c           shift output arrivals as well
               do icomp=1,3
                 curamp(icomp)=amp(icomp,iph,itr)
                 if (curamp(icomp) .ne. curamp(icomp)) then
-                  write (*,*) '!!! ERROR -- amplitude is not a number'
+                  write (*,*) 'WARNING -- amplitude is not a number'
                   write (*,*) 'Trace ',itr,' phase ',iph,' comp ',icomp
                   write (*,*) 'Setting to zero, continuing.'
                   curamp(icomp)=0
