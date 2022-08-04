@@ -146,11 +146,11 @@ class Model(object):
         return self.nlay
 
     def __str__(self):
-        buf = '# thickn     rho      vp      vs  flag aniso  trend  '
-        buf += 'plunge  strike   dip\n'
+        buf = '# thickn     rho      vp      vs  flag aniso   trend '
+        buf += 'plunge strike   dip\n'
 
-        f = '{: 8.1f} {: 7.1f} {: 7.1f} {: 7.1f} {: 1.0f} {: 5.1f} {: 6.1f}'
-        f += '{: 5.1f} {: 6.1f} {: 5.1f}\n'
+        f = '{: 8.1f} {: 7.1f} {: 7.1f} {: 7.1f} {: 4.0f} {: 6.1f} {: 7.1f} '
+        f += '{: 6.1f} {: 6.1f} {: 5.1f}\n'
 
         for th, vp, vs, r, fl, a, tr, p, s, d in zip(
                 self.thickn, self.vp, self.vs, self.rho, self.flag, self.ani,
@@ -410,6 +410,12 @@ class Model(object):
 
         self.nlay -= bottom - top - 1
         self.update()
+
+    def save(self, fname='sample.mod', comment=''):
+        """
+        Alias for :class:`~pyraysum.prs.Model.write()`
+        """
+        self.write(fname=fname, comment=comment)
 
     def write(self, fname='sample.mod', comment=''):
         """
@@ -767,6 +773,12 @@ class Geometry(object):
             out += form.format(bb, ss, xx, yy)
         return out
 
+    def save(self, fname='sample.geom'):
+        """
+        Alias for :class:`~pyraysum.prs.Geometry.write()`
+        """
+        self.write(fname=fname)
+
     def write(self, fname='sample.geom'):
         """
         Write ray geometry to disk as ascii file
@@ -1020,6 +1032,12 @@ class RC(object):
         self.parameters = [self.iphase, self.mults, self.npts, self.dt,
                            self.align, self.shift, self.rot, self.verbose,
                            self._nseg, self._numph, self._phaselist]
+
+    def save(self, fname='raysum-param'):
+        """
+        Alias for :class:`~pyraysum.prs.RC.write()`
+        """
+        self.write(fname=fname)
 
     def write(self, fname='raysum-param'):
         """
