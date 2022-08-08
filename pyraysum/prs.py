@@ -252,7 +252,7 @@ class Model(object):
 
         Args:
             command (str):
-                An arbitray number command substrings seperated by ';'
+                An arbitray number of command substrings seperated by ';'
 
             verbose (bool):
                 Print changed parameters to screen
@@ -318,14 +318,14 @@ class Model(object):
         }
 
         changed = []
-        for command in commands.split(";"):
-            command = command.strip()
-            if not command:
+        for com in command.split(";"):
+            com = com.strip()
+            if not com:
                 continue
 
             # split by sign
             for sign in "=+-":
-                ans = command.split(sign, maxsplit=1)
+                ans = com.split(sign, maxsplit=1)
                 if len(ans) == 2:
                     break
 
