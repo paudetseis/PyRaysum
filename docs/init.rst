@@ -30,13 +30,10 @@ Installation
 Dependencies
 ++++++++++++
 
-``PyRaysum`` requires a modern Fortran compiler (e.g., `gfortran <https://gcc.gnu.org/wiki/GFortran>`_, ifort). In addition, the following packages are required:
-
-- `pandas <https://pandas.pydata.org>`_
-- `obspy <https://github.com/obspy/obspy/wiki>`_
-
-By  default, both ``numpy`` and ``matplotlib`` are installed as dependencies
-of ``obspy``.
+``PyRaysum`` requires a modern Fortran compiler (e.g., `gfortran
+<https://gcc.gnu.org/wiki/GFortran>`_, ifort) and `obspy
+<https://github.com/obspy/obspy/wiki>`_. By  default, both ``numpy`` and ``matplotlib``
+are installed as dependencies of ``obspy``.
 
 .. warning::
     There appears to be an issue when installing `obspy==1.2.2` with `numpy=1.22.2`. 
@@ -53,13 +50,15 @@ where ``pyraysum`` can be installed along with its dependencies:
 
 .. sourcecode:: bash
 
-   conda create -n prs python=3.8 fortran-compiler obspy pandas -c conda-forge
+   conda create -n prs python=3.8 fortran-compiler obspy -c conda-forge
 
 Activate the newly created environment:
 
 .. sourcecode:: bash
 
    conda activate prs
+
+You can interchange the name ``prs`` for any environment name you like.
 
 Installing latest version from PyPi
 +++++++++++++++++++++++++++++++++++
@@ -246,7 +245,18 @@ Examples
 .. sourcecode:: python
 
    >>> # Example using a single line
-   >>> model = Model([20000., 0.], [2800., 3300.], [4000., 6000.], [2600., 3600.], [0, 1], [5., 0], [30., 0], [10., 0], [0., 0.], [0., 0.])
+   >>> model = Model(
+        [20000., 0.],
+        [2800., 3300.],
+        [4000., 6000.],
+        [2600., 3600.],
+        [0, 1],
+        [5., 0],
+        [30., 0],
+        [10., 0],
+        [0., 0.],
+        [0., 0.],
+       )
 
 .. note::
 

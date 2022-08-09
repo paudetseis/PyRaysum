@@ -33,6 +33,13 @@ Documentation
    api
 
 .. toctree::
+   :glob:
+   :maxdepth: 1
+   :caption: Turtorials
+
+   turtorials/*/*
+
+.. toctree::
    :maxdepth: 1
    :caption: Jupyter Notebooks
 
