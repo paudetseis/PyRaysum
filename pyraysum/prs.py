@@ -1222,6 +1222,37 @@ class Seismogram(object):
 
         return
 
+    def descriptors(self):
+        """
+        Returns:
+            list
+                Unique list of all phase descriptors present
+
+        Raises:
+            AttributeError: If no descriptors are present
+
+        Example
+        -------
+        >>> from pyraysum import Model, RC, Geometry, run
+        >>> model = Model([30000., 0], [2800., 3300.], [6000., 8000.], [3600., 4500.])
+        >>> geom = Geometry(0., 0.06)
+        >>> rc = RC(mults=1)
+        >>> seismogram = run(model, geom, rc)
+        >>> seismogram.descriptors()
+        ['1P0P', '1P0S']
+        """
+
+        phl = []
+        for st in self.streams:
+            for tr in st:
+                try:
+                    phl.extend(tr.stats.phase_descriptors)
+                except AttributeError:
+                    msg = "No phase descriptors present. Did you run in 'full' mode?"
+                    raise AttributeError(msg)
+
+        return sorted(list(set(phl)))
+
     def plot(self, typ, **kwargs):
         """
 

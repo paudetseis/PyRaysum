@@ -376,10 +376,12 @@ multiples, i.e. reflections of the direct *P* wave. Reflections from
 *PS* are missing, most notably *PSpP*. To address this problem, we will
 next use the ``RC.set_phaselist()`` method to explicitly name the phases
 we whish to compute. The methods implicitly sets ``mults=3``.
+``Seismogram`` has a dedicated method ``descriptors()`` to list unique
+phases present in the synthetics.
 
 .. code:: ipython3
 
-    phl = prsd[0].stats.phase_descriptors
+    phl = seismogram.descriptors()
     eqp = prs.equivalent_phases(phl)
     print("Phases computed with mult=2:")
     print(phl)
@@ -391,10 +393,10 @@ we whish to compute. The methods implicitly sets ``mults=3``.
 .. parsed-literal::
 
     Phases computed with mult=2:
-    ['1P0P' '1P0S' '1P0P0p0P' '1P0P0p0S' '1P0P0s0S']
+    ['1P0P', '1P0P0p0P', '1P0P0p0S', '1P0P0s0S', '1P0S']
     
     Dynamically equivalent phases:
-    ['1P0S0p0S', '1P0P0s0P', '1P0S0p0P', '1P0S0s0P']
+    ['1P0P0s0P', '1P0S0s0P', '1P0S0p0P', '1P0S0p0S']
 
 
 We will now set a phaselist that includes these phases using the

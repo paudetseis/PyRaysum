@@ -123,7 +123,6 @@ def test_filtered_rf_array():
     #input('Press key to continue')
     
 
-
 def test_single_event():
 
     model = mod.test_def_model()
