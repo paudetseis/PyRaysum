@@ -43,7 +43,7 @@ def stack_all(stream, pws=False):
             Enables Phase-Weighted Stacking
 
     Returns:
-        stack (:class:`~obspy.core.Trace`):
+        :class:`~obspy.core.Trace`:
             Stacked trace
 
     """
@@ -79,8 +79,10 @@ def stack_all(stream, pws=False):
 
 
 def rf_wiggles(rflist, btyp='baz', wvtype='P', pws=False, tmin=-5., tmax=20,
-               scale=None, save=False, ftitle='Figure_rf_wiggle',
-               fmt='png'):
+               scale=None, pcolor='red', ncolor='blue', save=False,
+               ftitle='Figure_rf_wiggle',
+               fmt='png', plot_kwargs={'linewidth': 0.1, 'linecolor': 'black'},
+               figure_kwargs={}):
     """
     Plots receiver function seismograms sorted by back-azimuth or slowness.
 
@@ -99,16 +101,24 @@ def rf_wiggles(rflist, btyp='baz', wvtype='P', pws=False, tmin=-5., tmax=20,
         tmax (float):
             Upper bound of time axis (s)
         scale (float):
-            Scaling factor
+            Amplitude scaling factor
         save (bool):
             Whether or not to save the figure
+        pcolor (str):
+            Color to fill positive wiggles
+        ncolor (str):
+            Color to fill negative wiggles
         ftitle (str):
-            Title of figure to be saved
+            Filename of figure to be saved (without format suffix, see fmt)
         fmt (str):
             Output format ('png', 'jpg', or 'eps', etc.)
+        plot_kwargs (dict):
+            Keyword arguments passed to :meth:`~matplotlib.pyplot.plot()`
+        figure (dict):
+            Keyword arguments passed to :meth:`~matplotlib.pyplot.figure()`
 
     Returns:
-        fig (:class:`~matplotlib.pyplot`):
+        :class:`~matplotlib.pyplot`:
             Figure handle
     """
 
@@ -130,7 +140,7 @@ def rf_wiggles(rflist, btyp='baz', wvtype='P', pws=False, tmin=-5., tmax=20,
     time = str1[0].stats.taxis
 
     # Initialize figure
-    fig = plt.figure()
+    fig = plt.figure(**figure_kwargs)
     plt.clf()
 
     # Get more control on subplots
@@ -141,10 +151,10 @@ def rf_wiggles(rflist, btyp='baz', wvtype='P', pws=False, tmin=-5., tmax=20,
 
     # Plot stack of all traces from str1 on top left
     ax1.fill_between(time, 0., tr1.data, where=tr1.data+1e-6 <= 0.,
-                     facecolor='blue', linewidth=0, interpolate=True)
+                     facecolor=ncolor, linewidth=0, interpolate=True)
     ax1.fill_between(time, 0., tr1.data, where=tr1.data+1e-6 >= 0.,
-                     facecolor='red', linewidth=0, interpolate=True)
-    ax1.plot(time, tr1.data, linewidth=0.1, color='black')
+                     facecolor=pcolor, linewidth=0, interpolate=True)
+    ax1.plot(time, tr1.data, **plot_kwargs)
     ax1.set_ylim(-np.max(np.abs(tr1.data)), np.max(np.abs(tr1.data)))
     ax1.set_yticks(())
     ax1.set_xticks(())
@@ -153,10 +163,10 @@ def rf_wiggles(rflist, btyp='baz', wvtype='P', pws=False, tmin=-5., tmax=20,
 
     # Plot stack of all SH traces on top right
     ax3.fill_between(time, 0., tr2.data, where=tr2.data+1e-6 <= 0.,
-                     facecolor='blue', linewidth=0, interpolate=True)
+                     facecolor=ncolor, linewidth=0, interpolate=True)
     ax3.fill_between(time, 0., tr2.data, where=tr2.data+1e-6 >= 0.,
-                     facecolor='red', linewidth=0, interpolate=True)
-    ax3.plot(time, tr2.data, linewidth=0.1, color='black')
+                     facecolor=pcolor, linewidth=0, interpolate=True)
+    ax3.plot(time, tr2.data, **plot_kwargs)
     ax3.set_xlim(tmin, tmax)
     ax3.set_ylim(-np.max(np.abs(tr1.data)), np.max(np.abs(tr1.data)))
     ax3.set_yticks(())
@@ -195,17 +205,17 @@ def rf_wiggles(rflist, btyp='baz', wvtype='P', pws=False, tmin=-5., tmax=20,
             # Fill positive in red, negative in blue
             ax.fill_between(
                 time, y, y+tr.data*maxval, where=tr.data+1e-6 <= 0.,
-                facecolor='blue', linewidth=0, interpolate=True)
+                facecolor=ncolor, linewidth=0, interpolate=True)
             ax.fill_between(
                 time, y, y+tr.data*maxval, where=tr.data+1e-6 >= 0.,
-                facecolor='red', linewidth=0, interpolate=True)
-            ax.plot(time, y+tr.data*maxval, linewidth=0.1, color='black')
+                facecolor=pcolor, linewidth=0, interpolate=True)
+            ax.plot(time, y+tr.data*maxval, **plot_kwargs)
 
         ax.set_xlim(tmin, tmax)
 
         if btyp == 'baz':
             ax.set_ylim(-5, 370)
-            ax.set_ylabel('Back-azimuth (deg)')
+            ax.set_ylabel('Back-azimuth (degree)')
 
         elif btyp == 'slow':
             if wvtype == 'P':
@@ -222,9 +232,9 @@ def rf_wiggles(rflist, btyp='baz', wvtype='P', pws=False, tmin=-5., tmax=20,
                 ax.set_ylim(53., 107.)
             elif wvtype == 'SKS':
                 ax.set_ylim(83., 117.)
-            ax.set_ylabel('Distance (deg)')
+            ax.set_ylabel('Distance (degree)')
 
-        ax.set_xlabel('Time (sec)')
+        ax.set_xlabel('Time (seconds)')
         ax.grid(ls=':')
 
     # Remove labels on axis 4
@@ -232,7 +242,7 @@ def rf_wiggles(rflist, btyp='baz', wvtype='P', pws=False, tmin=-5., tmax=20,
     ax4.set_yticklabels(())
 
     if save:
-        plt.savefig(ftitle+'.'+fmt, dpi=300, bbox_inches='tight', format=fmt)
+        plt.savefig(ftitle+'.'+fmt, bbox_inches='tight', format=fmt)
     else:
         plt.show()
 
@@ -240,8 +250,9 @@ def rf_wiggles(rflist, btyp='baz', wvtype='P', pws=False, tmin=-5., tmax=20,
 
 
 def stream_wiggles(streamlist, btyp='baz', wvtype='P', tmin=-5., tmax=20.,
-                   scale=None, save=False, ftitle='Figure_pw_wiggles',
-                   fmt='png'):
+                   scale=None, pcolor='red', ncolor='blue', save=False, ftitle='Figure_pw_wiggles',
+                   fmt='png', plot_kwargs={'linewidth': 0.1, 'linecolor': 'black'},
+                   figure_kwargs={}):
     """
     Plots displacement seismograms sorted by back-azimuth or slowness.
 
@@ -259,15 +270,23 @@ def stream_wiggles(streamlist, btyp='baz', wvtype='P', tmin=-5., tmax=20.,
             Upper bound of time axis (s)
         scale (float):
             Scaling factor
+        pcolor (str):
+            Color to fill positive wiggles
+        ncolor (str):
+            Color to fill negative wiggles
         save (bool):
             Whether or not to save the figure
         ftitle (str):
-            Title of figure to be saved
+            Filename of figure to be saved (without format suffix, see fmt)
         fmt (str):
             Output format ('png', 'jpg', or 'eps', etc.)
+        plot_kwargs (dict):
+            Keyword arguments passed to :meth:`~matplotlib.pyplot.plot()`
+        figure (dict):
+            Keyword arguments passed to :meth:`~matplotlib.pyplot.figure()`
 
     Returns:
-        fig (:class:`~matplotlib.pyplot`):
+        :class:`~matplotlib.pyplot`:
             Figure handle
     """
 
@@ -284,7 +303,7 @@ def stream_wiggles(streamlist, btyp='baz', wvtype='P', tmin=-5., tmax=20.,
     time = str1[0].stats.taxis
 
     # Initialize figure
-    fig = plt.figure()
+    fig = plt.figure(**figure_kwargs)
     plt.clf()
 
     # Get more control on subplots
@@ -322,17 +341,17 @@ def stream_wiggles(streamlist, btyp='baz', wvtype='P', tmin=-5., tmax=20.,
             # Fill positive in red, negative in blue
             ax.fill_between(
                 time, y, y+tr.data*maxval, where=tr.data+1e-6 <= 0.,
-                facecolor='blue', linewidth=0, interpolate=True)
+                facecolor=ncolor, linewidth=0, interpolate=True)
             ax.fill_between(
                 time, y, y+tr.data*maxval, where=tr.data+1e-6 >= 0.,
-                facecolor='red', linewidth=0, interpolate=True)
-            ax.plot(time, y+tr.data*maxval, linewidth=0.1, color='black')
+                facecolor=pcolor, linewidth=0, interpolate=True)
+            ax.plot(time, y+tr.data*maxval, **plot_kwargs)
 
         ax.set_xlim(tmin, tmax)
 
         if btyp == 'baz':
             ax.set_ylim(-5, 370)
-            ax.set_ylabel('Back-azimuth (deg)')
+            ax.set_ylabel('Back-azimuth (degree)')
 
         elif btyp == 'slow':
             if wvtype == 'P':
@@ -349,9 +368,9 @@ def stream_wiggles(streamlist, btyp='baz', wvtype='P', tmin=-5., tmax=20.,
                 ax.set_ylim(53., 107.)
             elif wvtype == 'SKS':
                 ax.set_ylim(83., 117.)
-            ax.set_ylabel('Distance (deg)')
+            ax.set_ylabel('Distance (degree)')
 
-        ax.set_xlabel('Time (sec)')
+        ax.set_xlabel('Time (seconds)')
         ax.set_title(st[0].stats.channel)
         ax.grid(ls=':')
 
@@ -362,7 +381,7 @@ def stream_wiggles(streamlist, btyp='baz', wvtype='P', tmin=-5., tmax=20.,
     ax3.set_yticklabels(())
 
     if save:
-        plt.savefig(ftitle+'.'+fmt, dpi=300, bbox_inches='tight', format=fmt)
+        plt.savefig(ftitle+'.'+fmt, bbox_inches='tight', format=fmt)
     else:
         plt.show()
 
@@ -370,7 +389,7 @@ def stream_wiggles(streamlist, btyp='baz', wvtype='P', tmin=-5., tmax=20.,
 
 
 def seis_wiggles(stream, tmin=-5., tmax=20., save=False,
-                 ftitle='Figure_pw_wiggles_3c', fmt='png'):
+                 ftitle='Figure_pw_wiggles_3c', fmt='png', figure_kwargs={}):
     """
     Plots 3-component wiggles.
 
@@ -384,12 +403,12 @@ def seis_wiggles(stream, tmin=-5., tmax=20., save=False,
         save (bool):
             Whether or not to save the figure
         ftitle (str):
-            Title of figure to be saved
+            Filename of figure to be saved (without format suffix, see fmt)
         fmt (str):
             Output format ('png', 'jpg', or 'eps', etc.)
 
     Returns:
-        fig (:class:`~matplotlib.pyplot`):
+        :class:`~matplotlib.pyplot`:
             Figure handle
     """
 
@@ -397,7 +416,7 @@ def seis_wiggles(stream, tmin=-5., tmax=20., save=False,
     dt = stream[0].stats.delta
 
     # Clear figure
-    fig = plt.figure()
+    fig = plt.figure(**figure_kwargs)
 
     # Time axis
     time = stream[0].stats.taxis
@@ -412,7 +431,7 @@ def seis_wiggles(stream, tmin=-5., tmax=20., save=False,
             label='Vertical component', lw=0.75)
     ax.set_xlim(tmin, tmax)
     ax.set_ylim(-1.1, 1.1)
-    ax.set_xlabel('Time following $P$-wave arrival (sec)')
+    ax.set_xlabel('Time following $P$-wave arrival (seconds)')
 
     plt.legend()
 
@@ -437,7 +456,7 @@ def seis_wiggles(stream, tmin=-5., tmax=20., save=False,
     plt.tight_layout()
 
     if save:
-        plt.savefig(ftitle+'.'+fmt, dpi=300, bbox_inches='tight', format=fmt)
+        plt.savefig(ftitle+'.'+fmt, bbox_inches='tight', format=fmt)
     else:
         plt.show()
 
