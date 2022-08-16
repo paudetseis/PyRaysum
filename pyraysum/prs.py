@@ -642,19 +642,24 @@ class Model(object):
 
         return ax
 
-    def plot_interfaces(self, zmax=75, ax=None):
+    def plot_interfaces(self, zmax=75, info=["vp", "vs", "vpvs", "rho"], ax=None):
         """
         Plot model as interfaces with possibly dipping layers
 
         Args:
             zmax (float):
                 Maximum depth of model to plot (km)
+            info (list of str):
+                Which :class:`Model` attributes to list for each layer
             ax (plt.axis):
                 Axis handle for plotting. If ``None``, show the plot
 
         Returns:
             plt.axis:
                 Axis handle for plotting
+
+        Raises:
+            ValueError: If element in :const:`info` is not recognized
 
         """
 
@@ -685,23 +690,28 @@ class Model(object):
                     xs[-1], zs[-1], ">{:.0f}°".format(dipdir), ha="left", va="center"
                 )
 
-            info = (
-                "{: 2d}: "
-                "$V_P={:.1f}$km/s, "
-                "$V_S={:.1f}$km/s, "
-                "$V_P/V_S={:.2f}$, "
-                "$\\rho={:.1f}$kg/m$^3$"
-            ).format(
-                i,
-                self.vp[i] / 1000,
-                self.vs[i] / 1000,
-                self.vpvs[i],
-                self.rho[i] / 1000,
-            )
+            if info:
+                msg = "{: 2d}: ".format(i)
+
+            for n, inf in enumerate(info):
+                if inf == "vp":
+                    msg += "$V_P={:.1f}$km/s".format(self.vp[i] / 1000)
+                elif inf == "vs":
+                    msg += "$V_S={:.1f}$km/s".format(self.vs[i] / 1000)
+                elif inf == "vpvs":
+                    msg += "$V_P/V_S={:.2f}$".format(self.vpvs[i])
+                elif inf == "rho":
+                    msg += "$\\rho={:.1f}$kg/m$^3$".format(self.rho[i] / 1000)
+                else:
+                    err = "Unknown argument to 'info': " + inf
+                    raise ValueError(err)
+                if len(info[n:]) > 1:
+                    msg += ", "
+
             ax.text(
                 0,
                 depth + 1,
-                info,
+                msg,
                 rotation=-self.dip[i],
                 rotation_mode="anchor",
                 ha="center",
@@ -709,13 +719,12 @@ class Model(object):
             )
 
             if self.flag[i] == 0:
-                aninfo = "--{:.0f}%--{:.0f}°".format(self.ani[i], self.trend[i])
+                aninfo = "-{:.0f}%-{:.0f}°".format(self.ani[i], self.trend[i])
                 ax.text(
                     xs[-1],
                     zs[-1] + self.thickn[i] / 2000,
                     aninfo,
                     rotation=-self.plunge[i],
-                    rotation_mode="anchor",
                     ha="left",
                     va="center",
                 )
