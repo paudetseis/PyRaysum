@@ -1155,17 +1155,20 @@ class Seismogram(object):
         streams (List):
             List of :class:`~obspy.core.Stream` objects.
 
-    The :attr:`~obspy.core.Trace.stats` holds additional attributes
-        phase_times (list):
+    If created with :const:`mode='full'` in :meth:`run()`, the :attr:`stats` atrribute
+    of each :class:`~obspy.core.Trace` in each :class:`~obspy.core.Stream` holds the
+    additional attributes:
+
+        phase_times
             Arrival times of seismic phases
-        phase_amplitudes (list):
+        phase_amplitudes
             Amplitudes of seismic phases
-        phase_descriptors (list):
+        phase_descriptors
             Descripors of seismic phases. Index indicates layer through which phase
             propagates. (e.g. "1P0S", see also :meth:`descriptors()`)
-        phase_names (list):
+        phase_names
             Short names of seismic phases (e.g. "PS")
-        conversion_names (list):
+        conversion_names
             Conversion names of seimic phases. Index indcates top of layer at which
             conversion occurrs. (e.g. "P1S")
 
