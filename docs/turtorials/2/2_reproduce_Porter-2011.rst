@@ -1,5 +1,5 @@
-Example 2: Reproducing Receiver Functions for Dipping and Anisotropic Subsurfac Structure
-=========================================================================================
+Example 2: Reproducing Receiver Functions for Dipping and Anisotropic Subsurface Structure
+==========================================================================================
 
 In this example we generate *P* receiver functions for a model that
 includes either a dipping lower crustal layer or a lower-crustal
@@ -32,7 +32,7 @@ Define the arrays of slowness and back-azimuth values of the incident
 
 
 Define the model object. The values used are found in the caption of
-Figure 3. Note that :math:`V_S` can be parameterized either diectly or
+Figure 3. Note that :math:`V_S` can be parameterized either directly or
 as :math:`V_P/V_S`, which is what we do here. Also note that values that
 are constant for all layers can be given as floats.
 
@@ -148,8 +148,8 @@ velocity is 6.2 km/s. We could define a new model as above. Another
 possibility is to use use a short command string to change the existing
 model.
 
-Note that when we change the *P* wave velocity and want to mainatin a
-constant :math:`V_P/V_S` ratio, we must explicilty change ``vpvs`` by
+Note that when we change the *P* wave velocity and want to maintain a
+constant :math:`V_P/V_S` ratio, we must explicitly change ``vpvs`` by
 changing ``vs``. This is archived using the ``'pss'`` attribute
 indicator below.
 
@@ -204,14 +204,14 @@ Understanding Fast and Slow S-Waves
 -----------------------------------
 
 To understand the different phases present we can look at, e.g., the
-receiver function at backazimuth 150°. We look into how the individual
+receiver function at back-azimuth 150°. We look into how the individual
 phases are called and when they arrive.
 
 The following command tells us that the negative wiggle arriving at 2.5
-seconds is a P-to-S convsersion at the bottom of layer 0 (i.e. the top
-of the anisotropic layer), whereas the positive wiggle at 3s consists of
+seconds is a P-to-S conversion at the bottom of layer 0 (i.e. the top of
+the anisotropic layer), whereas the positive wiggle at 3s consists of
 two S-waves arriving shortly after one another: The smaller wiggle is
-the P-to-S1 conversion at the bottom of layer 1 (the anistropic layer),
+the P-to-S1 conversion at the bottom of layer 1 (the anisotropic layer),
 and the larger one is the P-to-S2 conversion at the same interface.
 (Note that the slow S-wave is denoted *T*, to avoid ambiguity with the
 layer indices.) Both phases travel as an S-wave (here again named *T*)
@@ -261,9 +261,9 @@ Validation against Telewavesim Data
 
 As in the previous example, we would now like to compare these results
 with independently obtained results from *Telewavesim*. We’ll need
-*NumPy* to conviniently load our Telewavesim data from file, *obspy* to
-store them in a *Stream* obbject, and *Matplotlib* to make the
-comparison plot.
+*NumPy* to conveniently load our Telewavesim data from file, *obspy* to
+store them in a *Stream* object, and *Matplotlib* to make the comparison
+plot.
 
 .. code:: ipython3
 
@@ -327,7 +327,7 @@ and scale them to its amplitude on the vertical component.
         tr.data *= norm  # normalize
         tr.trim(prsd[0].stats.starttime, prsd[0].stats.endtime)
 
-For a good comparisson, we use the plot function from the previous
+For a good comparison, we use the plot function from the previous
 example:
 
 .. code:: ipython3
@@ -407,10 +407,10 @@ Conclusion
 ----------
 
 In this example we have explored the capabilities of *Pyraysum* to
-compute snytheitc seismograms and receiver functions for dippin or
+compute synthetic seismograms and receiver functions for dipping or
 anisotropic layers. We have compared the outcome of our simulations with
 published results and, for the anisotropic example, also with synthetic
-data from another numerical method. Both comparisions showed that
+data from another numerical method. Both comparisons showed that
 *Pyraysum* delivers comparable results.
 
 References

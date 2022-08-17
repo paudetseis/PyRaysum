@@ -3,7 +3,7 @@ Example 3: Invert a Receiver Function
 
 In this example we are going to load a receiver function that has been
 created from seismograms recorded at station Hyderabad, India, of
-earthquakes that occurred in the Philipines. The source station
+earthquakes that occurred in the Philippines. The source station
 configuration is identical to the one in example 1. We are going to work
 with receiver function, as in example 2. This example explores the
 provisions of ``pyraysum`` for time optimized execution. We are going to
@@ -145,9 +145,9 @@ Inversion Script
 Recording Geometry
 ~~~~~~~~~~~~~~~~~~
 
-Now it is time to run the script. We define the backazimuth and slowness
-of seismic rays arriving at Hyberabad from the Philipines. The time
-window should span the intervall between 0 and 25 seconds after the
+Now it is time to run the script. We define the back-azimuth and
+slowness of seismic rays arriving at Hyderabad from the Philippines. The
+time window should span the interval between 0 and 25 seconds after the
 arrival of the direct P-wave. Data should be bandpass filtered between
 20 and 2 seconds period.
 
@@ -163,16 +163,16 @@ arrival of the direct P-wave. Data should be bandpass filtered between
 Loading a Receiver Function
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We load the radial and transverse receiver fuctions from file. The
+We load the radial and transverse receiver functions from file. The
 present receiver function has been created from 3 high-quality
-earthquake recordings from the Philipines. Note that ``rfr`` and ``rft``
-here need to be structured such that the arrival of the direct P-wave is
-located in the middle of the array. In other words, the acausal part
-(earlier than direct P) must be as long as the causal part (later than
-direct P). In this way, the definition of the time window mask ``ist``
-is such that it can be reused for post-processing of the synthetic
-receiver functions. The windowed receiver function are concatenated to
-yield the data vector.
+earthquake recordings from the Philippines. Note that ``rfr`` and
+``rft`` here need to be structured such that the arrival of the direct
+P-wave is located in the middle of the array. In other words, the
+acausal part (earlier than direct P) must be as long as the causal part
+(later than direct P). In this way, the definition of the time window
+mask ``ist`` is such that it can be reused for post-processing of the
+synthetic receiver functions. The windowed receiver function are
+concatenated to yield the data vector.
 
 .. code:: ipython3
 
@@ -182,7 +182,7 @@ yield the data vector.
     
         observed = np.concatenate((rfr[ist], rft[ist]))
 
-Setup of Background Model and Run Controll Paramters
+Setup of Background Model and Run Control Parameters
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 We set up the background subsurface velocity model using Saul et
@@ -199,7 +199,7 @@ al. (2000), as well as the recording geometry.
         geometry = prs.Geometry([baz], [slow])    
 
 We choose the RC parameters so that they match the processing of the
-receiver functions. In the present case, the receiver funtions are
+receiver functions. In the present case, the receiver functions are
 rotated to the P-SV-SH ray coordinate system (``rot=2``), and the
 sampling interval (``dt``) and number of samples (``npts``) are set to
 match the input. The ``align=1`` option (together with ``shift=None``,
@@ -266,11 +266,11 @@ shape ``(geometry.ntr, 2, rc.npts)``.
 
         rfarray = prs.rfarray(geometry, rc)
 
-A First Look at the Obersved and Predicted Data Vectors
+A First Look at the Observed and Predicted Data Vectors
 -------------------------------------------------------
 
 Let’s see how well the starting model predicts the data. See what
-changes if you set ``rf=False``, in which case no spectral devision is
+changes if you set ``rf=False``, in which case no spectral division is
 performed and the model prediction is the synthetic seismogram. This
 expedites the computation, but is less exact.
 
@@ -490,9 +490,9 @@ Conclusion
 ----------
 
 In this example we looked into some basic functions that can be helpful
-when using *PyRaysum* in parameter esimtation problems. We defined a
+when using *PyRaysum* in parameter estimation problems. We defined a
 function ``predictRF`` to predict a receiver function from a given input
-model, as well as a ``misfit`` function whose scalar ouput should be
+model, as well as a ``misfit`` function whose scalar output should be
 minimized through inverse modeling. We then plugged these functions into
 *SciPy*\ ’s ``optimize`` toolbox to estimate the thickness and *S*-wave
 velocity of the cratonic crust in Hyderabad, India.
