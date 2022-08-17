@@ -1153,7 +1153,22 @@ class Seismogram(object):
         rc (:class:`~pyraysum.prs.RC`):
             The run controll parameters used
         streams (List):
-            List of `~obspy.core.Stream` objects.
+            List of :class:`~obspy.core.Stream` objects.
+
+    The :attr:`~obspy.core.Trace.stats` holds additional attributes
+        phase_times (list):
+            Arrival times of seismic phases
+        phase_amplitudes (list):
+            Amplitudes of seismic phases
+        phase_descriptors (list):
+            Descripors of seismic phases. Index indicates layer through which phase
+            propagates. (e.g. "1P0S", see also :meth:`descriptors()`)
+        phase_names (list):
+            Short names of seismic phases (e.g. "PS")
+        conversion_names (list):
+            Conversion names of seimic phases. Index indcates top of layer at which
+            conversion occurrs. (e.g. "P1S")
+
     """
 
     def __init__(self, model=None, geom=None, rc=None, streams=None):
@@ -1573,7 +1588,7 @@ def equivalent_phases(descriptors, kinematic=False):
 def read_traces(traces, rc, geometry, arrivals=None):
     """
     Creates a :class:`Seismogram` from the traces produced by :meth:`fraysum.run_bare()`
-    and :meth:`fraysum.run_full`
+    and :meth:`fraysum.run_full`.
 
     Parameters:
         rc (:class:`RC`):
@@ -1649,6 +1664,7 @@ def read_traces(traces, rc, geometry, arrivals=None):
                         "phase_amplitudes": arrivals[iitr][ic][1],
                         "phase_descriptors": arrivals[iitr][ic][2],
                         "phase_names": arrivals[iitr][ic][3],
+                        "conversion_names": arrivals[iitr][ic][4],
                     }
                 )
 
@@ -1671,7 +1687,7 @@ def read_arrivals(ttimes, amplitudes, phaselist, geometry):
     """
     Convert the :const:`phaselist`, :const:`amplitude` and :const:`traveltime` output of
     :meth:`fraysum.run_full()` to lists of phase arrival times, amplitudes, long phase
-    descriptors, and short phase names.
+    descriptors, short phase names, and conversion names.
 
     Parameters:
         ttimes (np.array):
@@ -1688,37 +1704,53 @@ def read_arrivals(ttimes, amplitudes, phaselist, geometry):
             3-component phase arrival lists, where indices translate to:
             * :const:`0`: phase arrival times
             * :const:`1`: phase amplitudes
-            * :const:`2`: (long) phase desciptors
-            * :const:`3`: (short) phase names
+            * :const:`2`: (long) phase desciptors, e.g. "1P0S"
+            * :const:`3`: (short) phase names, e.g. "PS"
+            * :const:`4`: (intermediate) conversion names, e.g. "P1S"
     """
 
     dscrs = []
     phnms = []
+    convs = []
     for iph in range(len(phaselist[0, 0, :])):
         dscr = ""
         phnm = ""
+        conv = ""
 
         for iseg in range(len(phaselist[:, 0, 0])):
             if phaselist[iseg, 0, iph] == 0:
                 # No more reflections / conversions
                 dscrs.append(dscr)
                 phnms.append(phnm)
+                convs.append(conv)
                 break
 
             phid = phaselist[iseg, 1, iph]
-            layn = str(phaselist[iseg, 0, iph] - 1)  # Python indexing
+            layn = phaselist[iseg, 0, iph] - 1  # Python indexing
 
             phn = _phnames[phid]
-            dscr += layn + phn
+            dscr += str(layn) + phn
 
-            # Omit not-converted segment from phase name
+            if phn.isupper():
+                # Upward-conversion at top of layer below
+                con = str(layn + 1) + phn
+            else:
+                con = str(layn) + phn
+
+            # Omit not-converted segment from phase name and conversions
             try:
                 if phnm[-1] == phn:
                     phn = ""
+                    con = ""
             except IndexError:
-                pass
+                con = ""
+
+            # Always prefix incoming wavetype to conversions
+            if iseg == 0:
+                con = phn
 
             phnm += phn
+            conv += con
 
         if phaselist[0, 0, iph + 1] == 0:
             break
@@ -1727,6 +1759,7 @@ def read_arrivals(ttimes, amplitudes, phaselist, geometry):
 
     dscrs = np.array(dscrs)
     phnms = np.array(phnms)
+    convs = np.array(convs)
 
     tanss = []
     for itr in range(geometry.ntr):
@@ -1736,7 +1769,7 @@ def read_arrivals(ttimes, amplitudes, phaselist, geometry):
             ia = abs(amps) > 1e-6  # Dismiss 0 amplitude arrivals
             tans.append(
                 np.array(
-                    [ttimes[:nphs, itr][ia], amps[ia], dscrs[ia], phnms[ia]],
+                    [ttimes[:nphs, itr][ia], amps[ia], dscrs[ia], phnms[ia], convs[ia]],
                     dtype=object,
                 )
             )
