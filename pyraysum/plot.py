@@ -81,7 +81,7 @@ def stack_all(stream, pws=False):
 def rf_wiggles(rflist, btyp='baz', wvtype='P', pws=False, tmin=-5., tmax=20,
                scale=None, pcolor='red', ncolor='blue', save=False,
                ftitle='Figure_rf_wiggle',
-               fmt='png', plot_kwargs={'linewidth': 0.1, 'linecolor': 'black'},
+               fmt='png', plot_kwargs={'linewidth': 0.1, 'color': 'black'},
                figure_kwargs={}):
     """
     Plots receiver function seismograms sorted by back-azimuth or slowness.
@@ -251,7 +251,7 @@ def rf_wiggles(rflist, btyp='baz', wvtype='P', pws=False, tmin=-5., tmax=20,
 
 def stream_wiggles(streamlist, btyp='baz', wvtype='P', tmin=-5., tmax=20.,
                    scale=None, pcolor='red', ncolor='blue', save=False, ftitle='Figure_pw_wiggles',
-                   fmt='png', plot_kwargs={'linewidth': 0.1, 'linecolor': 'black'},
+                   fmt='png', plot_kwargs={'linewidth': 0.1, 'color': 'black'},
                    figure_kwargs={}):
     """
     Plots displacement seismograms sorted by back-azimuth or slowness.
