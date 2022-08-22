@@ -1280,9 +1280,41 @@ class Seismogram(object):
 
         return sorted(list(set(phl)))
 
+    def write(self, fname="sample.tr"):
+        """
+        Write streams to file, using legacy Raysum trace format
+
+        Parameters:
+            fname (str):
+                Name of the output file
+        """
+        buf = "#{:>11s}{:>11s}{:>11s}{:>11s}{:>11s}\n".format(
+            "#traces", "#samples", "dt (s)", "align", "shift"
+        )
+        buf += " {:11d}{:11d}{:11.3f}{:11d}{:11.3f}\n".format(
+            len(self.streams), self.rc.npts, self.rc.dt, self.rc.align, self.rc.shift
+        )
+        for itr, stream in enumerate(self.streams):
+            arr = np.vstack((stream[0].data, stream[1].data, stream[2].data)).T
+            buf += "#-------------------\n"
+            buf += "# Trace number {:5d}\n".format(itr+1)  # Fortran indexing
+            buf += "#-------------------\n"
+            buf += (
+                np.array2string(
+                    arr,
+                    threshold=3*arr.shape[0] + 1,
+                    formatter={"float": lambda i: "{:15.7e}".format(i)},
+                )
+                .replace("[", " ")
+                .replace("]", " ")
+            )
+            buf += "\n"
+
+        with open(fname, "w") as fid:
+            fid.write(buf)
+
     def plot(self, typ, **kwargs):
         """
-
         Plots the displacement seismograms and/or receiver functions stored in
         :class:`~pyraysum.prs.Seismogram` streams.
 
