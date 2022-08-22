@@ -79,7 +79,7 @@ class Model(object):
         nlay
           Number of layers
         parameters
-          Convinience attribute gathers the below `f`-attributes in the order expected
+          Convenience attribute gathers the below `f`-attributes in the order expected
           by `fraysum.run_bare()` and `fraysum.run_full()`
         fthickn
           Thickness of layers (m)
@@ -219,7 +219,7 @@ class Model(object):
 
     def update(self, change="vpvs"):
         """
-        Update all attributess after one was changed by the user.
+        Update all attributes after one was changed by the user.
 
         Parameters:
             change (str):
@@ -252,7 +252,7 @@ class Model(object):
 
         Args:
             command (str):
-                An arbitray number of command substrings seperated by ';'
+                An arbitrary number of command substrings separated by ';'
 
             verbose (bool):
                 Print changed parameters to screen
@@ -260,7 +260,7 @@ class Model(object):
         Returns:
             list of 3*tuple:
                List of changes applied of the form:
-               (attribute, layer, newvalue)
+               (attribute, layer, new value)
 
         Note:
             In the ``command`` argument, each substring has the form:
@@ -413,7 +413,7 @@ class Model(object):
     def average_layers(self, top, bottom):
         """
         Combine layers between top and bottom index into one with summed
-        thicknes and average vp, vs, and rho.
+        thickness and average vp, vs, and rho.
 
         Args:
             top (int):
@@ -630,7 +630,7 @@ class Model(object):
             else:
                 cax = ax.axhspan(depths[i], depths[i + 1], color=colors[i])
 
-        # Fix axes and labelts
+        # Fix axes and labels
         ax.set_ylim(0.0, zmax)
         ax.set_xticks(())
         ax.invert_yaxis()
@@ -753,7 +753,7 @@ class Geometry(object):
 
     Parameters:
         baz (float or np.ndarray):
-          Ray backazimuths (deg)
+          Ray back-azimuths (deg)
         slow (float or np.ndarray):
           Ray slownesses (s/km)
         dn (np.ndarray):
@@ -770,10 +770,10 @@ class Geometry(object):
         ntr (int):
           Number of traces
         parameters (list):
-          Convinience attribute gathers the below `f`-attributes in the order expected
+          Convenience attribute gathers the below `f`-attributes in the order expected
           by `fraysum.run_bare()` and `fraysum.run_full()`
         fbaz (np.ndarray):
-          Ray backazimuth (radians)
+          Ray back-azimuth (radians)
         fslow (np.ndarray):
           Ray slowness (m/s)
         fdn (np.ndarray):
@@ -875,7 +875,7 @@ class Geometry(object):
 
 class RC(object):
     """
-    Run Controll parameters for :meth:`prs.run()`.
+    Run Control parameters for :meth:`prs.run()`.
 
     Parameters:
         wvtype (str):
@@ -891,7 +891,7 @@ class RC(object):
         npts (int):
             Number of samples in time series
         dt (float):
-            Sampling intervall in seconds
+            Sampling interval in seconds
         align (int):
             ID for time alignment of seismograms
 
@@ -1022,7 +1022,7 @@ class RC(object):
         Parameters:
 
             descriptors (list of str):
-                List of phase descriptors, where each discriptor is a string of
+                List of phase descriptors, where each descriptor is a string of
                 consecutive PHASE SEGMENT pairs, where
                 PHASE is:
 
@@ -1042,17 +1042,17 @@ class RC(object):
                 Limit equivalent phases to those with same polarity as input phases
 
         Raises:
-            IndexError: If resulting phaslist is longer than :const:`maxph`.
+            IndexError: If resulting phaselist is longer than :const:`maxph`.
 
         Hint:
-            In a two layer model (layer 1 is the underlying halfspace, layer 0 is the
-            topmost subsruface layer) the :const:`descriptors` compute the phases:
+            In a two layer model (layer 1 is the underlying half-space, layer 0 is the
+            topmost subsurface layer) the :const:`descriptors` compute the phases:
 
             * ``['1P0P']``: direct P-wave
             * ``['1P0S']``: P-to-S converted wave
             * ``['1P0P', '1P0S']``: direct P-wave and P-to-S converted wave
             * ``['1P0P0s0S']``: P reflected s at the surface, reflected S at the top of
-            the halfspace
+            the half-space
 
         Caution:
             Using :const:`equivalent=False` may result in wrong amplitudes, because
@@ -1085,7 +1085,7 @@ class RC(object):
 
     def null_phaselist(self, mults=2):
         """
-        Do not use phaselist, but compute using mults keyword.
+        Do not use phaselist, but compute using :const:`mults` keyword.
 
         Args:
             mults (int):
@@ -1155,7 +1155,7 @@ class Seismogram(object):
         streams (List):
             List of :class:`~obspy.core.Stream` objects.
 
-    If created with :const:`mode='full'` in :meth:`run()`, the :attr:`stats` atrribute
+    If created with :const:`mode='full'` in :meth:`run()`, the :attr:`stats` attribute
     of each :class:`~obspy.core.Trace` in each :class:`~obspy.core.Stream` holds the
     additional attributes:
 
@@ -1164,13 +1164,13 @@ class Seismogram(object):
         phase_amplitudes
             Amplitudes of seismic phases
         phase_descriptors
-            Descripors of seismic phases. Index indicates layer through which phase
+            Descriptors of seismic phases. Index indicates layer through which phase
             propagates. (e.g. "1P0S", see also :meth:`descriptors()`)
         phase_names
             Short names of seismic phases (e.g. "PS")
         conversion_names
-            Conversion names of seimic phases. Index indcates top of layer at which
-            conversion occurrs. (e.g. "P1S")
+            Conversion names of seismic phases. Index indicates top of layer at which
+            conversion occurs. (e.g. "P1S")
 
     """
 
@@ -1390,7 +1390,7 @@ class Seismogram(object):
 
 def run(model, geometry, rc, mode="full", rf=False):
     """
-    Run a wavefield simulation. Calls the compiled :mod:`fraysum` binaries.
+    Run a wave-field simulation. Calls the compiled :mod:`fraysum` binaries.
 
     Parameters:
         model (:class:`~pyraysum.prs.Model`):
@@ -1398,7 +1398,7 @@ def run(model, geometry, rc, mode="full", rf=False):
         geometry (:class:`~pyraysum.prs.Geometry`):
             Recording geometry
         rc (:class:`~pyraysum.prs.RC`):
-            Run controll parameters
+            Run control parameters
         mode (str):
             * :const:`'full'`: Compute seismograms and phase arrivals and descriptors (slower)
             * :const:`'bare'`: Only compute seismograms (faster)
@@ -1500,7 +1500,7 @@ def read_geometry(geomfile, encoding=None):
 
 def read_rc(paramfile):
     """
-    Reads raysum runcontroll parameters from file and returns an
+    Reads raysum run control parameters from file and returns an
     instance of class :class:`~pyraysum.prs.RC`.
 
     Returns:
@@ -1739,7 +1739,7 @@ def read_arrivals(ttimes, amplitudes, phaselist, geometry):
             3-component phase arrival lists, where indices translate to:
             * :const:`0`: phase arrival times
             * :const:`1`: phase amplitudes
-            * :const:`2`: (long) phase desciptors, e.g. "1P0S"
+            * :const:`2`: (long) phase descriptors, e.g. "1P0S"
             * :const:`3`: (short) phase names, e.g. "PS"
             * :const:`4`: (intermediate) conversion names, e.g. "P1S"
     """
