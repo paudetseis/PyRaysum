@@ -3,9 +3,9 @@ from pkg_resources import resource_filename
 from pyraysum import prs, Model
 
 dipfile = resource_filename('pyraysum',
-                           'examples/models/model_Porter2011_dip.txt')
+                           'examples/data/model_Porter2011_dip.txt')
 anisofile = resource_filename('pyraysum',
-                           'examples/models/model_Porter2011_aniso.txt')
+                           'examples/data/model_Porter2011_aniso.txt')
 
 
 def test_read_model_dip():

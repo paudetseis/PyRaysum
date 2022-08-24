@@ -158,4 +158,4 @@ def test_rfs():
     rc.rot = 1
     streamlist2 = prs.run(model, geom, rc)
     rflist = streamlist2.calculate_rfs()
-    [rf.filter('lowpass', freq=1., corners=2, zerophase=True) for rf in rflist]
+    [rf.filter('lowpass', freq=1., corners=2, zerophase=True) for rf in streamlist2.rfs]
