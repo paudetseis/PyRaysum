@@ -1247,7 +1247,7 @@ class Seismogram(object):
 
         self.rfs = rflist
 
-        return
+        return 
 
     def descriptors(self):
         """
@@ -1475,7 +1475,7 @@ def read_model(modfile, encoding=None):
             Seismic velocity model
     """
 
-    vals = np.genfromtxt(modfile, encoding=encoding)
+    vals = np.genfromtxt(modfile, encoding=encoding).T
     return Model(*vals)
 
 
