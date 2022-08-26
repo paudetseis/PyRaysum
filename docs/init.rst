@@ -114,15 +114,16 @@ of synthetic data from `Porter et al. (2011) <https://doi.org/10.1130/L126.1>`_.
 
 
 After ``pyraysum`` is installed, these notebooks can be locally installed
-(i.e., in a local folder ``Notebooks``) from the package
+(i.e., in a local folder ``Examples``) from the package
 by typing in a ``python`` window:
 
 .. sourcecode :: python
 
    from pyraysum import doc
-   doc.install_doc(path='Notebooks')
+   doc.install_doc(path='Examples')
 
-To run the notebooks you will have to further install ``jupyter``.
+This will also install packaged data that are necessary to run the notebooks. 
+Note that to run the notebooks, you will have to further install ``jupyter``.
 From the terminal, type:
 
 .. sourcecode :: bash
