@@ -1820,7 +1820,7 @@ def rfarray(geometry, rc):
 
     Returns:
         :const:`numpy.zeros((geometry.ntr, 2, rc.npts))`:
-            Array in shape to be used by :meth`filterd_rf_array` and
+            Array in shape to be used by :meth:`filterd_rf_array` and
             :meth:`filtered_array`.
     """
     return np.zeros((geometry.ntr, 2, rc.npts))
@@ -1844,7 +1844,7 @@ def filtered_rf_array(traces, rfarray, ntr, npts, dt, fmin, fmax):
     :meth:`fraysum.run_bare()` output
 
     Roughly equivalent to subsequent calls to :func:`read_traces()`,
-    :meth:`Seismogram.calculate_rfs()`, and :meth:`Seismogram.filter()`, stripped down
+    :meth:`Seismogram.calculate_rfs()` and :meth:`Seismogram.filter()`, stripped down
     for computational efficiency, for use in inversion/probabilistic approaches.
 
     Parameters:
