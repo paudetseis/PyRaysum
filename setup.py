@@ -46,6 +46,7 @@ setup(
     include_package_data=True,
     package_data={
         'pyraysum': [
-            'examples/models/*.txt',
-            'examples/Notebooks/*.ipynb']},
+            'examples/data/*.txt',
+            'examples/data/*.dat',
+            'examples/notebooks/*.ipynb']},
 )
