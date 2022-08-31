@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Licence &mdash; pyraysum 0.1.0 documentation</title>
+  <title>Licence &mdash; pyraysum 0.2.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -13,6 +14,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
@@ -51,6 +53,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#conda-environment">Conda environment</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#installing-latest-version-from-pypi">Installing latest version from PyPi</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#installing-development-version-from-source">Installing development version from source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#testing">Testing</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="#usage">Usage</a><ul>
@@ -63,6 +66,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#creating-a-model-class-instance">Creating a <code class="docutils literal notranslate"><span class="pre">Model</span></code> class instance</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#an-important-note-on-dipping-layers">An important note on dipping layers</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#plotting-a-model">Plotting a model</a><ul>
@@ -73,6 +77,11 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#basic-usage">Basic usage</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#modeling-a-single-event">Modeling a single event</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#modeling-multiple-events">Modeling multiple events</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#array-of-back-azimuth-values">Array of back-azimuth values</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#array-of-slowness-values">Array of slowness values</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#modeling-receiver-functions">Modeling receiver functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#method-1">Method 1</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#method-2">Method 2</a></li>
@@ -88,9 +97,17 @@
 <li class="toctree-l1"><a class="reference internal" href="api.html">Classes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html#modules">Modules</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/1/1_make_seismograms.html">Example 1: Compare PyRaysum with other synthetic and real data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/2/2_reproduce_Porter-2011.html">Example 2: Reproducing Receiver Functions for Dipping and Anisotropic Subsurface Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/3/3_invert_rf.html">Example 3: Invert a Receiver Function</a></li>
+</ul>
 <p class="caption" role="heading"><span class="caption-text">Jupyter Notebooks</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference external" href="https://nbviewer.jupyter.org/github/paudetseis/PyRaysum/blob/main/pyraysum/examples/notebooks/sim_Porter2011.ipynb">Example 1: Reproducing Figure 2 in Porter et al. (2011)</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://nbviewer.jupyter.org/github/paudetseis/PyRaysum/blob/main/pyraysum/examples/notebooks/1_make_seismograms.ipynb">Example 1: Compare PyRaysum with other synthetic and real data</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://nbviewer.jupyter.org/github/paudetseis/PyRaysum/blob/main/pyraysum/examples/notebooks/2_reproduce_Porter-2011.ipynb">Example 2: Reproducing Figure 2 in Porter et al. (2011)</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://nbviewer.jupyter.org/github/paudetseis/PyRaysum/blob/main/pyraysum/examples/notebooks/3_invert_rf.ipynb">Example 3: Invert a receiver function</a></li>
 </ul>
 
         </div>
@@ -117,11 +134,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <div class="figure align-center">
+  <figure class="align-center">
 <img alt="_images/PyRaysum_logo.png" src="_images/PyRaysum_logo.png" />
-</div>
-<div class="section" id="licence">
-<h1>Licence<a class="headerlink" href="#licence" title="Permalink to this headline"></a></h1>
+</figure>
+<section id="licence">
+<h1>Licence<a class="headerlink" href="#licence" title="Permalink to this heading"></a></h1>
 <p>Copyright 2020 Pascal Audet</p>
 <p>Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the “Software”), to deal
@@ -138,38 +155,41 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.</p>
+</section>
+<section id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h1>
+<section id="dependencies">
+<h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">PyRaysum</span></code> requires a modern Fortran compiler (e.g., <a class="reference external" href="https://gcc.gnu.org/wiki/GFortran">gfortran</a>, ifort) and <a class="reference external" href="https://github.com/obspy/obspy/wiki">obspy</a>. By  default, both <code class="docutils literal notranslate"><span class="pre">numpy</span></code> and <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code>
+are installed as dependencies of <code class="docutils literal notranslate"><span class="pre">obspy</span></code>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>There appears to be an issue when installing <cite>obspy==1.2.2</cite> with <cite>numpy=1.22.2</cite>.
+If you run into <cite>AttributeError: ‘numpy.int64’ object has no attribute ‘split’</cite>,
+you can downgrade to <cite>numpy=1.21.5</cite> with <cite>conda install numpy=1.21.5</cite> within the
+conda environment (see below).</p>
 </div>
-<div class="section" id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline"></a></h1>
-<div class="section" id="dependencies">
-<h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline"></a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">PyRaysum</span></code> requires a modern Fortran compiler (e.g., <a class="reference external" href="https://gcc.gnu.org/wiki/GFortran">gfortran</a>, ifort). In addition, the following packages are required:</p>
-<ul class="simple">
-<li><p><a class="reference external" href="https://pandas.pydata.org">pandas</a></p></li>
-<li><p><a class="reference external" href="https://github.com/obspy/obspy/wiki">obspy</a></p></li>
-</ul>
-<p>By  default, both <code class="docutils literal notranslate"><span class="pre">numpy</span></code> and <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> are installed as dependencies
-of <code class="docutils literal notranslate"><span class="pre">obspy</span></code>.</p>
-</div>
-<div class="section" id="conda-environment">
-<h2>Conda environment<a class="headerlink" href="#conda-environment" title="Permalink to this headline"></a></h2>
+</section>
+<section id="conda-environment">
+<h2>Conda environment<a class="headerlink" href="#conda-environment" title="Permalink to this heading"></a></h2>
 <p>We recommend creating a custom
 <a class="reference external" href="https://conda.io/docs/user-guide/tasks/manage-environments.html">conda environment</a>
 where <code class="docutils literal notranslate"><span class="pre">pyraysum</span></code> can be installed along with its dependencies:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda create -n prs <span class="nv">python</span><span class="o">=</span><span class="m">3</span>.8 fortran-compiler obspy pandas -c conda-forge
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda create -n prs <span class="nv">python</span><span class="o">=</span><span class="m">3</span>.8 fortran-compiler obspy -c conda-forge
 </pre></div>
 </div>
 <p>Activate the newly created environment:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda activate prs
 </pre></div>
 </div>
-</div>
-<div class="section" id="installing-latest-version-from-pypi">
-<h2>Installing latest version from PyPi<a class="headerlink" href="#installing-latest-version-from-pypi" title="Permalink to this headline"></a></h2>
+<p>You can interchange the name <code class="docutils literal notranslate"><span class="pre">prs</span></code> for any environment name you like.</p>
+</section>
+<section id="installing-latest-version-from-pypi">
+<h2>Installing latest version from PyPi<a class="headerlink" href="#installing-latest-version-from-pypi" title="Permalink to this heading"></a></h2>
 <p><em>This option is not available at this time</em></p>
-</div>
-<div class="section" id="installing-development-version-from-source">
-<h2>Installing development version from source<a class="headerlink" href="#installing-development-version-from-source" title="Permalink to this headline"></a></h2>
+</section>
+<section id="installing-development-version-from-source">
+<h2>Installing development version from source<a class="headerlink" href="#installing-development-version-from-source" title="Permalink to this heading"></a></h2>
 <ul class="simple">
 <li><p>Clone the repository:</p></li>
 </ul>
@@ -183,25 +203,44 @@ where <code class="docutils literal notranslate"><span class="pre">pyraysum</spa
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install .
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="usage">
-<h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline"></a></h1>
-<div class="section" id="jupyter-notebooks">
-<h2>Jupyter Notebooks<a class="headerlink" href="#jupyter-notebooks" title="Permalink to this headline"></a></h2>
-<p>Included in this package is a set of Jupyter Notebooks (see Table of Content),
-which give examples on how to call the various routines and obtain plane wave
-seismograms and receiver functions.
-The Notebooks describe how to reproduce published examples of synthetic data
-from <a class="reference external" href="https://doi.org/10.1130/L126.1">Porter et al. (2011)</a>.</p>
-<p>After <code class="docutils literal notranslate"><span class="pre">pyraysum</span></code> is installed, these notebooks can be locally installed
-(i.e., in a local folder <code class="docutils literal notranslate"><span class="pre">Notebooks</span></code>) from the package
-by typing in a <code class="docutils literal notranslate"><span class="pre">python</span></code> window:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyraysum</span> <span class="kn">import</span> <span class="n">doc</span>
-<span class="n">doc</span><span class="o">.</span><span class="n">install_doc</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s1">&#39;Notebooks&#39;</span><span class="p">)</span>
+</section>
+<section id="testing">
+<h2>Testing<a class="headerlink" href="#testing" title="Permalink to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">pyraysum</span></code> is bundled with unit tests that can be run once the software is installed.</p>
+<ul class="simple">
+<li><p>Install <code class="docutils literal notranslate"><span class="pre">pytest</span></code></p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install pytest
 </pre></div>
 </div>
-<p>To run the notebooks you will have to further install <code class="docutils literal notranslate"><span class="pre">jupyter</span></code>.
+<ul class="simple">
+<li><p>Run the tests</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir empty
+<span class="nb">cd</span> empty
+pytest -v ../pyraysum/tests/
+</pre></div>
+</div>
+</section>
+</section>
+<section id="usage">
+<h1>Usage<a class="headerlink" href="#usage" title="Permalink to this heading"></a></h1>
+<section id="jupyter-notebooks">
+<h2>Jupyter Notebooks<a class="headerlink" href="#jupyter-notebooks" title="Permalink to this heading"></a></h2>
+<p>Included in this package is a set of Jupyter Notebooks (see Table of Content),
+that give examples on how to call the various routines and obtain plane wave
+seismograms and receiver functions.
+In particular, the Notebooks describe how to reproduce published examples
+of synthetic data from <a class="reference external" href="https://doi.org/10.1130/L126.1">Porter et al. (2011)</a>.</p>
+<p>After <code class="docutils literal notranslate"><span class="pre">pyraysum</span></code> is installed, these notebooks can be locally installed
+(i.e., in a local folder <code class="docutils literal notranslate"><span class="pre">Examples</span></code>) from the package
+by typing in a <code class="docutils literal notranslate"><span class="pre">python</span></code> window:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyraysum</span> <span class="kn">import</span> <span class="n">doc</span>
+<span class="n">doc</span><span class="o">.</span><span class="n">install_doc</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s1">&#39;Examples&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This will also install packaged data that are necessary to run the notebooks.
+Note that to run the notebooks, you will have to further install <code class="docutils literal notranslate"><span class="pre">jupyter</span></code>.
 From the terminal, type:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install jupyter
 </pre></div>
@@ -213,12 +252,12 @@ jupyter notebook
 </div>
 <p>You can then save the notebooks as <code class="docutils literal notranslate"><span class="pre">python</span></code> scripts,
 check out the model files and set up your own examples.</p>
-</div>
-<div class="section" id="seismic-velocity-models">
-<h2>Seismic velocity models<a class="headerlink" href="#seismic-velocity-models" title="Permalink to this headline"></a></h2>
-<div class="section" id="loading-a-model-file">
-<h3>Loading a model file<a class="headerlink" href="#loading-a-model-file" title="Permalink to this headline"></a></h3>
-<p>In the Jupiter notebooks you will find a folder named <code class="docutils literal notranslate"><span class="pre">models</span></code> where a
+</section>
+<section id="seismic-velocity-models">
+<h2>Seismic velocity models<a class="headerlink" href="#seismic-velocity-models" title="Permalink to this heading"></a></h2>
+<section id="loading-a-model-file">
+<h3>Loading a model file<a class="headerlink" href="#loading-a-model-file" title="Permalink to this heading"></a></h3>
+<p>In the Jupiter notebooks you will find a folder named <code class="docutils literal notranslate"><span class="pre">data</span></code> where a
 few examples are provided. The header of the file <code class="docutils literal notranslate"><span class="pre">model_Porter2011_dip.txt</span></code>
 looks like:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1">################################################</span>
@@ -253,50 +292,49 @@ looks like:</p>
 <span class="c1">################################################</span>
 </pre></div>
 </div>
-<p>The header is not required and can be deleted when you become familiar
+<p>This header is not required and can be deleted when you become familiar
 with the various definitions. Note that the code requires 10 entries per
-layer, regardless of whether or not the variable is required (it will
-simply be ignored if it’s not).</p>
+layer (i.e., per line), regardless of whether or not the variable is required
+(it will simply be ignored if it’s not).</p>
 <p>Let us break down each line, depending on how you set <code class="docutils literal notranslate"><span class="pre">Layer</span> <span class="pre">flag</span></code>:</p>
-<div class="section" id="layer-flag-set-to-1">
-<h4>Layer flag set to <code class="docutils literal notranslate"><span class="pre">1</span></code><a class="headerlink" href="#layer-flag-set-to-1" title="Permalink to this headline"></a></h4>
-<p>This flag represents a case where the layer is isotropic.</p>
+<section id="layer-flag-set-to-1">
+<h4>Layer flag set to <code class="docutils literal notranslate"><span class="pre">1</span></code><a class="headerlink" href="#layer-flag-set-to-1" title="Permalink to this heading"></a></h4>
+<p>This case represents a case where the medium is isotropic.</p>
 <ul class="simple">
-<li><p>Set column 0 (<code class="docutils literal notranslate"><span class="pre">Thickness</span></code>), column 1 (<code class="docutils literal notranslate"><span class="pre">Density</span></code>), column 2 (<code class="docutils literal notranslate"><span class="pre">P-wave</span> <span class="pre">velocity</span></code>), column 3 (<code class="docutils literal notranslate"><span class="pre">S-wave</span> <span class="pre">velocity</span></code>) and column 4 (as <code class="docutils literal notranslate"><span class="pre">iso</span></code>)</p></li>
-<li><p>Set columns 5 to 7 to <code class="docutils literal notranslate"><span class="pre">0.</span></code> or any other numerical value - they will be ignored by the software.</p></li>
-<li><p>Set columns 8 and 9 to the strike and dip angles of the layer in degrees (0. by default)</p></li>
+<li><p>Set column 0 (<code class="docutils literal notranslate"><span class="pre">Thickness</span></code>), column 1 (<code class="docutils literal notranslate"><span class="pre">Density</span></code>), column 2 (<code class="docutils literal notranslate"><span class="pre">P-wave</span> <span class="pre">velocity</span></code>), column 3 (<code class="docutils literal notranslate"><span class="pre">S-wave</span> <span class="pre">velocity</span></code>) and column 4 (set to <code class="docutils literal notranslate"><span class="pre">1</span></code>)</p></li>
+<li><p>Set columns 5 to 7 to <code class="docutils literal notranslate"><span class="pre">0.</span></code> or any other numerical value - they will be ignored by the code.</p></li>
+<li><p>Set columns 8 and 9 to the strike and dip angles of the top interface in degrees (0. by default)</p></li>
 </ul>
-</div>
-<div class="section" id="layer-flag-set-to-0">
-<h4>Layer flag set to <code class="docutils literal notranslate"><span class="pre">0</span></code><a class="headerlink" href="#layer-flag-set-to-0" title="Permalink to this headline"></a></h4>
-<p>This flag represents a transversely isotropic layer. We adhere with
+</section>
+<section id="layer-flag-set-to-0">
+<h4>Layer flag set to <code class="docutils literal notranslate"><span class="pre">0</span></code><a class="headerlink" href="#layer-flag-set-to-0" title="Permalink to this heading"></a></h4>
+<p>This case represents a transversely isotropic medium. We adhere with
 the definition in
 <a class="reference external" href="https://doi.org/10.1130/L126.1">Porter et al. (2011)</a>,
 whereby the parameter <span class="math notranslate nohighlight">\(\eta\)</span>, which describes the curvature of the
 velocity “ellipsoid” between the <span class="math notranslate nohighlight">\(V_P\)</span>-fast and <span class="math notranslate nohighlight">\(V_P\)</span>-slow axes, varies
 with anisotropy for a 2-<span class="math notranslate nohighlight">\(\psi\)</span> model and is not fixed.</p>
 <p>The column 5 in this case sets the percent anisotropy for both
-<span class="math notranslate nohighlight">\(V_P\)</span> and <span class="math notranslate nohighlight">\(V_S\)</span> (equal anisotropy for both <span class="math notranslate nohighlight">\(V_P\)</span> and <span class="math notranslate nohighlight">\(V_S\)</span>) and is the only
-instance where this column is required.</p>
+<span class="math notranslate nohighlight">\(V_P\)</span> and <span class="math notranslate nohighlight">\(V_S\)</span> (equal anisotropy for both <span class="math notranslate nohighlight">\(V_P\)</span> and <span class="math notranslate nohighlight">\(V_S\)</span>).</p>
 <ul class="simple">
-<li><p>Set all columns to the required numerical value (and column 4 to <code class="docutils literal notranslate"><span class="pre">1</span></code>)</p></li>
+<li><p>Set all columns to the required numerical value (and column 4 to <code class="docutils literal notranslate"><span class="pre">0</span></code>)</p></li>
 </ul>
-</div>
-</div>
-<div class="section" id="creating-a-model-class-instance">
-<h3>Creating a <code class="docutils literal notranslate"><span class="pre">Model</span></code> class instance<a class="headerlink" href="#creating-a-model-class-instance" title="Permalink to this headline"></a></h3>
-<p>Models can also be defined on the fly in Python using lists that contain
+</section>
+</section>
+<section id="creating-a-model-class-instance">
+<h3>Creating a <code class="docutils literal notranslate"><span class="pre">Model</span></code> class instance<a class="headerlink" href="#creating-a-model-class-instance" title="Permalink to this heading"></a></h3>
+<p>Models can also be defined on the fly in Python using arrays or lists that contain
 the relevant information as input into an instance of the
 <a class="reference internal" href="api.html#pyraysum.prs.Model" title="pyraysum.prs.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a> class.</p>
-<div class="section" id="examples">
-<h4>Examples<a class="headerlink" href="#examples" title="Permalink to this headline"></a></h4>
+<section id="examples">
+<h4>Examples<a class="headerlink" href="#examples" title="Permalink to this heading"></a></h4>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyraysum</span> <span class="kn">import</span> <span class="n">Model</span>
 </pre></div>
 </div>
 <ul class="simple">
-<li><p>Define a two-layer model with isotropic properties and no dip</p></li>
+<li><p>Define a model with two flat, isotropic layers (i.e., layer over half-space)</p></li>
 </ul>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">thick</span> <span class="o">=</span> <span class="p">[</span><span class="mf">20000.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>       <span class="c1"># Second layer thickness is irrelevant</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">thick</span> <span class="o">=</span> <span class="p">[</span><span class="mf">20000.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>       <span class="c1"># Second layer thickness is irrelevant (half-space)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rho</span> <span class="o">=</span> <span class="p">[</span><span class="mf">2800.</span><span class="p">,</span> <span class="mf">3300.</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">vp</span> <span class="o">=</span> <span class="p">[</span><span class="mf">4600.</span><span class="p">,</span> <span class="mf">6000.</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">vs</span> <span class="o">=</span> <span class="p">[</span><span class="mf">2600.</span><span class="p">,</span> <span class="mf">3600.</span><span class="p">]</span>
@@ -304,79 +342,120 @@ the relevant information as input into an instance of the
 </pre></div>
 </div>
 <ul class="simple">
-<li><p>Define a two-layer model with transversely isotropic crust over isotropic half-space</p></li>
+<li><p>Define a model with transversely isotropic crust over isotropic half-space</p></li>
 </ul>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example using a single line</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">([</span><span class="mf">20000.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span> <span class="p">[</span><span class="mf">2800.</span><span class="p">,</span> <span class="mf">3300.</span><span class="p">],</span> <span class="p">[</span><span class="mf">4000.</span><span class="p">,</span> <span class="mf">6000.</span><span class="p">],</span> <span class="p">[</span><span class="mf">2600.</span><span class="p">,</span> <span class="mf">3600.</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mf">5.</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mf">30.</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mf">10.</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span>
+<span class="go">     [20000., 0.],</span>
+<span class="go">     [2800., 3300.],</span>
+<span class="go">     [4000., 6000.],</span>
+<span class="go">     [2600., 3600.],</span>
+<span class="go">     [0, 1],</span>
+<span class="go">     [5., 0],</span>
+<span class="go">     [30., 0],</span>
+<span class="go">     [10., 0],</span>
+<span class="go">     [0., 0.],</span>
+<span class="go">     [0., 0.],</span>
+<span class="go">    )</span>
 </pre></div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>In this example all entries for the first layer are required. Here the anisotropy is
-set to 5% (i.e., fast axis of symmetry; for slow axis the user should input <code class="docutils literal notranslate"><span class="pre">-5.</span></code>)
-and the axis of symmetry has a trend of 30 degrees and a plunge of 10 degrees.</p>
+<p>In this example all entries for the first layer are required. Here the
+anisotropy is set to 5% (i.e., fast axis of symmetry; for slow axis the
+user should input <code class="docutils literal notranslate"><span class="pre">-5.</span></code>) and the axis of symmetry has a trend of 30
+degrees and a plunge of 10 degrees.</p>
 </div>
+</section>
+<section id="an-important-note-on-dipping-layers">
+<h4>An important note on dipping layers<a class="headerlink" href="#an-important-note-on-dipping-layers" title="Permalink to this heading"></a></h4>
+<p>In the model setup, it is more appropriate to think of the layer strike and
+dip angles as the angles of the <em>top interface</em>. For a truly dipping
+<em>layer</em>, bounded above and below by dipping interfaces, the strike and dip
+angles should also be applied to the top interface of the <em>underlying</em>
+layer. Note that if those angles are not the same across the layers, dipping
+layer thickness is not conserved and the code may produce
+aberrant results. For instance, the dipping layer model of <a class="reference external" href="https://doi.org/10.1130/L126.1">Porter et al.
+(2011)</a> where a lower-crustal
+low-velocity layer has a strike of 90 degrees and dip angle of 20 degrees,
+is specified as:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example of dipping layer from Porter et al. (2011)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">thick</span> <span class="o">=</span> <span class="p">[</span><span class="mf">20000.</span><span class="p">,</span> <span class="mf">5000.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rho</span> <span class="o">=</span> <span class="p">[</span><span class="mf">2800.</span><span class="p">,</span> <span class="mf">2800.</span><span class="p">,</span> <span class="mf">2800.</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vp</span> <span class="o">=</span> <span class="p">[</span><span class="mf">6400.</span><span class="p">,</span> <span class="mf">5800.</span><span class="p">,</span> <span class="mf">7800.</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vs</span> <span class="o">=</span> <span class="p">[</span><span class="mf">3660.</span><span class="p">,</span> <span class="mf">3314.</span><span class="p">,</span> <span class="mf">4480.</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">strike</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">90.</span><span class="p">,</span> <span class="mf">90.</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dip</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">20.</span><span class="p">,</span> <span class="mf">20.</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="n">thick</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">vp</span><span class="p">,</span> <span class="n">vs</span><span class="p">,</span> <span class="n">strike</span><span class="o">=</span><span class="n">strike</span><span class="p">,</span> <span class="n">dip</span><span class="o">=</span><span class="n">dip</span><span class="p">)</span>
+</pre></div>
 </div>
-</div>
-<div class="section" id="plotting-a-model">
-<h3>Plotting a model<a class="headerlink" href="#plotting-a-model" title="Permalink to this headline"></a></h3>
-<p>When a <a class="reference internal" href="api.html#pyraysum.prs.Model" title="pyraysum.prs.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a> is created (from either method detailed above), the <code class="docutils literal notranslate"><span class="pre">model</span></code> instance has methods to generate plots of the seismic velocity model that it contains. The simplest option is to use the <code class="docutils literal notranslate"><span class="pre">plot()</span></code> method, which will produce a figure with two subplots: 1) a stair-case plot of the seismic velocity and density profiles, and 2) a layered (stratigraphic-like) representation of the model. These subplots can be created separately using the <code class="docutils literal notranslate"><span class="pre">plot_profile()</span></code> and <code class="docutils literal notranslate"><span class="pre">plot_layers()</span></code> methods directly.</p>
-<div class="section" id="example">
-<h4>Example<a class="headerlink" href="#example" title="Permalink to this headline"></a></h4>
+</section>
+</section>
+<section id="plotting-a-model">
+<h3>Plotting a model<a class="headerlink" href="#plotting-a-model" title="Permalink to this heading"></a></h3>
+<p>When a <a class="reference internal" href="api.html#pyraysum.prs.Model" title="pyraysum.prs.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a> is created (or read from a file as above),
+the <code class="docutils literal notranslate"><span class="pre">model</span></code> instance has methods to generate plots of the seismic velocity model
+that it describes. The simplest option is to use the <code class="docutils literal notranslate"><span class="pre">plot()</span></code> method, which will
+produce a figure with three subplots: 1) a stair-case plot of the seismic velocity
+and density profiles, 2) a layered (stratigraphic-like) representation of the model,
+and 3) a labeled geometric representation of layer properties. These subplots can
+be created separately using the <code class="docutils literal notranslate"><span class="pre">plot_profile()</span></code>, <code class="docutils literal notranslate"><span class="pre">plot_layers()</span></code> and
+<code class="docutils literal notranslate"><span class="pre">plot_interfaces()</span></code> methods directly.</p>
+<section id="example">
+<h4>Example<a class="headerlink" href="#example" title="Permalink to this heading"></a></h4>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyraysum</span> <span class="kn">import</span> <span class="n">Model</span>
 </pre></div>
 </div>
 <ul class="simple">
 <li><p>Define a four-layer model with a mix of isotropic and transverse isotopic properties.</p></li>
 </ul>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Note here we do not specify the trend and plunge of the symmetry axis since this information is not (yet) used in the plot. Default values will apply (<code class="docutils literal notranslate"><span class="pre">0.</span></code> for both parameters).</p>
-</div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">thick</span> <span class="o">=</span> <span class="p">[</span><span class="mf">15000.</span><span class="p">,</span> <span class="mf">20000.</span><span class="p">,</span> <span class="mf">15000.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rho</span> <span class="o">=</span> <span class="p">[</span><span class="mf">2750.</span><span class="p">,</span>  <span class="mf">2800.</span><span class="p">,</span> <span class="mf">3300.</span><span class="p">,</span> <span class="mf">3250.</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">vp</span> <span class="o">=</span> <span class="p">[</span><span class="mf">4300.</span><span class="p">,</span> <span class="mf">4600.</span><span class="p">,</span> <span class="mf">5600.</span><span class="p">,</span> <span class="mf">6000.</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">vs</span> <span class="o">=</span> <span class="p">[</span><span class="mf">2400.</span><span class="p">,</span> <span class="mf">2600.</span><span class="p">,</span> <span class="mf">3300.</span><span class="p">,</span> <span class="mf">3600.</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">isoflg</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">flag</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ani</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">5.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="n">thick</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">vp</span><span class="p">,</span> <span class="n">vs</span><span class="p">,</span> <span class="n">isoflg</span><span class="o">=</span><span class="n">isoflg</span><span class="p">,</span> <span class="n">ani</span><span class="o">=</span><span class="n">ani</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">trend</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">30.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plunge</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">20.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="n">thick</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">vp</span><span class="p">,</span> <span class="n">vs</span><span class="p">,</span> <span class="n">flag</span><span class="o">=</span><span class="n">flag</span><span class="p">,</span> <span class="n">ani</span><span class="o">=</span><span class="n">ani</span><span class="p">,</span> <span class="n">trend</span><span class="o">=</span><span class="n">trend</span><span class="p">,</span> <span class="n">plunge</span><span class="o">=</span><span class="n">plunge</span><span class="p">)</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
-<div class="figure align-center">
+<figure class="align-center">
 <img alt="_images/Figure_4layer_model.png" src="_images/Figure_4layer_model.png" />
-</div>
-</div>
-</div>
-</div>
-<div class="section" id="basic-usage">
-<h2>Basic usage<a class="headerlink" href="#basic-usage" title="Permalink to this headline"></a></h2>
-<p>These examples are extracted from the <code class="xref py py-func docutils literal notranslate"><span class="pre">run_prs()</span></code> function.</p>
-<p>For anisotropic velocity models, users need to specify the back-azimuth
-value in degrees. Furthermore, the default type of the incoming
-teleseismic body wave is <code class="docutils literal notranslate"><span class="pre">'P'</span></code> for compressional wave. Other options are
-<code class="docutils literal notranslate"><span class="pre">'SV'</span></code> or <code class="docutils literal notranslate"><span class="pre">'SH'</span></code> for vertically-polarized shear wave or
-horizontally-polarized shear wave, respectively.
-Wave modes cannot be mixed.</p>
-<div class="section" id="modeling-a-single-event">
-<h3>Modeling a single event<a class="headerlink" href="#modeling-a-single-event" title="Permalink to this headline"></a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyraysum</span> <span class="kn">import</span> <span class="n">prs</span><span class="p">,</span> <span class="n">Model</span><span class="p">,</span> <span class="n">Geometry</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Define two-layer model with isotropic crust over isotropic half-space</span>
+</figure>
+</section>
+</section>
+</section>
+<section id="basic-usage">
+<h2>Basic usage<a class="headerlink" href="#basic-usage" title="Permalink to this heading"></a></h2>
+<p>These examples are extracted from the <a class="reference internal" href="api.html#pyraysum.prs.run" title="pyraysum.prs.run"><code class="xref py py-func docutils literal notranslate"><span class="pre">run()</span></code></a> function.</p>
+<p>The default type of the incoming teleseismic body wave is <code class="docutils literal notranslate"><span class="pre">'P'</span></code> for compressional wave. Other options are <code class="docutils literal notranslate"><span class="pre">'SV'</span></code> or <code class="docutils literal notranslate"><span class="pre">'SH'</span></code> for vertically-polarized or horizontally-polarized shear wave, respectively. Incident wave types cannot be mixed.</p>
+<section id="modeling-a-single-event">
+<h3>Modeling a single event<a class="headerlink" href="#modeling-a-single-event" title="Permalink to this heading"></a></h3>
+<p>Here we model P waveforms from a single event, characterized by a back-azimuth of 30 degrees and slowness of 0.05 s/km. Let’s examine the synthetic waveforms that would be recorded in a Z-N-E coordinate system (<code class="docutils literal notranslate"><span class="pre">rot=0</span></code>) from the P-wave propagating through a simple homogeneous crust over a mantle half-space:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyraysum</span> <span class="kn">import</span> <span class="n">prs</span><span class="p">,</span> <span class="n">Model</span><span class="p">,</span> <span class="n">Geometry</span><span class="p">,</span> <span class="n">RC</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Define model with isotropic crust over isotropic half-space mantle</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">([</span><span class="mf">30000.</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mf">2800.</span><span class="p">,</span> <span class="mf">3300.</span><span class="p">],</span> <span class="p">[</span><span class="mf">6000.</span><span class="p">,</span> <span class="mf">8000.</span><span class="p">],</span> <span class="p">[</span><span class="mf">3600.</span><span class="p">,</span> <span class="mf">4500.</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">geom</span> <span class="o">=</span> <span class="n">Geometry</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.06</span><span class="p">)</span> <span class="c1"># baz = 0 deg; slow = 0.06 x/km</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">npts</span> <span class="o">=</span> <span class="mi">1500</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">dt</span> <span class="o">=</span> <span class="mf">0.025</span>      <span class="c1"># s</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">streamlist</span> <span class="o">=</span> <span class="n">prs</span><span class="o">.</span><span class="n">run_frs</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">geom</span><span class="p">,</span> <span class="n">npts</span><span class="o">=</span><span class="n">npts</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">)</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">streamlist</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Define the ray geometry for one event</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">geom</span> <span class="o">=</span> <span class="n">Geometry</span><span class="p">(</span><span class="mf">30.</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span> <span class="c1"># baz = 30 deg; slow = 0.05 s/km</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Define the run-control parameters</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># sampling of 0.025 s; 1500 samples; with multiples; in Z-N-E coordinate system</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rc</span> <span class="o">=</span> <span class="n">RC</span><span class="p">(</span><span class="n">dt</span><span class="o">=</span><span class="mf">0.025</span><span class="p">,</span> <span class="n">npts</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span> <span class="n">mults</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">rot</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Run Raysum for this setup</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">streamlist</span> <span class="o">=</span> <span class="n">prs</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">geom</span><span class="p">,</span> <span class="n">rc</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Examine the resulting three-component stream</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">st</span> <span class="o">=</span> <span class="n">streamlist</span><span class="o">.</span><span class="n">streams</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">st</span><span class="p">)</span>
 <span class="go">&lt;class &#39;obspy.core.stream.Stream&#39;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">st</span><span class="p">)</span>
 <span class="go">3 Trace(s) in Stream:</span>
-<span class="go">3 Trace(s) in Stream:</span>
-<span class="go">.synt..BHN | 2020-11-30T21:04:43.890339Z - 2020-11-30T21:05:21.365339Z | 40.0 Hz, 1500 samples</span>
-<span class="go">.synt..BHE | 2020-11-30T21:04:43.891418Z - 2020-11-30T21:05:21.366418Z | 40.0 Hz, 1500 samples</span>
-<span class="go">.synt..BHZ | 2020-11-30T21:04:43.891692Z - 2020-11-30T21:05:21.366692Z | 40.0 Hz, 1500 samples   &gt;&gt;&gt; st.plot(size=(600, 450))</span>
+<span class="go">.prs..R | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples</span>
+<span class="go">.prs..T | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples</span>
+<span class="go">.prs..Z | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples</span>
 </pre></div>
 </div>
 <p>Filter streams using a lowpass filter and plot using the <code class="docutils literal notranslate"><span class="pre">obspy</span></code> function.</p>
@@ -384,61 +463,109 @@ Wave modes cannot be mixed.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">streamlist</span><span class="o">.</span><span class="n">streams</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
-<div class="figure align-center">
+<figure class="align-center">
 <img alt="_images/Figure_Moho.png" src="_images/Figure_Moho.png" />
+</figure>
+</section>
+<section id="modeling-multiple-events">
+<h3>Modeling multiple events<a class="headerlink" href="#modeling-multiple-events" title="Permalink to this heading"></a></h3>
+<p>We again model P waveforms but this time for multiple event origins. The example above
+can be slightly modified to use an array of back-azimuth values (and/or array of slowness
+values). Let’s examine both options. Here we only modify the lines <code class="docutils literal notranslate"><span class="pre">geom</span> <span class="pre">=</span></code> and
+keep the rest of the code snippet unchanged. We also modify the time limits in the plot
+of amplitude versus slowness to emphasize the effect on delay times.</p>
+<section id="array-of-back-azimuth-values">
+<h4>Array of back-azimuth values<a class="headerlink" href="#array-of-back-azimuth-values" title="Permalink to this heading"></a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># baz from 0 to 360 deg; slow = 0.05 s/km</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">geom</span> <span class="o">=</span> <span class="n">Geometry</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">360.</span><span class="p">,</span> <span class="mf">10.</span><span class="p">),</span> <span class="mf">0.05</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">streamlist</span> <span class="o">=</span> <span class="n">prs</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">geom</span><span class="p">,</span> <span class="n">rc</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">streamlist</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="s1">&#39;streams&#39;</span><span class="p">,</span> <span class="s1">&#39;lowpass&#39;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">corners</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">zerophase</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prs</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">stream_wiggles</span><span class="p">(</span><span class="n">streamlist</span><span class="p">)</span>
+</pre></div>
 </div>
+<figure class="align-center">
+<img alt="_images/Figure_baz_ZNE.png" src="_images/Figure_baz_ZNE.png" />
+</figure>
+<p>Note that the same figure could be obtained with:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">streamlist</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;streams&#39;</span><span class="p">)</span>
+</pre></div>
 </div>
-<div class="section" id="modeling-receiver-functions">
-<h3>Modeling receiver functions<a class="headerlink" href="#modeling-receiver-functions" title="Permalink to this headline"></a></h3>
-<p>Receiver functions can only be calculated for component rotation equals to ‘1’ (R-T-Z system)
+</section>
+<section id="array-of-slowness-values">
+<h4>Array of slowness values<a class="headerlink" href="#array-of-slowness-values" title="Permalink to this heading"></a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># baz = 30 deg; slow from 0.04 to 0.08 s/km</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">geom</span> <span class="o">=</span> <span class="n">Geometry</span><span class="p">(</span><span class="mf">30.</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.04</span><span class="p">,</span> <span class="mf">0.08</span><span class="p">,</span> <span class="mf">0.002</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">streamlist</span> <span class="o">=</span> <span class="n">prs</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">geom</span><span class="p">,</span> <span class="n">rc</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">streamlist</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="s1">&#39;streams&#39;</span><span class="p">,</span> <span class="s1">&#39;lowpass&#39;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">corners</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">zerophase</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prs</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">stream_wiggles</span><span class="p">(</span><span class="n">streamlist</span><span class="p">,</span> <span class="n">btyp</span><span class="o">=</span><span class="s1">&#39;slow&#39;</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="mf">10.</span><span class="p">)</span>
+</pre></div>
+</div>
+<figure class="align-center">
+<img alt="_images/Figure_slow_ZNE.png" src="_images/Figure_slow_ZNE.png" />
+</figure>
+<p>Note that the same figure could be obtained with:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">streamlist</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;streams&#39;</span><span class="p">,</span> <span class="n">btyp</span><span class="o">=</span><span class="s1">&#39;slow&#39;</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="mf">10.</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="modeling-receiver-functions">
+<h3>Modeling receiver functions<a class="headerlink" href="#modeling-receiver-functions" title="Permalink to this heading"></a></h3>
+<p>Receiver functions can only be calculated for component rotations equal to ‘1’ (R-T-Z system)
 or ‘2’ (P-SV-SH system). There are two ways to calculate receiver functions - either directly
-from the function <code class="docutils literal notranslate"><span class="pre">run_prs</span></code> with the argument <code class="docutils literal notranslate"><span class="pre">rf=True</span></code> (default is False), or after
-you have obtained the 3-component seismograms from <code class="docutils literal notranslate"><span class="pre">run_prs</span></code> with <code class="docutils literal notranslate"><span class="pre">rot=1</span></code> or <code class="docutils literal notranslate"><span class="pre">rot=2</span></code>.</p>
-<p>Let’s first define a simple 2-layer model:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyraysum</span> <span class="kn">import</span> <span class="n">prs</span><span class="p">,</span> <span class="n">Model</span><span class="p">,</span> <span class="n">Geometry</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Define two-layer model with isotropic crust over isotropic half-space</span>
+from the function <code class="docutils literal notranslate"><span class="pre">run()</span></code> with the argument <code class="docutils literal notranslate"><span class="pre">rf=True</span></code> (default is <code class="docutils literal notranslate"><span class="pre">rf=False</span></code>), or after
+you have obtained the 3-component seismograms from <code class="docutils literal notranslate"><span class="pre">run()</span></code> with <code class="docutils literal notranslate"><span class="pre">rot=1</span></code> or <code class="docutils literal notranslate"><span class="pre">rot=2</span></code>.
+Here we calculate receiver functions for a single event. Other examples that describe receiver
+function calculation for multiple events are included in the accompanying Jupyter notebook
+tutorials.</p>
+<p>Let’s first setup a simulation for a simple 2-layer model:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyraysum</span> <span class="kn">import</span> <span class="n">prs</span><span class="p">,</span> <span class="n">Model</span><span class="p">,</span> <span class="n">Geometry</span><span class="p">,</span> <span class="n">RC</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Define model with isotropic crust over isotropic half-space mantle</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">([</span><span class="mf">30000.</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mf">2800.</span><span class="p">,</span> <span class="mf">3300.</span><span class="p">],</span> <span class="p">[</span><span class="mf">6000.</span><span class="p">,</span> <span class="mf">8000.</span><span class="p">],</span> <span class="p">[</span><span class="mf">3600.</span><span class="p">,</span> <span class="mf">4500.</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">geom</span> <span class="o">=</span> <span class="n">Geometry</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.06</span><span class="p">)</span> <span class="c1"># baz = 0 deg; slow = 0.06 x/km</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">npts</span> <span class="o">=</span> <span class="mi">1500</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">dt</span> <span class="o">=</span> <span class="mf">0.025</span>      <span class="c1"># s</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">geom</span> <span class="o">=</span> <span class="n">Geometry</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.06</span><span class="p">)</span> <span class="c1"># baz = 0 deg; slow = 0.06 s/km</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rc</span> <span class="o">=</span> <span class="n">RC</span><span class="p">(</span><span class="n">dt</span><span class="o">=</span><span class="mf">0.025</span><span class="p">,</span> <span class="n">npts</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span> <span class="n">mults</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">rot</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="section" id="method-1">
-<h4>Method 1<a class="headerlink" href="#method-1" title="Permalink to this headline"></a></h4>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">streamlist</span> <span class="o">=</span> <span class="n">prs</span><span class="o">.</span><span class="n">run_frs</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">geom</span><span class="p">,</span> <span class="n">npts</span><span class="o">=</span><span class="n">npts</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span> <span class="n">rot</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">rf</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">streamlist</span><span class="o">.</span><span class="n">rfs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<section id="method-1">
+<h4>Method 1<a class="headerlink" href="#method-1" title="Permalink to this heading"></a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">streamlist1</span> <span class="o">=</span> <span class="n">prs</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">geom</span><span class="p">,</span> <span class="n">rc</span><span class="p">,</span> <span class="n">rf</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Print stream of receiver functions</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">streamlist1</span><span class="o">.</span><span class="n">rfs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 <span class="go">2 Trace(s) in Stream:</span>
-<span class="go">.synt..RFR | 2020-12-12T21:43:39.788002Z - 2020-12-12T21:44:17.263002Z | 40.0 Hz, 1500 samples</span>
-<span class="go">.synt..RFT | 2020-12-12T21:43:39.788682Z - 2020-12-12T21:44:17.263682Z | 40.0 Hz, 1500 samples</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="n">streamlist</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="s1">&#39;rfs&#39;</span><span class="p">,</span> <span class="s1">&#39;lowpass&#39;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">corners</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">zerophase</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">streamlist</span><span class="o">.</span><span class="n">rfs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="go">.prs..RFR | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples</span>
+<span class="go">.prs..RFT | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Filter and plot</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">streamlist1</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="s1">&#39;rfs&#39;</span><span class="p">,</span> <span class="s1">&#39;lowpass&#39;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">corners</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">zerophase</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">streamlist1</span><span class="o">.</span><span class="n">rfs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="method-2">
-<h4>Method 2<a class="headerlink" href="#method-2" title="Permalink to this headline"></a></h4>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">streamlist</span> <span class="o">=</span> <span class="n">prs</span><span class="o">.</span><span class="n">run_frs</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">geom</span><span class="p">,</span> <span class="n">npts</span><span class="o">=</span><span class="n">npts</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span> <span class="n">rot</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">rflist</span> <span class="o">=</span> <span class="n">streamlist</span><span class="o">.</span><span class="n">calculate_rfs</span><span class="p">()</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">rflist</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</section>
+<section id="method-2">
+<h4>Method 2<a class="headerlink" href="#method-2" title="Permalink to this heading"></a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">streamlist2</span> <span class="o">=</span> <span class="n">prs</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">geom</span><span class="p">,</span> <span class="n">rc</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">streamlist2</span><span class="o">.</span><span class="n">calculate_rfs</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Print stream of receiver functions</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">streamlist2</span><span class="o">.</span><span class="n">rfs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 <span class="go">2 Trace(s) in Stream:</span>
-<span class="go">.synt..RFR | 2020-12-12T21:44:13.539484Z - 2020-12-12T21:44:51.014484Z | 40.0 Hz, 1500 samples</span>
-<span class="go">.synt..RFT | 2020-12-12T21:44:13.540241Z - 2020-12-12T21:44:51.015241Z | 40.0 Hz, 1500 samples</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">rf</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="s1">&#39;lowpass&#39;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">corners</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">zerophase</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">rf</span> <span class="ow">in</span> <span class="n">rflist</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">rflist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="go">.prs..RFR | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples</span>
+<span class="go">.prs..RFT | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Filter and plot</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">streamlist2</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="s1">&#39;rfs&#39;</span><span class="p">,</span> <span class="s1">&#39;lowpass&#39;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">corners</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">zerophase</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">streamlist2</span><span class="o">.</span><span class="n">rfs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>Both methods will produce the same receiver function figure. Note that the zero lag time at the center of the time axis. You can also notice wrap-around effects (weak arrivals before zero-lag time). Be careful when selecting time-sampling parameters when running <code class="docutils literal notranslate"><span class="pre">Raysum</span></code>.</p>
-<div class="figure align-center">
+<p>Both methods will produce the same receiver function figure. Notice the zero lag time is
+located at the center of the time axis. You can also observe wrap-around effects (weak
+arrivals before zero-lag time). Be careful when selecting time sampling parameters when
+running <code class="docutils literal notranslate"><span class="pre">Raysum</span></code> to minimize those.</p>
+<figure class="align-center">
 <img alt="_images/Figure_RF_Moho.png" src="_images/Figure_RF_Moho.png" />
-</div>
-</div>
-</div>
-</div>
-</div>
+</figure>
+</section>
+</section>
+</section>
+</section>
 
 
            </div>

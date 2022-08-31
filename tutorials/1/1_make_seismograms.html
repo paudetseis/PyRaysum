@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Example 1: Compare PyRaysum with other synthetic and real data &mdash; pyraysum 0.2.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Example 2: Reproducing Receiver Functions for Dipping and Anisotropic Subsurface Structure" href="../2/2_reproduce_Porter-2011.html" />
+    <link rel="prev" title="Classes" href="../../api.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> pyraysum
+            <img src="../../_static/PyRaysum_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Quick Links</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../links.html">GitHub Repository</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../links.html#references">References</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../init.html">Licence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../init.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../init.html#usage">Usage</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html#modules">Modules</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Example 1: Compare PyRaysum with other synthetic and real data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#loading-earthquake-data">Loading earthquake data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#loading-synthetic-telewavesim-data">Loading synthetic Telewavesim data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#creating-synthetic-data-with-pyraysum">Creating synthetic data with PyRaysum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#comparison-plots">Comparison plots</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#comparison-with-real-data">Comparison with real data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#comparison-with-synthetic-data">Comparison with synthetic data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#computing-equivalent-phases">Computing equivalent phases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#conclusion">Conclusion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../2/2_reproduce_Porter-2011.html">Example 2: Reproducing Receiver Functions for Dipping and Anisotropic Subsurface Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../3/3_invert_rf.html">Example 3: Invert a Receiver Function</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Jupyter Notebooks</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://nbviewer.jupyter.org/github/paudetseis/PyRaysum/blob/main/pyraysum/examples/notebooks/1_make_seismograms.ipynb">Example 1: Compare PyRaysum with other synthetic and real data</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://nbviewer.jupyter.org/github/paudetseis/PyRaysum/blob/main/pyraysum/examples/notebooks/2_reproduce_Porter-2011.ipynb">Example 2: Reproducing Figure 2 in Porter et al. (2011)</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://nbviewer.jupyter.org/github/paudetseis/PyRaysum/blob/main/pyraysum/examples/notebooks/3_invert_rf.ipynb">Example 3: Invert a receiver function</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pyraysum</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Example 1: Compare PyRaysum with other synthetic and real data</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/tutorials/1/1_make_seismograms.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="example-1-compare-pyraysum-with-other-synthetic-and-real-data">
+<h1>Example 1: Compare PyRaysum with other synthetic and real data<a class="headerlink" href="#example-1-compare-pyraysum-with-other-synthetic-and-real-data" title="Permalink to this heading"></a></h1>
+<p>In this example we are going to compare arrival times and amplitudes
+from <code class="docutils literal notranslate"><span class="pre">PyRaysum</span></code> with synthetic data from <code class="docutils literal notranslate"><span class="pre">Telewavesim</span></code>
+(<a class="reference external" href="https://paudetseis.github.io/Telewavesim/">https://paudetseis.github.io/Telewavesim/</a>) and a real data example from
+station <code class="docutils literal notranslate"><span class="pre">HYB</span></code> in Hyderabad, India.</p>
+<p>We’ll use <code class="docutils literal notranslate"><span class="pre">obspy</span></code> to download and process seismic data, <code class="docutils literal notranslate"><span class="pre">numpy</span></code> to
+read the provided <code class="docutils literal notranslate"><span class="pre">telewavesim</span></code> output and <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> to make a
+comparison plot.</p>
+<blockquote>
+<div><p><strong>NOTE:</strong> To load the data included in the PyRaysum package, you
+first need to install the <code class="docutils literal notranslate"><span class="pre">Examples</span></code> folder following the notes
+described
+<a class="reference external" href="https://paudetseis.github.io/PyRaysum/init.html#usage">here</a>, and
+execute the notebook from the Examples/notebooks/ directory.</p>
+</div></blockquote>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import obspy
+from obspy.clients.fdsn import Client
+from pyraysum import prs
+import matplotlib.pyplot as mp
+import numpy as np
+</pre></div>
+</div>
+<section id="loading-earthquake-data">
+<h2>Loading earthquake data<a class="headerlink" href="#loading-earthquake-data" title="Permalink to this heading"></a></h2>
+<p>The event we will be looking at is an intermediate depth, magnitude 6.3
+earthquake that occurred in the Philippines in 2002. The recording comes
+from station <code class="docutils literal notranslate"><span class="pre">HYB</span></code> in Hyderabad, India, which is located on a
+seismically transparent (i.e., homogeneous) cratonic crust. The
+earthquake arrives due east (back-azimuth equal to 90°), so that the
+east component in the seismogram is in the radial direction.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Use the `IRIS` client
+client = Client(&quot;IRIS&quot;)
+
+# Set the origin time to search catalogue
+t0 = obspy.UTCDateTime(&quot;2002-01-01T11:29:22&quot;)
+
+# Fetch event object
+event = client.get_events(
+    starttime=t0,
+    endtime=t0 + 1,
+    minmagnitude=6.0,
+    maxmagnitude=6.5,
+    mindepth=100,
+)[0]
+
+# Display event information
+print(event.origins[0])
+print(event.magnitudes[0])
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Origin</span>
+       <span class="n">resource_id</span><span class="p">:</span> <span class="n">ResourceIdentifier</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;smi:service.iris.edu/fdsnws/event/1/query?originid=3110321&quot;</span><span class="p">)</span>
+              <span class="n">time</span><span class="p">:</span> <span class="n">UTCDateTime</span><span class="p">(</span><span class="mi">2002</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">29</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="mi">720000</span><span class="p">)</span>
+         <span class="n">longitude</span><span class="p">:</span> <span class="mf">125.749</span>
+          <span class="n">latitude</span><span class="p">:</span> <span class="mf">6.282</span>
+             <span class="n">depth</span><span class="p">:</span> <span class="mf">140100.0</span>
+     <span class="n">creation_info</span><span class="p">:</span> <span class="n">CreationInfo</span><span class="p">(</span><span class="n">author</span><span class="o">=</span><span class="s1">&#39;ISC&#39;</span><span class="p">)</span>
+<span class="n">Magnitude</span>
+        <span class="n">resource_id</span><span class="p">:</span> <span class="n">ResourceIdentifier</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;smi:service.iris.edu/fdsnws/event/1/query?magnitudeid=16655792&quot;</span><span class="p">)</span>
+                <span class="n">mag</span><span class="p">:</span> <span class="mf">6.3</span>
+     <span class="n">magnitude_type</span><span class="p">:</span> <span class="s1">&#39;MW&#39;</span>
+      <span class="n">creation_info</span><span class="p">:</span> <span class="n">CreationInfo</span><span class="p">(</span><span class="n">author</span><span class="o">=</span><span class="s1">&#39;HRVD&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The event has a very simple P waveform that arrives just before 11:38. A
+few seconds later, the surface reflected pP wave arrives. Around 11:45,
+the S waves arrive. They are here shown only for orientation. We will
+only be interested in the short time interval between P and pP.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Set start (t1) and end (t2) times of P-wave window
+t1 = t0 + 8*60. + 20.
+t2 = t0 + 8*60. + 45.
+
+# Here we fetch and plot -1 to +10 minutes following the P-wave window start time
+hybd = client.get_waveforms(&quot;G&quot;, &quot;HYB&quot;, &quot;&quot;, &quot;BH?&quot;, t1 - 60, t1 + 10*60)
+hybd.sort(reverse=True)
+print(hybd)
+_ = hybd.plot()
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">3</span> <span class="n">Trace</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="ow">in</span> <span class="n">Stream</span><span class="p">:</span>
+<span class="n">G</span><span class="o">.</span><span class="n">HYB</span><span class="o">..</span><span class="n">BHZ</span> <span class="o">|</span> <span class="mi">2002</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="n">T11</span><span class="p">:</span><span class="mi">36</span><span class="p">:</span><span class="mf">42.047000</span><span class="n">Z</span> <span class="o">-</span> <span class="mi">2002</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="n">T11</span><span class="p">:</span><span class="mi">47</span><span class="p">:</span><span class="mf">41.997000</span><span class="n">Z</span> <span class="o">|</span> <span class="mf">20.0</span> <span class="n">Hz</span><span class="p">,</span> <span class="mi">13200</span> <span class="n">samples</span>
+<span class="n">G</span><span class="o">.</span><span class="n">HYB</span><span class="o">..</span><span class="n">BHN</span> <span class="o">|</span> <span class="mi">2002</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="n">T11</span><span class="p">:</span><span class="mi">36</span><span class="p">:</span><span class="mf">42.047000</span><span class="n">Z</span> <span class="o">-</span> <span class="mi">2002</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="n">T11</span><span class="p">:</span><span class="mi">47</span><span class="p">:</span><span class="mf">41.997000</span><span class="n">Z</span> <span class="o">|</span> <span class="mf">20.0</span> <span class="n">Hz</span><span class="p">,</span> <span class="mi">13200</span> <span class="n">samples</span>
+<span class="n">G</span><span class="o">.</span><span class="n">HYB</span><span class="o">..</span><span class="n">BHE</span> <span class="o">|</span> <span class="mi">2002</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="n">T11</span><span class="p">:</span><span class="mi">36</span><span class="p">:</span><span class="mf">42.047000</span><span class="n">Z</span> <span class="o">-</span> <span class="mi">2002</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="n">T11</span><span class="p">:</span><span class="mi">47</span><span class="p">:</span><span class="mf">41.997000</span><span class="n">Z</span> <span class="o">|</span> <span class="mf">20.0</span> <span class="n">Hz</span><span class="p">,</span> <span class="mi">13200</span> <span class="n">samples</span>
+</pre></div>
+</div>
+<img alt="../../_images/output_5_1.png" src="../../_images/output_5_1.png" />
+</section>
+<section id="loading-synthetic-telewavesim-data">
+<h2>Loading synthetic Telewavesim data<a class="headerlink" href="#loading-synthetic-telewavesim-data" title="Permalink to this heading"></a></h2>
+<p>The Telewavesim data have been created with the same subsurface
+structure with <code class="docutils literal notranslate"><span class="pre">Telewavesim</span></code> (Audet et al. 2019), that computes
+reverberations in a stratified medium using the matrix propagator method
+(Thomson et al. 1997). It was created from the same subsurface model
+(Saul et al., 2000) that we will also be using to generate synthetic
+data with <code class="docutils literal notranslate"><span class="pre">pyraysum</span></code>. The incident teleseismic P wave is characterized
+by 90 degree back-azimuth and 0.06 s/km slowness. Note that we are here
+only looking at a much shorter time interval, i.e. 35 seconds of data.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Load telewavesim data
+twt, twn, twe, twz = np.loadtxt(&quot;../data/telewavesim_baz090-slow006.dat&quot;, unpack=True)
+
+# Get time interval `dt` from data
+dt = twt[1] - twt[0]
+
+# Store into Stream, switch Z component polarity and set header
+twsd = obspy.Stream()
+for tr, channel in zip([twz, twn, twe], [&quot;Z&quot;, &quot;N&quot;, &quot;E&quot;]):
+    header = {&quot;delta&quot;: dt, &quot;station&quot;: &quot;tws&quot;, &quot;channel&quot;: channel}
+    trace = obspy.Trace(tr, header=header)
+    twsd.append(trace)
+
+# Make simple plot
+print(twsd)
+_ = twsd.plot()
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">3</span> <span class="n">Trace</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="ow">in</span> <span class="n">Stream</span><span class="p">:</span>
+<span class="o">.</span><span class="n">tws</span><span class="o">..</span><span class="n">Z</span> <span class="o">|</span> <span class="mi">1970</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="n">T00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mf">00.000000</span><span class="n">Z</span> <span class="o">-</span> <span class="mi">1970</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="n">T00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mf">44.990000</span><span class="n">Z</span> <span class="o">|</span> <span class="mf">100.0</span> <span class="n">Hz</span><span class="p">,</span> <span class="mi">4500</span> <span class="n">samples</span>
+<span class="o">.</span><span class="n">tws</span><span class="o">..</span><span class="n">N</span> <span class="o">|</span> <span class="mi">1970</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="n">T00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mf">00.000000</span><span class="n">Z</span> <span class="o">-</span> <span class="mi">1970</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="n">T00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mf">44.990000</span><span class="n">Z</span> <span class="o">|</span> <span class="mf">100.0</span> <span class="n">Hz</span><span class="p">,</span> <span class="mi">4500</span> <span class="n">samples</span>
+<span class="o">.</span><span class="n">tws</span><span class="o">..</span><span class="n">E</span> <span class="o">|</span> <span class="mi">1970</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="n">T00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mf">00.000000</span><span class="n">Z</span> <span class="o">-</span> <span class="mi">1970</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="n">T00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mf">44.990000</span><span class="n">Z</span> <span class="o">|</span> <span class="mf">100.0</span> <span class="n">Hz</span><span class="p">,</span> <span class="mi">4500</span> <span class="n">samples</span>
+</pre></div>
+</div>
+<img alt="../../_images/output_7_1.png" src="../../_images/output_7_1.png" />
+</section>
+<section id="creating-synthetic-data-with-pyraysum">
+<h2>Creating synthetic data with PyRaysum<a class="headerlink" href="#creating-synthetic-data-with-pyraysum" title="Permalink to this heading"></a></h2>
+<p>We will be using the subsurface model of the Indian craton of Saul et.
+al (2000), which suggests a 32 km thick cratonic crust with P- and
+S-wave velocities of 6.55 and 3.50 km/s, repectively. In <code class="docutils literal notranslate"><span class="pre">pyraysum</span></code>,
+we define:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Make a pyraysum model
+thickn = [32000, 0]
+rho = [2800, 3600]
+vp = [6550, 8100]
+vs = [3500, 4650]
+model = prs.Model(thickn, rho, vp, vs)
+
+# Plot model
+model.plot()
+</pre></div>
+</div>
+<img alt="../../_images/output_9_0.png" src="../../_images/output_9_0.png" />
+<p>We again use the incident P-wave geometry of the Philippines earthquake:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>baz = 90
+slow = 0.06
+geom = prs.Geometry(baz=[baz], slow=[slow])
+</pre></div>
+</div>
+<p>In the run control (RC) parameters, we specify that we would like to: 1)
+generate data in a seismometer coordinate system (east-north-up;
+<code class="docutils literal notranslate"><span class="pre">rot=0</span></code>), 2) include all free surface reflections (<code class="docutils literal notranslate"><span class="pre">mults=2</span></code>); 3)
+and use a sampling rate of 100 Hz (<code class="docutils literal notranslate"><span class="pre">dt=1/100</span></code>) with 2500 samples
+(<code class="docutils literal notranslate"><span class="pre">npts=2500</span></code>). This yields a 25s-long seismogram. The waveforms should
+not be shifted or aligned (<code class="docutils literal notranslate"><span class="pre">align=0</span></code>). Note that the unit amplitude
+points <em>toward</em> the source.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Set `run` parameters
+rc = prs.RC(
+    verbose=False,
+    rot=0,
+    mults=2,
+    dt=1/100,
+    npts=2500,
+    align=0,
+)
+
+# Run Raysum and get seismograms
+seismogram = prs.run(model, geom, rc)
+
+# Extract first set of seismograms (element `0` in `streams`)
+prsd = seismogram.streams[0]
+
+# Make simple plot
+print(prsd)
+_ = prsd.plot()
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">3</span> <span class="n">Trace</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="ow">in</span> <span class="n">Stream</span><span class="p">:</span>
+<span class="o">.</span><span class="n">prs</span><span class="o">..</span><span class="n">Z</span> <span class="o">|</span> <span class="mi">1970</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="n">T00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mf">00.000000</span><span class="n">Z</span> <span class="o">-</span> <span class="mi">1970</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="n">T00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mf">24.990000</span><span class="n">Z</span> <span class="o">|</span> <span class="mf">100.0</span> <span class="n">Hz</span><span class="p">,</span> <span class="mi">2500</span> <span class="n">samples</span>
+<span class="o">.</span><span class="n">prs</span><span class="o">..</span><span class="n">N</span> <span class="o">|</span> <span class="mi">1970</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="n">T00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mf">00.000000</span><span class="n">Z</span> <span class="o">-</span> <span class="mi">1970</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="n">T00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mf">24.990000</span><span class="n">Z</span> <span class="o">|</span> <span class="mf">100.0</span> <span class="n">Hz</span><span class="p">,</span> <span class="mi">2500</span> <span class="n">samples</span>
+<span class="o">.</span><span class="n">prs</span><span class="o">..</span><span class="n">E</span> <span class="o">|</span> <span class="mi">1970</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="n">T00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mf">00.000000</span><span class="n">Z</span> <span class="o">-</span> <span class="mi">1970</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="n">T00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mf">24.990000</span><span class="n">Z</span> <span class="o">|</span> <span class="mf">100.0</span> <span class="n">Hz</span><span class="p">,</span> <span class="mi">2500</span> <span class="n">samples</span>
+</pre></div>
+</div>
+<img alt="../../_images/output_13_1.png" src="../../_images/output_13_1.png" />
+<p>We will now pre-process all data equally. We will filter them, and align
+and normalize them to the maximum amplitude on the vertical component of
+the measured seismogram.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Set frequency corners in Hz
+fmin = 1./20.
+fmax = 1.
+
+# Demean and filter all data
+for dat in [hybd, twsd, prsd]:
+    dat.detrend(&quot;demean&quot;)
+    dat.filter(&quot;bandpass&quot;, freqmin=fmin, freqmax=fmax, zerophase=True)
+
+# Extract the P-wave window in real data
+hybd.trim(t1, t2)
+
+# Index of the maximum amplitude on the vertical component of the data
+imax = np.argmax(abs(hybd[0].data))
+
+# Cycle through both synthetic data and process them equally
+for trs in [prsd, twsd]:
+    jmax = np.argmax(abs(trs[0].data))  # maximum vertical amplitude
+    dt = hybd[0].times()[imax] - trs[0].times()[jmax]  # relative time shift of maximum
+    dt0 = hybd[0].stats.starttime - trs[0].stats.starttime  # absolute time difference
+    norm = hybd[0].data[imax] / trs[0].data[jmax]  # relative amplitude of vertical maximum
+    for tr in trs:
+        tr.stats.starttime += dt + dt0  # align peaks
+        tr.data *= norm  # normalize
+        tr.trim(t1, t2)  # cut around P-wave
+        if tr.stats.station == &quot;prs&quot;:
+            tr.stats.phase_amplitudes *= norm
+</pre></div>
+</div>
+</section>
+<section id="comparison-plots">
+<h2>Comparison plots<a class="headerlink" href="#comparison-plots" title="Permalink to this heading"></a></h2>
+<p>We define a function to plot the PyRaysum data against the real
+Hyderabad and the synthetic Telewavesim data. Note how the book-keeping
+infrastructure of <code class="docutils literal notranslate"><span class="pre">obspy.Trace</span></code> is used to store phase names, arrival
+times and amplitudes. These are used here to better interpret the
+seismograms.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def plot(data, model):
+
+    lws = [4, 1]  # linewidths ...
+    cols = [&quot;darkgray&quot;, &quot;crimson&quot;]  # colors for data and model
+
+    # Subplot with 3 rows
+    fig, axs = mp.subplots(
+        nrows=3, ncols=1, figsize=(10, 6), tight_layout=True, sharex=True, sharey=True
+    )
+
+    # Cycle through components
+    for ax, dat, mod in zip(axs, data, model):
+        trs = [dat, mod]
+
+        # Cycle through data and model
+        for tr, lw, col in zip(trs, lws, cols):
+            ax.plot(
+                tr.times(),
+                tr.data,
+                label=tr.stats.station + &quot;.&quot; + tr.stats.channel,
+                lw=lw,
+                color=col,
+            )
+
+            # Write phase info
+            if tr.stats.station == &quot;prs&quot;:
+                tim = np.nan
+                dy = 300
+                n = 1
+                # Time sorted, then reverse amplitude sorted
+                for pht, phn, phd, pha in sorted(
+                    zip(
+                        tr.stats.phase_times,
+                        tr.stats.phase_names,
+                        tr.stats.phase_descriptors,
+                        tr.stats.phase_amplitudes,
+                    ),
+                    key=lambda x: (x[0], -abs(x[3])),
+                ):
+                    # Plot all lables opposite of largest amplitude
+                    if abs(tim - pht) &lt; 1:
+                        n += 1
+                        pha = amp
+                    else:
+                        n = 1
+                    sign = -np.sign(pha)  # absolute amplitudes are here meaningless due to applied filter
+                    ax.text(pht, sign*n*dy, phn, ha=&quot;center&quot;, va=&quot;center&quot;)
+                    ax.text(pht, sign*3*dy + sign*n*dy, phd, ha=&quot;center&quot;, va=&quot;center&quot;)
+                    tim = pht
+                    amp = pha
+
+        ax.legend(frameon=False)
+        ax.set_axis_off()
+
+    # Only plot lowermost time axes
+    ax.set_axis_on()
+    ax.spines[[&quot;top&quot;, &quot;left&quot;, &quot;right&quot;, &quot;bottom&quot;]].set_visible(False)
+    ax.set_yticks([])
+    ax.set_xlabel(&quot;Time(s)&quot;)
+
+    return fig
+</pre></div>
+</div>
+<section id="comparison-with-real-data">
+<h3>Comparison with real data<a class="headerlink" href="#comparison-with-real-data" title="Permalink to this heading"></a></h3>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>fig = plot(hybd, prsd)
+_ = fig.suptitle(&quot;Comparison between Pyraysum and seismogram recored at G.HYB&quot;)
+</pre></div>
+</div>
+<img alt="../../_images/output_19_0.png" src="../../_images/output_19_0.png" />
+<p>The comparison with the real data shows that some complexity of the
+P-wave train can, in this simple example, be attributed to conversions
+and reflections of the seismic wave field in the cratonic crust. The
+long phase descriptors consist of layer numbers and phase letters.</p>
+<blockquote>
+<div><p>Note: Read for example “<strong>1P0P0s0S</strong>” as: A wave that travels through
+layer <strong>1</strong> as an <strong>upgoing P</strong>-wave, layer <strong>0</strong> as an <strong>upgoing
+P</strong>-wave, gets reflected, travels through layer <strong>0</strong> as a
+<strong>downgoing S</strong>-wave, gets again reflected and finally travels
+through layer <strong>0</strong> as an <strong>upgoing S</strong>-wave”. The timing and
+amplitude of such reverberations will be used in example 3 to invert
+for subsurface properties instead of assuming them, as we did here.</p>
+</div></blockquote>
+</section>
+<section id="comparison-with-synthetic-data">
+<h3>Comparison with synthetic data<a class="headerlink" href="#comparison-with-synthetic-data" title="Permalink to this heading"></a></h3>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>fig = plot(twsd, prsd)
+_ = fig.suptitle(&quot;Comparison between PyRaysum and Telewavesim synthetics&quot;)
+</pre></div>
+</div>
+<img alt="../../_images/output_22_0.png" src="../../_images/output_22_0.png" />
+<p>The comparison with synthetic data from Telewavesim shows a good match
+of the major phases. Note that the data need to be filtered, because raw
+telewavesim data suffer from aliasing at infinite frequencies.</p>
+</section>
+</section>
+<section id="computing-equivalent-phases">
+<h2>Computing equivalent phases<a class="headerlink" href="#computing-equivalent-phases" title="Permalink to this heading"></a></h2>
+<p>The amplitude of the <em>PpS</em> phase is apparently overestimated on the E
+component and underestimated on the Z component. This is the case,
+because the RC parameter <code class="docutils literal notranslate"><span class="pre">mults=2</span></code> only computes first-order
+multiples, i.e. reflections of the direct <em>P</em> wave. Reflections from
+<em>PS</em> are missing, most notably <em>PSpP</em>. To address this problem, we will
+next use the <code class="docutils literal notranslate"><span class="pre">RC.set_phaselist()</span></code> method to explicitly name the phases
+we wish to compute. The method implicitly sets <code class="docutils literal notranslate"><span class="pre">mults=3</span></code>.
+<code class="docutils literal notranslate"><span class="pre">Seismogram</span></code> has a dedicated method <code class="docutils literal notranslate"><span class="pre">descriptors()</span></code> to list unique
+phases present in the synthetic waveforms.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>phl = seismogram.descriptors()
+eqp = prs.equivalent_phases(phl)
+print(&quot;Phases computed with mult=2:&quot;)
+print(phl)
+print()
+print(&quot;Dynamically equivalent phases:&quot;)
+print(eqp)
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Phases</span> <span class="n">computed</span> <span class="k">with</span> <span class="n">mult</span><span class="o">=</span><span class="mi">2</span><span class="p">:</span>
+<span class="p">[</span><span class="s1">&#39;1P0P&#39;</span><span class="p">,</span> <span class="s1">&#39;1P0P0p0P&#39;</span><span class="p">,</span> <span class="s1">&#39;1P0P0p0S&#39;</span><span class="p">,</span> <span class="s1">&#39;1P0P0s0S&#39;</span><span class="p">,</span> <span class="s1">&#39;1P0S&#39;</span><span class="p">]</span>
+
+<span class="n">Dynamically</span> <span class="n">equivalent</span> <span class="n">phases</span><span class="p">:</span>
+<span class="p">[</span><span class="s1">&#39;1P0S0s0P&#39;</span><span class="p">,</span> <span class="s1">&#39;1P0P0s0P&#39;</span><span class="p">,</span> <span class="s1">&#39;1P0S0p0P&#39;</span><span class="p">,</span> <span class="s1">&#39;1P0S0p0S&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>We will now set a phaselist that includes these phases using the
+<code class="docutils literal notranslate"><span class="pre">equivalent</span></code> option of <code class="docutils literal notranslate"><span class="pre">set_phaselist</span></code>.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>rc.set_phaselist(phl, equivalent=True)
+</pre></div>
+</div>
+<p>And run <em>PyRaysum</em> and the post processing again:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Run Raysum and get seismograms
+seismogram = prs.run(model, geom, rc)
+
+# Extract first set of seismograms (element `0` in `streams`)
+prsd = seismogram.streams[0]
+prsd.filter(&quot;bandpass&quot;, freqmin=fmin, freqmax=fmax, zerophase=True)
+
+jmax = np.argmax(abs(prsd[0].data))  # maximum vertical amplitude
+dt = hybd[0].times()[imax] - prsd[0].times()[jmax]  # relative time shift of maximum
+dt0 = hybd[0].stats.starttime - prsd[0].stats.starttime  # absolute time difference
+norm = hybd[0].data[imax] / prsd[0].data[jmax]  # relative amplitude of vertical maximum
+for tr in prsd:
+    tr.stats.starttime += dt + dt0  # align peaks
+    tr.data *= norm  # normalize
+    tr.trim(t1, t2)  # cut around P-wave
+    if tr.stats.station == &quot;prs&quot;:
+        tr.stats.phase_amplitudes *= norm
+
+fig = plot(twsd, prsd)
+_ = fig.suptitle(&quot;Comparison between PyRaysum and Telewavesim synthetics, including equivalent phases&quot;)
+</pre></div>
+</div>
+<img alt="../../_images/output_29_0.png" src="../../_images/output_29_0.png" />
+<p>The amplitudes of the reflected phases are now better matched. To
+explore the actual amplitude contributions of the equivalent phases, we
+look them up in the metadata of the synthetic seismic trace:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>print(&quot;Name, Time, Amplitude&quot;)
+f = &quot;{:4s}  {:&gt;4.1f}    {:&gt;7.0f}&quot;
+stats = prsd[0].stats
+for t, a, n in sorted(zip(stats.phase_times, stats.phase_amplitudes, stats.phase_names)):
+    print(f.format(n, t, a))
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Name</span><span class="p">,</span> <span class="n">Time</span><span class="p">,</span> <span class="n">Amplitude</span>
+<span class="n">P</span>      <span class="mf">4.5</span>      <span class="mi">74495</span>
+<span class="n">PS</span>     <span class="mf">8.9</span>      <span class="o">-</span><span class="mi">2628</span>
+<span class="n">PpP</span>   <span class="mf">13.5</span>     <span class="o">-</span><span class="mi">10550</span>
+<span class="n">PsP</span>   <span class="mf">17.9</span>      <span class="o">-</span><span class="mi">6219</span>
+<span class="n">PpS</span>   <span class="mf">17.9</span>      <span class="o">-</span><span class="mi">2792</span>
+<span class="n">PSpP</span>  <span class="mf">17.9</span>        <span class="mi">829</span>
+<span class="n">PSsP</span>  <span class="mf">22.4</span>       <span class="o">-</span><span class="mi">966</span>
+<span class="n">PSpS</span>  <span class="mf">22.4</span>        <span class="mi">219</span>
+<span class="n">PsS</span>   <span class="mf">22.4</span>       <span class="mi">2648</span>
+</pre></div>
+</div>
+</section>
+<section id="conclusion">
+<h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this heading"></a></h2>
+<p>This example demonstrated how <code class="docutils literal notranslate"><span class="pre">PyRaysum</span></code> can be used to compute the
+timing and amplitude of P-wave energy converted and reflected at the
+base of a cratonic crust. We compared the modelling results with a real
+data example from the Indian craton and a synthetic example that has
+been generated with an independent waveform simulation method.</p>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Audet, P., Thomson, C.J., Bostock, M.G., and Eulenfeld, T. (2019).
+Telewavesim: Python software for teleseismic body wave modeling.
+Journal of Open Source Software, 4(44), 1818,
+<a class="reference external" href="https://doi.org/10.21105/joss.01818">https://doi.org/10.21105/joss.01818</a></p></li>
+<li><p>Saul, J., Kumar, M. R., &amp; Sarkar, D. (2000). Lithospheric and upper
+mantle structure of the Indian Shield, from teleseismic receiver
+functions. Geophysical Research Letters, 27(16), 2357-2360.
+<a class="reference external" href="https://doi.org/10.1029/1999GL011128">https://doi.org/10.1029/1999GL011128</a></p></li>
+<li><p>Thomson, C.J. (1997). Modelling surface waves in anisotropic
+structures: I. Theory. Physics of the Earth and Planetary interiors,
+103, 195-206. <a class="reference external" href="https://doi.org/10.1016/S0031-9201(97)00033-2">https://doi.org/10.1016/S0031-9201(97)00033-2</a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../../api.html" class="btn btn-neutral float-left" title="Classes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../2/2_reproduce_Porter-2011.html" class="btn btn-neutral float-right" title="Example 2: Reproducing Receiver Functions for Dipping and Anisotropic Subsurface Structure" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, Pascal Audet.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

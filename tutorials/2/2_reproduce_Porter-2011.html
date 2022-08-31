@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Example 2: Reproducing Receiver Functions for Dipping and Anisotropic Subsurface Structure &mdash; pyraysum 0.2.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Example 3: Invert a Receiver Function" href="../3/3_invert_rf.html" />
+    <link rel="prev" title="Example 1: Compare PyRaysum with other synthetic and real data" href="../1/1_make_seismograms.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> pyraysum
+            <img src="../../_static/PyRaysum_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Quick Links</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../links.html">GitHub Repository</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../links.html#references">References</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../init.html">Licence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../init.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../init.html#usage">Usage</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html#modules">Modules</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../1/1_make_seismograms.html">Example 1: Compare PyRaysum with other synthetic and real data</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Example 2: Reproducing Receiver Functions for Dipping and Anisotropic Subsurface Structure</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#dipping-layers">Dipping Layers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anisotropic-layers">Anisotropic Layers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#understanding-fast-and-slow-s-waves">Understanding Fast and Slow S-Waves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#validation-against-telewavesim-data">Validation against Telewavesim Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#conclusion">Conclusion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../3/3_invert_rf.html">Example 3: Invert a Receiver Function</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Jupyter Notebooks</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://nbviewer.jupyter.org/github/paudetseis/PyRaysum/blob/main/pyraysum/examples/notebooks/1_make_seismograms.ipynb">Example 1: Compare PyRaysum with other synthetic and real data</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://nbviewer.jupyter.org/github/paudetseis/PyRaysum/blob/main/pyraysum/examples/notebooks/2_reproduce_Porter-2011.ipynb">Example 2: Reproducing Figure 2 in Porter et al. (2011)</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://nbviewer.jupyter.org/github/paudetseis/PyRaysum/blob/main/pyraysum/examples/notebooks/3_invert_rf.ipynb">Example 3: Invert a receiver function</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pyraysum</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Example 2: Reproducing Receiver Functions for Dipping and Anisotropic Subsurface Structure</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/tutorials/2/2_reproduce_Porter-2011.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="example-2-reproducing-receiver-functions-for-dipping-and-anisotropic-subsurface-structure">
+<h1>Example 2: Reproducing Receiver Functions for Dipping and Anisotropic Subsurface Structure<a class="headerlink" href="#example-2-reproducing-receiver-functions-for-dipping-and-anisotropic-subsurface-structure" title="Permalink to this heading"></a></h1>
+<p>In this example we generate <em>P</em> receiver functions for a model that
+includes either a dipping lower crustal layer or a lower-crustal
+anisotropic layer. These example reproduce the results of Figure 3 in
+<a class="reference external" href="#references">Porter et al. (2011)</a>.</p>
+<p>Start by importing the necessary packages:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from pyraysum import prs, Geometry, Model, RC
+import numpy as np
+</pre></div>
+</div>
+<section id="dipping-layers">
+<h2>Dipping Layers<a class="headerlink" href="#dipping-layers" title="Permalink to this heading"></a></h2>
+<p>First we define the arrays of slowness and back-azimuth values of the
+incident <code class="docutils literal notranslate"><span class="pre">P</span></code> wave to use as input in the simulation</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>baz = np.arange(0., 360., 10.)
+slow = 0.06
+geom = Geometry(baz, slow)
+_ = geom.plot()
+</pre></div>
+</div>
+<img alt="../../_images/output_3_0.png" src="../../_images/output_3_0.png" />
+<p>Next we define the model object. These values are found in the caption
+of Figure 3 in <a class="reference external" href="#references">Porter et al. (2011)</a>. Note that
+<span class="math notranslate nohighlight">\(V_S\)</span> can be parameterized either directly or as <span class="math notranslate nohighlight">\(V_P/V_S\)</span>,
+which is what we do here. Also note that values that are constant for
+all layers can be given as floats.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>thickn = [20000, 5000, 0]
+rho = 2800
+vp = [6400, 5800, 7800]
+vpvs = [1.75, 1.74, 1.74]
+dip = [0, 20, 20]
+strike = 90
+
+model = Model(thickn, rho, vp, vpvs=vpvs, strike=strike, dip=dip)
+model.plot()
+print(model)
+</pre></div>
+</div>
+<img alt="../../_images/output_5_0.png" src="../../_images/output_5_0.png" />
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># thickn     rho      vp      vs  flag aniso   trend plunge strike   dip</span>
+ <span class="mf">20000.0</span>  <span class="mf">2800.0</span>  <span class="mf">6400.0</span>  <span class="mf">3657.1</span>    <span class="mi">1</span>    <span class="mf">0.0</span>     <span class="mf">0.0</span>    <span class="mf">0.0</span>   <span class="mf">90.0</span>   <span class="mf">0.0</span>
+  <span class="mf">5000.0</span>  <span class="mf">2800.0</span>  <span class="mf">5800.0</span>  <span class="mf">3333.3</span>    <span class="mi">1</span>    <span class="mf">0.0</span>     <span class="mf">0.0</span>    <span class="mf">0.0</span>   <span class="mf">90.0</span>  <span class="mf">20.0</span>
+     <span class="mf">0.0</span>  <span class="mf">2800.0</span>  <span class="mf">7800.0</span>  <span class="mf">4482.8</span>    <span class="mi">1</span>    <span class="mf">0.0</span>     <span class="mf">0.0</span>    <span class="mf">0.0</span>   <span class="mf">90.0</span>  <span class="mf">20.0</span>
+</pre></div>
+</div>
+<p>Now we specify the run-control parameters. Here we use the argument
+<code class="docutils literal notranslate"><span class="pre">rot=1</span></code> to produce seismograms aligned in the <code class="docutils literal notranslate"><span class="pre">R-T-Z</span></code> coordinate
+system. The default value is <code class="docutils literal notranslate"><span class="pre">rot=0</span></code>, which produces seismograms
+aligned in the <code class="docutils literal notranslate"><span class="pre">N-E-Z</span></code> coordinate system that <strong>should not</strong> be used
+to calculate receiver functions. Furthermore, we are interested only in
+the direct conversions, and therefore specify <code class="docutils literal notranslate"><span class="pre">mults=0</span></code> to avoid
+dealing with multiples. This is required to reproduce the published
+examples, although it is good practice to keep all first-order multiples
+to properly simulate all possible phase arrivals.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>rc = RC(rot=1, mults=0, verbose=False, npts=1200, dt=0.0125)
+</pre></div>
+</div>
+<p>Finally, let’s run the simulation. All book-keeping is handled
+internally.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>seismogram = prs.run(model, geom, rc)
+</pre></div>
+</div>
+<p>The function returns a <code class="docutils literal notranslate"><span class="pre">Seismogram</span></code> object whose attributes are the
+<code class="docutils literal notranslate"><span class="pre">Model</span></code>, <code class="docutils literal notranslate"><span class="pre">Geometry</span></code> of incoming rays, a list of <code class="docutils literal notranslate"><span class="pre">Streams</span></code> as well
+as all run-time arguments that are used by Raysum:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>seismogram.__dict__.keys()
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dict_keys</span><span class="p">([</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="s1">&#39;geom&#39;</span><span class="p">,</span> <span class="s1">&#39;streams&#39;</span><span class="p">,</span> <span class="s1">&#39;rc&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>We can then use the method <code class="docutils literal notranslate"><span class="pre">calculate_rfs()</span></code> to calculate receiver
+functions.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>seismogram.calculate_rfs()
+</pre></div>
+</div>
+<p>The receiver functions are stored as an additional attribute of the
+streamlist object, which is itself a list of <code class="docutils literal notranslate"><span class="pre">Streams</span></code> containing the
+radial and transverse component RFs:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>seismogram.__dict__.keys()
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dict_keys</span><span class="p">([</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="s1">&#39;geom&#39;</span><span class="p">,</span> <span class="s1">&#39;streams&#39;</span><span class="p">,</span> <span class="s1">&#39;rc&#39;</span><span class="p">,</span> <span class="s1">&#39;rfs&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>We can now filter and plot the results - we specify the key <code class="docutils literal notranslate"><span class="pre">'rfs'</span></code> to
+work on the receiver functions only.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>seismogram.filter(&#39;rfs&#39;, &#39;lowpass&#39;, freq=1., zerophase=True, corners=2)
+seismogram.plot(&#39;rfs&#39;, tmin=-0.5, tmax=8.)
+</pre></div>
+</div>
+<img alt="../../_images/output_17_0.png" src="../../_images/output_17_0.png" />
+</section>
+<section id="anisotropic-layers">
+<h2>Anisotropic Layers<a class="headerlink" href="#anisotropic-layers" title="Permalink to this heading"></a></h2>
+<p>Now let’s reproduce the second case with the anisotropic lower crustal
+layer. Here, the second layer (<code class="docutils literal notranslate"><span class="pre">1</span></code> in python indexing) is not dipping,
+but has a strong anisotropy of -20% (a negative value means a slow axis
+of hexagonal symmetry). The anisotropy axis trends south
+(<code class="docutils literal notranslate"><span class="pre">trend</span> <span class="pre">=</span> <span class="pre">180</span></code>) and plunges 45 degree (<code class="docutils literal notranslate"><span class="pre">plunge</span> <span class="pre">=</span> <span class="pre">45</span></code>). The <em>P</em>-wave
+velocity is 6.2 km/s. We could define a new model as above. Another
+possibility is to use use a short command string to change the existing
+model.</p>
+<p>Note that when we change the <em>P</em>-wave velocity and want to maintain a
+constant <span class="math notranslate nohighlight">\(V_P/V_S\)</span> ratio, we must explicitly change <code class="docutils literal notranslate"><span class="pre">vpvs</span></code> by
+changing <code class="docutils literal notranslate"><span class="pre">vs</span></code>. This is achieved using the <code class="docutils literal notranslate"><span class="pre">'pss'</span></code> attribute
+indicator below.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>model.change(&#39;d1=0; d2=0; vp1=6.2; pss1=1.75; a1=-20; tr1=180; pl1=45;&#39;)
+model.plot()
+print(model)
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Changed</span><span class="p">:</span> <span class="n">dip</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="n">Changed</span><span class="p">:</span> <span class="n">dip</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="n">Changed</span><span class="p">:</span> <span class="n">vp</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">6200.0</span>
+<span class="n">Changed</span><span class="p">:</span> <span class="n">vpvs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.75</span>
+<span class="n">Changed</span><span class="p">:</span> <span class="n">ani</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">20.0</span>
+<span class="n">Changed</span><span class="p">:</span> <span class="n">trend</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">180.0</span>
+<span class="n">Changed</span><span class="p">:</span> <span class="n">plunge</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">45.0</span>
+</pre></div>
+</div>
+<img alt="../../_images/output_19_1.png" src="../../_images/output_19_1.png" />
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># thickn     rho      vp      vs  flag aniso   trend plunge strike   dip</span>
+ <span class="mf">20000.0</span>  <span class="mf">2800.0</span>  <span class="mf">6400.0</span>  <span class="mf">3657.1</span>    <span class="mi">1</span>    <span class="mf">0.0</span>     <span class="mf">0.0</span>    <span class="mf">0.0</span>   <span class="mf">90.0</span>   <span class="mf">0.0</span>
+  <span class="mf">5000.0</span>  <span class="mf">2800.0</span>  <span class="mf">6200.0</span>  <span class="mf">3542.9</span>    <span class="mi">0</span>  <span class="o">-</span><span class="mf">20.0</span>   <span class="mf">180.0</span>   <span class="mf">45.0</span>   <span class="mf">90.0</span>   <span class="mf">0.0</span>
+     <span class="mf">0.0</span>  <span class="mf">2800.0</span>  <span class="mf">7800.0</span>  <span class="mf">4482.8</span>    <span class="mi">1</span>    <span class="mf">0.0</span>     <span class="mf">0.0</span>    <span class="mf">0.0</span>   <span class="mf">90.0</span>   <span class="mf">0.0</span>
+</pre></div>
+</div>
+<p>Instead of two dipping interfaces, the model now has a thin anisotropic
+layer at the base of the crust. We again compute synthetic seismograms
+and use the <code class="docutils literal notranslate"><span class="pre">rf</span></code> argument to process the receiver functions as well.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>seismogram = prs.run(model, geom, rc, rf=True)
+
+seismogram.filter(&#39;rfs&#39;, &#39;lowpass&#39;, freq=1., zerophase=True, corners=2)
+seismogram.plot(&#39;rfs&#39;, tmin=-0.5, tmax=8.)
+</pre></div>
+</div>
+<img alt="../../_images/output_21_0.png" src="../../_images/output_21_0.png" />
+</section>
+<section id="understanding-fast-and-slow-s-waves">
+<h2>Understanding Fast and Slow S-Waves<a class="headerlink" href="#understanding-fast-and-slow-s-waves" title="Permalink to this heading"></a></h2>
+<p>To understand the different phases displayed, we can look at, e.g., the
+receiver function at back-azimuth 150°. We look at how the individual
+phases are called and when they arrive.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>print(seismogram.streams[15][0].stats.phase_descriptors)
+print(seismogram.streams[15][0].stats.phase_times)
+_ = seismogram.streams[15][0].plot()
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;2P1P0P&#39;</span> <span class="s1">&#39;2P1P0S&#39;</span> <span class="s1">&#39;2P1S0S&#39;</span> <span class="s1">&#39;2P1T0S&#39;</span><span class="p">]</span>
+<span class="p">[</span><span class="mf">0.01250004768371582</span> <span class="mf">2.4625535011291504</span> <span class="mf">3.0867090225219727</span>
+ <span class="mf">3.174315929412842</span><span class="p">]</span>
+</pre></div>
+</div>
+<img alt="../../_images/output_23_1.png" src="../../_images/output_23_1.png" />
+<p>The commands above tell us that the negative wiggle arriving at 2.5
+seconds is a P-to-S conversion at the bottom of layer 0 (i.e. the top of
+the anisotropic layer), whereas the positive wiggle at 3s consists of
+two S-waves arriving shortly after one another: The smaller wiggle is
+the P-to-S1 conversion at the bottom of layer 1 (the anisotropic layer),
+and the larger one is the P-to-S2 conversion at the same interface.
+(Note that the slow S-wave is denoted <em>T</em>, to avoid ambiguity with the
+layer indices.) Both phases travel as an S-wave (here again named <em>T</em>)
+in the topmost layer 0, but at different speeds.</p>
+<p>On the transverse component, the P-to-S1 conversion has a negative
+amplitude, while the P-to-S2 conversion has a larger, positive one.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>print(seismogram.streams[15][1].stats.phase_descriptors)
+print(seismogram.streams[15][1].stats.phase_times)
+
+_ = seismogram.streams[15][1].plot()
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;2P1P0T&#39;</span> <span class="s1">&#39;2P1S0T&#39;</span> <span class="s1">&#39;2P1T0T&#39;</span><span class="p">]</span>
+<span class="p">[</span><span class="mf">2.4625535011291504</span> <span class="mf">3.0867090225219727</span> <span class="mf">3.174315929412842</span><span class="p">]</span>
+</pre></div>
+</div>
+<img alt="../../_images/output_25_1.png" src="../../_images/output_25_1.png" />
+</section>
+<section id="validation-against-telewavesim-data">
+<h2>Validation against Telewavesim Data<a class="headerlink" href="#validation-against-telewavesim-data" title="Permalink to this heading"></a></h2>
+<p>As in the previous example, we would now like to compare these results
+with independently obtained results from <em>Telewavesim</em>. We’ll need
+<em>NumPy</em> to conveniently load our Telewavesim data from file, <em>obspy</em> to
+store them in a <em>Stream</em> object, and <em>Matplotlib</em> to make the comparison
+plot.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import obspy
+import matplotlib.pyplot as mp
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Load telewavesim data
+time, twr, twt, twz = np.loadtxt(&quot;../data/telewavesim_aniso_baz150-slow006.dat&quot;, unpack=True)
+
+# Get time interval `dt` from data
+dt = time[1] - time[0]
+
+# Store into Stream, switch Z component polarity and set header
+twsd = obspy.Stream()
+for tr, channel in zip([twr, twt, twz], [&quot;R&quot;, &quot;T&quot;, &quot;Z&quot;]):
+    header = {&quot;delta&quot;: dt, &quot;station&quot;: &quot;tws&quot;, &quot;channel&quot;: channel}
+    trace = obspy.Trace(tr, header=header)
+    twsd.append(trace)
+
+# Make simple plot
+_ = twsd.plot()
+</pre></div>
+</div>
+<img alt="../../_images/output_28_0.png" src="../../_images/output_28_0.png" />
+<p>We’ll again filter both seismograms, as Telewavesim data does not
+provide a good infinite frequency approximation.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Set frequency corners in Hz
+fmin = 1./10.
+fmax = 10
+prsd = seismogram.streams[15]
+prsd.trim(endtime = prsd[0].stats.starttime+5)
+
+# Demean and filter all data
+for dat in [twsd, prsd]:
+    dat.detrend(&quot;demean&quot;)
+    dat.filter(&quot;bandpass&quot;, freqmin=fmin, freqmax=fmax, zerophase=True)
+</pre></div>
+</div>
+<p>We also need to align the two different datasets to the direct <em>P</em>-wave
+and scale them to its amplitude on the vertical component.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Index of the maximum amplitude on the vertical component of the data
+imax = np.argmax(abs(prsd[2].data))
+
+# Cycle through both synthetic data and process them equally
+jmax = np.argmax(abs(twsd[2].data))  # maximum vertical amplitude
+dt = prsd[2].times()[imax] - twsd[2].times()[jmax] # relative time shift of maximum
+norm = prsd[2].data[imax] / twsd[2].data[jmax]  # relative amplitude of vertical maximum
+for tr in twsd:
+    tr.stats.starttime += dt  # align peaks
+    tr.data *= norm  # normalize
+    tr.trim(prsd[0].stats.starttime, prsd[0].stats.endtime)
+</pre></div>
+</div>
+<p>For a good comparison, we use the plot function from the previous
+example:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def plot(data, model):
+
+    lws = [4, 1]  # linewidths ...
+    cols = [&quot;darkgray&quot;, &quot;crimson&quot;]  # colors for data and model
+
+    # Subplot with 3 rows
+    fig, axs = mp.subplots(
+        nrows=3, ncols=1, figsize=(8, 6), tight_layout=True, sharex=True, sharey=True
+    )
+
+    # Cycle through components
+    for ax, dat, mod in zip(axs, data, model):
+        trs = [dat, mod]
+
+        # Cycle through data and model
+        for tr, lw, col in zip(trs, lws, cols):
+            ax.plot(
+                tr.times(reftime=data[0].stats.starttime),
+                tr.data,
+                label=tr.stats.station + &quot;.&quot; + tr.stats.channel,
+                lw=lw,
+                color=col,
+            )
+            # Write phase info
+            if tr.stats.station == &quot;prs&quot;:
+                dy = 0.05
+                # Cycle through phase descriptors
+                for n, (pht, phn, pha) in enumerate(
+                    zip(
+                        tr.stats.phase_times,
+                        tr.stats.phase_names,
+                        tr.stats.phase_amplitudes,
+                    )
+                ):
+                    ha = &quot;center&quot;
+                    if phn == &quot;PST&quot;:
+                        ha = &quot;right&quot;
+                    elif  phn == &quot;PTS&quot;:
+                        ha = &quot;left&quot;
+
+                    sign = -np.sign(pha)  # absolute amplitudes are here meaningless due to applied filter
+                    ax.text(pht, sign*dy, phn, va=&quot;center&quot;, ha=ha)
+
+        ax.legend(frameon=False)
+        ax.set_axis_off()
+
+    # Only plot lowermost time axes
+    ax.set_axis_on()
+    ax.spines[[&quot;top&quot;, &quot;left&quot;, &quot;right&quot;, &quot;bottom&quot;]].set_visible(False)
+    ax.set_yticks([])
+    ax.set_xlabel(&quot;Time(s)&quot;)
+
+    return fig
+</pre></div>
+</div>
+<p>And run it</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>_ = plot(twsd, prsd)
+</pre></div>
+</div>
+<img alt="../../_images/output_36_0.png" src="../../_images/output_36_0.png" />
+<p>We see that the Waveforms of <em>Pyraysum</em> (red) and <em>Teleweavesim</em> (gray)
+match pretty well. The <em>Telewavsim</em> data has some additional energy at
+about 0.9 seconds, which is a reflection from the top of the anisotropic
+layer. This reflections has explicitly not been computed
+(<code class="docutils literal notranslate"><span class="pre">RC.mults</span> <span class="pre">=</span> <span class="pre">0</span></code>), but this could be done using <code class="docutils literal notranslate"><span class="pre">RC.set_phaselist()</span></code>.</p>
+</section>
+<section id="conclusion">
+<h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this heading"></a></h2>
+<p>In this example we have explored the capabilities of <em>Pyraysum</em> to
+compute synthetic seismograms and receiver functions for dipping or
+anisotropic layers. We have compared the outcome of our simulations with
+published results and, for the anisotropic example, also with synthetic
+data from another numerical method. Both comparisons showed that
+<em>Pyraysum</em> delivers comparable results.</p>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Audet, P., Thomson, C.J., Bostock, M.G., and Eulenfeld, T. (2019).
+Telewavesim: Python software for teleseismic body wave modeling.
+Journal of Open Source Software, 4(44), 1818,
+<a class="reference external" href="https://doi.org/10.21105/joss.01818">https://doi.org/10.21105/joss.01818</a></p></li>
+<li><p>Porter, R., Zandt, G., &amp; McQuarrie, N. (2011). Pervasive
+lower-crustal seismic anisotropy in Southern California: Evidence for
+underplated schists and active tectonics. Lithosphere, 3(3), 201-220.
+<a class="reference external" href="https://doi.org/10.1130/L126.1">https://doi.org/10.1130/L126.1</a></p></li>
+<li><p>Thomson, C.J. (1997). Modelling surface waves in anisotropic
+structures: I. Theory. Physics of the Earth and Planetary interiors,
+103, 195-206. <a class="reference external" href="https://doi.org/10.1016/S0031-9201(97)00033-2">https://doi.org/10.1016/S0031-9201(97)00033-2</a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../1/1_make_seismograms.html" class="btn btn-neutral float-left" title="Example 1: Compare PyRaysum with other synthetic and real data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../3/3_invert_rf.html" class="btn btn-neutral float-right" title="Example 3: Invert a Receiver Function" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, Pascal Audet.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

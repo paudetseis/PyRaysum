@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; pyraysum 0.1.0 documentation</title>
+  <title>Index &mdash; pyraysum 0.2.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -13,6 +13,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="#" />
@@ -51,9 +52,17 @@
 <li class="toctree-l1"><a class="reference internal" href="api.html">Classes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html#modules">Modules</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/1/1_make_seismograms.html">Example 1: Compare PyRaysum with other synthetic and real data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/2/2_reproduce_Porter-2011.html">Example 2: Reproducing Receiver Functions for Dipping and Anisotropic Subsurface Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/3/3_invert_rf.html">Example 3: Invert a Receiver Function</a></li>
+</ul>
 <p class="caption" role="heading"><span class="caption-text">Jupyter Notebooks</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference external" href="https://nbviewer.jupyter.org/github/paudetseis/PyRaysum/blob/main/pyraysum/examples/notebooks/sim_Porter2011.ipynb">Example 1: Reproducing Figure 2 in Porter et al. (2011)</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://nbviewer.jupyter.org/github/paudetseis/PyRaysum/blob/main/pyraysum/examples/notebooks/1_make_seismograms.ipynb">Example 1: Compare PyRaysum with other synthetic and real data</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://nbviewer.jupyter.org/github/paudetseis/PyRaysum/blob/main/pyraysum/examples/notebooks/2_reproduce_Porter-2011.ipynb">Example 2: Reproducing Figure 2 in Porter et al. (2011)</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://nbviewer.jupyter.org/github/paudetseis/PyRaysum/blob/main/pyraysum/examples/notebooks/3_invert_rf.ipynb">Example 3: Invert a receiver function</a></li>
 </ul>
 
         </div>
@@ -83,19 +92,53 @@
 <h1 id="index">Index</h1>
 
 <div class="genindex-jumpbox">
- <a href="#C"><strong>C</strong></a>
+ <a href="#A"><strong>A</strong></a>
+ | <a href="#C"><strong>C</strong></a>
+ | <a href="#D"><strong>D</strong></a>
+ | <a href="#E"><strong>E</strong></a>
  | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
  | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
  | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
+ | <a href="#U"><strong>U</strong></a>
+ | <a href="#W"><strong>W</strong></a>
  
 </div>
+<h2 id="A">A</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#pyraysum.prs.Model.average_layers">average_layers() (pyraysum.prs.Model method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#pyraysum.prs.StreamList.calculate_rfs">calculate_rfs() (pyraysum.prs.StreamList method)</a>
+      <li><a href="api.html#pyraysum.prs.Seismogram.calculate_rfs">calculate_rfs() (pyraysum.prs.Seismogram method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#pyraysum.prs.Model.change">change() (pyraysum.prs.Model method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="D">D</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#pyraysum.prs.Seismogram.descriptors">descriptors() (pyraysum.prs.Seismogram method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="E">E</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#pyraysum.prs.equivalent_phases">equivalent_phases() (in module pyraysum.prs)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -103,6 +146,12 @@
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#pyraysum.prs.Seismogram.filter">filter() (pyraysum.prs.Seismogram method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#pyraysum.prs.filtered_array">filtered_array() (in module pyraysum.prs)</a>
+</li>
       <li><a href="api.html#pyraysum.prs.filtered_rf_array">filtered_rf_array() (in module pyraysum.prs)</a>
 </li>
   </ul></td>
@@ -125,39 +174,55 @@
     module
 
       <ul>
+        <li><a href="api.html#module-pyraysum.plot">pyraysum.plot</a>
+</li>
         <li><a href="api.html#module-pyraysum.prs">pyraysum.prs</a>
 </li>
-        <li><a href="api.html#module-pyraysum.wiggle">pyraysum.wiggle</a>
-</li>
       </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#pyraysum.prs.RC.null_phaselist">null_phaselist() (pyraysum.prs.RC method)</a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#pyraysum.prs.Model.plot">plot() (pyraysum.prs.Model method)</a>
+      <li><a href="api.html#pyraysum.prs.RC.parameters">parameters (pyraysum.prs.RC attribute)</a>
 </li>
+      <li><a href="api.html#pyraysum.prs.Geometry.plot">plot() (pyraysum.prs.Geometry method)</a>
+
+      <ul>
+        <li><a href="api.html#pyraysum.prs.Model.plot">(pyraysum.prs.Model method)</a>
+</li>
+        <li><a href="api.html#pyraysum.prs.Seismogram.plot">(pyraysum.prs.Seismogram method)</a>
+</li>
+      </ul></li>
       <li><a href="api.html#pyraysum.prs.Model.plot_interfaces">plot_interfaces() (pyraysum.prs.Model method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#pyraysum.prs.Model.plot_layers">plot_layers() (pyraysum.prs.Model method)</a>
 </li>
       <li><a href="api.html#pyraysum.prs.Model.plot_profile">plot_profile() (pyraysum.prs.Model method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    pyraysum.plot
+
+      <ul>
+        <li><a href="api.html#module-pyraysum.plot">module</a>
+</li>
+      </ul></li>
       <li>
     pyraysum.prs
 
       <ul>
         <li><a href="api.html#module-pyraysum.prs">module</a>
-</li>
-      </ul></li>
-      <li>
-    pyraysum.wiggle
-
-      <ul>
-        <li><a href="api.html#module-pyraysum.wiggle">module</a>
 </li>
       </ul></li>
   </ul></td>
@@ -166,15 +231,27 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#pyraysum.prs.RC">RC (class in pyraysum.prs)</a>
+</li>
+      <li><a href="api.html#pyraysum.prs.read_arrivals">read_arrivals() (in module pyraysum.prs)</a>
+</li>
+      <li><a href="api.html#pyraysum.prs.read_geometry">read_geometry() (in module pyraysum.prs)</a>
+</li>
       <li><a href="api.html#pyraysum.prs.read_model">read_model() (in module pyraysum.prs)</a>
 </li>
-      <li><a href="api.html#pyraysum.prs.read_traces">read_traces() (in module pyraysum.prs)</a>
+      <li><a href="api.html#pyraysum.prs.read_rc">read_rc() (in module pyraysum.prs)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#pyraysum.wiggle.rf_wiggles">rf_wiggles() (in module pyraysum.wiggle)</a>
+      <li><a href="api.html#pyraysum.prs.read_traces">read_traces() (in module pyraysum.prs)</a>
 </li>
-      <li><a href="api.html#pyraysum.prs.run_frs">run_frs() (in module pyraysum.prs)</a>
+      <li><a href="api.html#pyraysum.prs.Model.remove_layer">remove_layer() (pyraysum.prs.Model method)</a>
+</li>
+      <li><a href="api.html#pyraysum.plot.rf_wiggles">rf_wiggles() (in module pyraysum.plot)</a>
+</li>
+      <li><a href="api.html#pyraysum.prs.rfarray">rfarray() (in module pyraysum.prs)</a>
+</li>
+      <li><a href="api.html#pyraysum.prs.run">run() (in module pyraysum.prs)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -182,16 +259,56 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#pyraysum.wiggle.seis_wiggles">seis_wiggles() (in module pyraysum.wiggle)</a>
+      <li><a href="api.html#pyraysum.prs.Geometry.save">save() (pyraysum.prs.Geometry method)</a>
+
+      <ul>
+        <li><a href="api.html#pyraysum.prs.Model.save">(pyraysum.prs.Model method)</a>
 </li>
-      <li><a href="api.html#pyraysum.wiggle.stack_all">stack_all() (in module pyraysum.wiggle)</a>
+        <li><a href="api.html#pyraysum.prs.RC.save">(pyraysum.prs.RC method)</a>
+</li>
+      </ul></li>
+      <li><a href="api.html#pyraysum.plot.seis_wiggles">seis_wiggles() (in module pyraysum.plot)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#pyraysum.wiggle.stream_wiggles">stream_wiggles() (in module pyraysum.wiggle)</a>
+      <li><a href="api.html#pyraysum.prs.Seismogram">Seismogram (class in pyraysum.prs)</a>
 </li>
-      <li><a href="api.html#pyraysum.prs.StreamList">StreamList (class in pyraysum.prs)</a>
+      <li><a href="api.html#pyraysum.prs.RC.set_phaselist">set_phaselist() (pyraysum.prs.RC method)</a>
 </li>
+      <li><a href="api.html#pyraysum.prs.Model.split_layer">split_layer() (pyraysum.prs.Model method)</a>
+</li>
+      <li><a href="api.html#pyraysum.plot.stack_all">stack_all() (in module pyraysum.plot)</a>
+</li>
+      <li><a href="api.html#pyraysum.plot.stream_wiggles">stream_wiggles() (in module pyraysum.plot)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="U">U</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#pyraysum.prs.Model.update">update() (pyraysum.prs.Model method)</a>
+
+      <ul>
+        <li><a href="api.html#pyraysum.prs.RC.update">(pyraysum.prs.RC method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="W">W</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#pyraysum.prs.Geometry.write">write() (pyraysum.prs.Geometry method)</a>
+
+      <ul>
+        <li><a href="api.html#pyraysum.prs.Model.write">(pyraysum.prs.Model method)</a>
+</li>
+        <li><a href="api.html#pyraysum.prs.RC.write">(pyraysum.prs.RC method)</a>
+</li>
+        <li><a href="api.html#pyraysum.prs.Seismogram.write">(pyraysum.prs.Seismogram method)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 

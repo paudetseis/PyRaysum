@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyraysum.plot &mdash; pyraysum 0.2.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> pyraysum
+            <img src="../../_static/PyRaysum_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Quick Links</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../links.html">GitHub Repository</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../links.html#references">References</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../init.html">Licence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../init.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../init.html#usage">Usage</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html#modules">Modules</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/1/1_make_seismograms.html">Example 1: Compare PyRaysum with other synthetic and real data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/2/2_reproduce_Porter-2011.html">Example 2: Reproducing Receiver Functions for Dipping and Anisotropic Subsurface Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/3/3_invert_rf.html">Example 3: Invert a Receiver Function</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Jupyter Notebooks</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://nbviewer.jupyter.org/github/paudetseis/PyRaysum/blob/main/pyraysum/examples/notebooks/1_make_seismograms.ipynb">Example 1: Compare PyRaysum with other synthetic and real data</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://nbviewer.jupyter.org/github/paudetseis/PyRaysum/blob/main/pyraysum/examples/notebooks/2_reproduce_Porter-2011.ipynb">Example 2: Reproducing Figure 2 in Porter et al. (2011)</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://nbviewer.jupyter.org/github/paudetseis/PyRaysum/blob/main/pyraysum/examples/notebooks/3_invert_rf.ipynb">Example 3: Invert a receiver function</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pyraysum</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>pyraysum.plot</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyraysum.plot</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2020 Pascal Audet</span>
+
+<span class="c1"># This file is part of PyRaysum.</span>
+
+<span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
+<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># in the Software without restriction, including without limitation the rights</span>
+<span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
+<span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
+<span class="c1"># furnished to do so, subject to the following conditions:</span>
+
+<span class="c1"># The above copyright notice and this permission notice shall be included in</span>
+<span class="c1"># all copies or substantial portions of the Software.</span>
+
+<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
+<span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
+<span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
+<span class="c1"># LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span>
+<span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
+<span class="c1"># SOFTWARE.</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">Functions to plot single station displacement or receiver function seismograms.</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">hilbert</span>
+<span class="kn">from</span> <span class="nn">obspy</span> <span class="kn">import</span> <span class="n">Stream</span><span class="p">,</span> <span class="n">Trace</span>
+
+
+<div class="viewcode-block" id="stack_all"><a class="viewcode-back" href="../../api.html#pyraysum.plot.stack_all">[docs]</a><span class="k">def</span> <span class="nf">stack_all</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">pws</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Stack all traces in ``Stream`` objects.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        stream (:class:`~obspy.core.Stream`):</span>
+<span class="sd">            Contains traces to stack</span>
+<span class="sd">        pws (bool):</span>
+<span class="sd">            Enables Phase-Weighted Stacking</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        :class:`~obspy.core.Trace`:</span>
+<span class="sd">            Stacked trace</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Copy stats from stream</span>
+    <span class="n">str_stats</span> <span class="o">=</span> <span class="n">stream</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">stats</span>
+
+    <span class="c1"># Initialize arrays</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">stream</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">))</span>
+    <span class="n">weight</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">stream</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+
+    <span class="c1"># Stack all traces</span>
+    <span class="k">for</span> <span class="n">tr</span> <span class="ow">in</span> <span class="n">stream</span><span class="p">:</span>
+        <span class="n">tmp</span> <span class="o">+=</span> <span class="n">tr</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">hilb</span> <span class="o">=</span> <span class="n">hilbert</span><span class="p">(</span><span class="n">tr</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">phase</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">hilb</span><span class="o">.</span><span class="n">imag</span><span class="p">,</span> <span class="n">hilb</span><span class="o">.</span><span class="n">real</span><span class="p">)</span>
+        <span class="n">weight</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">phase</span><span class="p">)</span>
+
+    <span class="c1"># Normalize</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">stream</span><span class="p">))</span>
+
+    <span class="c1"># Phase-weighting</span>
+    <span class="k">if</span> <span class="n">pws</span><span class="p">:</span>
+        <span class="n">weight</span> <span class="o">=</span> <span class="n">weight</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">stream</span><span class="p">))</span>
+        <span class="n">weight</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">weight</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">weight</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">stream</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">))</span>
+
+    <span class="c1"># Put back into traces</span>
+    <span class="n">stack</span> <span class="o">=</span> <span class="n">Trace</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">weight</span><span class="o">*</span><span class="n">tmp</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="n">str_stats</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">stack</span></div>
+
+
+<div class="viewcode-block" id="rf_wiggles"><a class="viewcode-back" href="../../api.html#pyraysum.plot.rf_wiggles">[docs]</a><span class="k">def</span> <span class="nf">rf_wiggles</span><span class="p">(</span><span class="n">rflist</span><span class="p">,</span> <span class="n">btyp</span><span class="o">=</span><span class="s1">&#39;baz&#39;</span><span class="p">,</span> <span class="n">wvtype</span><span class="o">=</span><span class="s1">&#39;P&#39;</span><span class="p">,</span> <span class="n">pws</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=-</span><span class="mf">5.</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+               <span class="n">scale</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pcolor</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">ncolor</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+               <span class="n">ftitle</span><span class="o">=</span><span class="s1">&#39;Figure_rf_wiggle&#39;</span><span class="p">,</span>
+               <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;png&#39;</span><span class="p">,</span> <span class="n">plot_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;linewidth&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="s1">&#39;black&#39;</span><span class="p">},</span>
+               <span class="n">figure_kwargs</span><span class="o">=</span><span class="p">{}):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plot receiver function seismograms sorted by back-azimuth or slowness.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        rflist (list or prs.Seismogram):</span>
+<span class="sd">            list of `obspy.core.Stream &lt;https://tinyurl.com/3u8dv8s8&gt;`_ objects </span>
+<span class="sd">            containing receiver functions</span>
+<span class="sd">        btyp (str):</span>
+<span class="sd">            Type of sorting for panel</span>
+<span class="sd">        wvtype (str):</span>
+<span class="sd">            Wavet type (&#39;P&#39;, &#39;SV&#39;, or &#39;SH&#39;)</span>
+<span class="sd">        pws (bool):</span>
+<span class="sd">            Enables Phase-Weighted Stacking</span>
+<span class="sd">        tmin (float):</span>
+<span class="sd">            Lower bound of time axis (s)</span>
+<span class="sd">        tmax (float):</span>
+<span class="sd">            Upper bound of time axis (s)</span>
+<span class="sd">        scale (float):</span>
+<span class="sd">            Amplitude scaling factor</span>
+<span class="sd">        save (bool):</span>
+<span class="sd">            Whether or not to save the figure</span>
+<span class="sd">        pcolor (str):</span>
+<span class="sd">            Color to fill positive wiggles</span>
+<span class="sd">        ncolor (str):</span>
+<span class="sd">            Color to fill negative wiggles</span>
+<span class="sd">        ftitle (str):</span>
+<span class="sd">            Filename of figure to be saved (without format suffix, see fmt)</span>
+<span class="sd">        fmt (str):</span>
+<span class="sd">            Output format (&#39;png&#39;, &#39;jpg&#39;, or &#39;eps&#39;, etc.)</span>
+<span class="sd">        plot_kwargs (dict):</span>
+<span class="sd">            Keyword arguments passed to </span>
+<span class="sd">            `matplotlib.pyplot.plot() &lt;https://tinyurl.com/2p9xy7hs&gt;`_</span>
+<span class="sd">        figure (dict):</span>
+<span class="sd">            Keyword arguments passed to </span>
+<span class="sd">            `matplotlib.pyplot.figure() &lt;https://tinyurl.com/yc3w956b&gt;`_</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        :class:`matplotlib.pyplot.figure` :</span>
+<span class="sd">            Figure handle</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">btyp</span> <span class="o">==</span> <span class="s1">&#39;baz&#39;</span> <span class="ow">or</span> <span class="n">btyp</span> <span class="o">==</span> <span class="s1">&#39;slow&#39;</span> <span class="ow">or</span> <span class="n">btyp</span> <span class="o">==</span> <span class="s1">&#39;dist&#39;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;type has to be &quot;baz&quot; or &quot;slow&quot; or &quot;dist&quot;&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">fmt</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;png&#39;</span><span class="p">,</span> <span class="s1">&#39;PNG&#39;</span><span class="p">,</span> <span class="s1">&#39;jpg&#39;</span><span class="p">,</span> <span class="s1">&#39;JPG&#39;</span><span class="p">,</span> <span class="s1">&#39;eps&#39;</span><span class="p">,</span> <span class="s1">&#39;EPS&#39;</span><span class="p">,</span> <span class="s1">&#39;pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;PDF&#39;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;fmt&#39; has to be one of &#39;png&#39;, &#39;jpg&#39;, &#39;eps&#39;, &#39;pdf&#39;&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Re-order streams in list</span>
+    <span class="n">str1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">(</span><span class="n">traces</span><span class="o">=</span><span class="p">[</span><span class="n">st</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">st</span> <span class="ow">in</span> <span class="n">rflist</span><span class="o">.</span><span class="n">rfs</span><span class="p">])</span>
+    <span class="n">str2</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">(</span><span class="n">traces</span><span class="o">=</span><span class="p">[</span><span class="n">st</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">st</span> <span class="ow">in</span> <span class="n">rflist</span><span class="o">.</span><span class="n">rfs</span><span class="p">])</span>
+
+    <span class="c1"># Get stacked traces</span>
+    <span class="n">tr1</span> <span class="o">=</span> <span class="n">stack_all</span><span class="p">(</span><span class="n">str1</span><span class="p">,</span> <span class="n">pws</span><span class="o">=</span><span class="n">pws</span><span class="p">)</span>
+    <span class="n">tr2</span> <span class="o">=</span> <span class="n">stack_all</span><span class="p">(</span><span class="n">str2</span><span class="p">,</span> <span class="n">pws</span><span class="o">=</span><span class="n">pws</span><span class="p">)</span>
+
+    <span class="c1"># Time axis</span>
+    <span class="n">time</span> <span class="o">=</span> <span class="n">str1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">taxis</span>
+
+    <span class="c1"># Initialize figure</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="o">**</span><span class="n">figure_kwargs</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+
+    <span class="c1"># Get more control on subplots</span>
+    <span class="n">ax1</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.825</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">])</span>
+    <span class="n">ax2</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">])</span>
+    <span class="n">ax3</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">0.45</span><span class="p">,</span> <span class="mf">0.825</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">])</span>
+    <span class="n">ax4</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">0.45</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">])</span>
+
+    <span class="c1"># Plot stack of all traces from str1 on top left</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="n">tr1</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="n">tr1</span><span class="o">.</span><span class="n">data</span><span class="o">+</span><span class="mf">1e-6</span> <span class="o">&lt;=</span> <span class="mf">0.</span><span class="p">,</span>
+                     <span class="n">facecolor</span><span class="o">=</span><span class="n">ncolor</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">interpolate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="n">tr1</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="n">tr1</span><span class="o">.</span><span class="n">data</span><span class="o">+</span><span class="mf">1e-6</span> <span class="o">&gt;=</span> <span class="mf">0.</span><span class="p">,</span>
+                     <span class="n">facecolor</span><span class="o">=</span><span class="n">pcolor</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">interpolate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">tr1</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">plot_kwargs</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">tr1</span><span class="o">.</span><span class="n">data</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">tr1</span><span class="o">.</span><span class="n">data</span><span class="p">)))</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(())</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(())</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Radial&#39;</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">tmin</span><span class="p">,</span> <span class="n">tmax</span><span class="p">)</span>
+
+    <span class="c1"># Plot stack of all SH traces on top right</span>
+    <span class="n">ax3</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="n">tr2</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="n">tr2</span><span class="o">.</span><span class="n">data</span><span class="o">+</span><span class="mf">1e-6</span> <span class="o">&lt;=</span> <span class="mf">0.</span><span class="p">,</span>
+                     <span class="n">facecolor</span><span class="o">=</span><span class="n">ncolor</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">interpolate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">ax3</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="n">tr2</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="n">tr2</span><span class="o">.</span><span class="n">data</span><span class="o">+</span><span class="mf">1e-6</span> <span class="o">&gt;=</span> <span class="mf">0.</span><span class="p">,</span>
+                     <span class="n">facecolor</span><span class="o">=</span><span class="n">pcolor</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">interpolate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">ax3</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">tr2</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">plot_kwargs</span><span class="p">)</span>
+    <span class="n">ax3</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">tmin</span><span class="p">,</span> <span class="n">tmax</span><span class="p">)</span>
+    <span class="n">ax3</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">tr1</span><span class="o">.</span><span class="n">data</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">tr1</span><span class="o">.</span><span class="n">data</span><span class="p">)))</span>
+    <span class="n">ax3</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(())</span>
+    <span class="n">ax3</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(())</span>
+    <span class="n">ax3</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Transverse&#39;</span><span class="p">)</span>
+
+    <span class="n">axes</span> <span class="o">=</span> <span class="p">[</span><span class="n">ax2</span><span class="p">,</span> <span class="n">ax4</span><span class="p">]</span>
+    <span class="n">streams</span> <span class="o">=</span> <span class="p">[</span><span class="n">str1</span><span class="p">,</span> <span class="n">str2</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="n">st</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">streams</span><span class="p">):</span>
+
+        <span class="c1"># Plot sorted traces from str1 on bottom left panel</span>
+        <span class="k">for</span> <span class="n">tr</span> <span class="ow">in</span> <span class="n">st</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="n">scale</span><span class="p">:</span>
+                <span class="n">maxval</span> <span class="o">=</span> <span class="n">scale</span>
+                <span class="c1"># Define y axis</span>
+                <span class="k">if</span> <span class="n">btyp</span> <span class="o">==</span> <span class="s1">&#39;baz&#39;</span><span class="p">:</span>
+                    <span class="n">y</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">baz</span>
+                <span class="k">elif</span> <span class="n">btyp</span> <span class="o">==</span> <span class="s1">&#39;slow&#39;</span><span class="p">:</span>
+                    <span class="n">y</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">slow</span>
+                <span class="k">elif</span> <span class="n">btyp</span> <span class="o">==</span> <span class="s1">&#39;dist&#39;</span><span class="p">:</span>
+                    <span class="n">y</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">slow</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Define y axis</span>
+                <span class="k">if</span> <span class="n">btyp</span> <span class="o">==</span> <span class="s1">&#39;baz&#39;</span><span class="p">:</span>
+                    <span class="n">y</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">baz</span>
+                    <span class="n">maxval</span> <span class="o">=</span> <span class="mi">180</span>
+                <span class="k">elif</span> <span class="n">btyp</span> <span class="o">==</span> <span class="s1">&#39;slow&#39;</span><span class="p">:</span>
+                    <span class="n">y</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">slow</span>
+                    <span class="n">maxval</span> <span class="o">=</span> <span class="mf">0.02</span>
+                <span class="k">elif</span> <span class="n">btyp</span> <span class="o">==</span> <span class="s1">&#39;dist&#39;</span><span class="p">:</span>
+                    <span class="n">y</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">slow</span>
+                    <span class="n">maxval</span> <span class="o">=</span> <span class="mi">20</span>
+
+            <span class="c1"># Fill positive in red, negative in blue</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span>
+                <span class="n">time</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">y</span><span class="o">+</span><span class="n">tr</span><span class="o">.</span><span class="n">data</span><span class="o">*</span><span class="n">maxval</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="n">tr</span><span class="o">.</span><span class="n">data</span><span class="o">+</span><span class="mf">1e-6</span> <span class="o">&lt;=</span> <span class="mf">0.</span><span class="p">,</span>
+                <span class="n">facecolor</span><span class="o">=</span><span class="n">ncolor</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">interpolate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span>
+                <span class="n">time</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">y</span><span class="o">+</span><span class="n">tr</span><span class="o">.</span><span class="n">data</span><span class="o">*</span><span class="n">maxval</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="n">tr</span><span class="o">.</span><span class="n">data</span><span class="o">+</span><span class="mf">1e-6</span> <span class="o">&gt;=</span> <span class="mf">0.</span><span class="p">,</span>
+                <span class="n">facecolor</span><span class="o">=</span><span class="n">pcolor</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">interpolate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">y</span><span class="o">+</span><span class="n">tr</span><span class="o">.</span><span class="n">data</span><span class="o">*</span><span class="n">maxval</span><span class="p">,</span> <span class="o">**</span><span class="n">plot_kwargs</span><span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">tmin</span><span class="p">,</span> <span class="n">tmax</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">btyp</span> <span class="o">==</span> <span class="s1">&#39;baz&#39;</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">370</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Back-azimuth (degree)&#39;</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">btyp</span> <span class="o">==</span> <span class="s1">&#39;slow&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">wvtype</span> <span class="o">==</span> <span class="s1">&#39;P&#39;</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mf">0.038</span><span class="p">,</span> <span class="mf">0.082</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">wvtype</span> <span class="o">==</span> <span class="s1">&#39;S&#39;</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mf">0.07</span><span class="p">,</span> <span class="mf">0.125</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">wvtype</span> <span class="o">==</span> <span class="s1">&#39;SKS&#39;</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mf">0.03</span><span class="p">,</span> <span class="mf">0.06</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Slowness (s/km)&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">btyp</span> <span class="o">==</span> <span class="s1">&#39;dist&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">wvtype</span> <span class="o">==</span> <span class="s1">&#39;P&#39;</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mf">28.</span><span class="p">,</span> <span class="mf">92.</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">wvtype</span> <span class="o">==</span> <span class="s1">&#39;S&#39;</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mf">53.</span><span class="p">,</span> <span class="mf">107.</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">wvtype</span> <span class="o">==</span> <span class="s1">&#39;SKS&#39;</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mf">83.</span><span class="p">,</span> <span class="mf">117.</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Distance (degree)&#39;</span><span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time (seconds)&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">ls</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Remove labels on axis 4</span>
+    <span class="n">ax4</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">ax4</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(())</span>
+
+    <span class="k">if</span> <span class="n">save</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">ftitle</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="o">+</span><span class="n">fmt</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">fmt</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">fig</span></div>
+
+
+<div class="viewcode-block" id="stream_wiggles"><a class="viewcode-back" href="../../api.html#pyraysum.plot.stream_wiggles">[docs]</a><span class="k">def</span> <span class="nf">stream_wiggles</span><span class="p">(</span><span class="n">streamlist</span><span class="p">,</span> <span class="n">btyp</span><span class="o">=</span><span class="s1">&#39;baz&#39;</span><span class="p">,</span> <span class="n">wvtype</span><span class="o">=</span><span class="s1">&#39;P&#39;</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=-</span><span class="mf">5.</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="mf">20.</span><span class="p">,</span>
+                   <span class="n">scale</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pcolor</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">ncolor</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ftitle</span><span class="o">=</span><span class="s1">&#39;Figure_pw_wiggles&#39;</span><span class="p">,</span>
+                   <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;png&#39;</span><span class="p">,</span> <span class="n">plot_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;linewidth&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="s1">&#39;black&#39;</span><span class="p">},</span>
+                   <span class="n">figure_kwargs</span><span class="o">=</span><span class="p">{}):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plot displacement seismograms sorted by back-azimuth or slowness.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        streamlist (list or prs.Seismogram):</span>
+<span class="sd">            list of `obspy.core.Stream &lt;https://tinyurl.com/3u8dv8s8&gt;`_ objects </span>
+<span class="sd">            containing displacement seismograms</span>
+<span class="sd">        btyp (str):</span>
+<span class="sd">            Type of sorting for panel</span>
+<span class="sd">        wvtype (str):</span>
+<span class="sd">            Wave type (&#39;P&#39;, &#39;SV&#39;, or &#39;SH&#39;)</span>
+<span class="sd">        tmin (float):</span>
+<span class="sd">            Lower bound of time axis (s)</span>
+<span class="sd">        tmax (float):</span>
+<span class="sd">            Upper bound of time axis (s)</span>
+<span class="sd">        scale (float):</span>
+<span class="sd">            Scaling factor</span>
+<span class="sd">        pcolor (str):</span>
+<span class="sd">            Color to fill positive wiggles</span>
+<span class="sd">        ncolor (str):</span>
+<span class="sd">            Color to fill negative wiggles</span>
+<span class="sd">        save (bool):</span>
+<span class="sd">            Whether or not to save the figure</span>
+<span class="sd">        ftitle (str):</span>
+<span class="sd">            Filename of figure to be saved (without format suffix, see fmt)</span>
+<span class="sd">        fmt (str):</span>
+<span class="sd">            Output format (&#39;png&#39;, &#39;jpg&#39;, or &#39;eps&#39;, etc.)</span>
+<span class="sd">        plot_kwargs (dict):</span>
+<span class="sd">            Keyword arguments passed to </span>
+<span class="sd">            `matplotlib.pyplot.plot() &lt;https://tinyurl.com/2p9xy7hs&gt;`_</span>
+<span class="sd">        figure (dict):</span>
+<span class="sd">            Keyword arguments passed to </span>
+<span class="sd">            `matplotlib.pyplot.figure() &lt;https://tinyurl.com/yc3w956b&gt;`_</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        :class:`matplotlib.pyplot.figure` :</span>
+<span class="sd">            Figure handle</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">btyp</span> <span class="o">==</span> <span class="s1">&#39;baz&#39;</span> <span class="ow">or</span> <span class="n">btyp</span> <span class="o">==</span> <span class="s1">&#39;slow&#39;</span> <span class="ow">or</span> <span class="n">btyp</span> <span class="o">==</span> <span class="s1">&#39;dist&#39;</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;type has to be &quot;baz&quot; or &quot;slow&quot; or &quot;dist&quot;&#39;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="c1"># Re-order streams in list</span>
+    <span class="n">str1</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">(</span><span class="n">traces</span><span class="o">=</span><span class="p">[</span><span class="n">st</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">st</span> <span class="ow">in</span> <span class="n">streamlist</span><span class="o">.</span><span class="n">streams</span><span class="p">])</span>
+    <span class="n">str2</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">(</span><span class="n">traces</span><span class="o">=</span><span class="p">[</span><span class="n">st</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">st</span> <span class="ow">in</span> <span class="n">streamlist</span><span class="o">.</span><span class="n">streams</span><span class="p">])</span>
+    <span class="n">str3</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">(</span><span class="n">traces</span><span class="o">=</span><span class="p">[</span><span class="n">st</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">st</span> <span class="ow">in</span> <span class="n">streamlist</span><span class="o">.</span><span class="n">streams</span><span class="p">])</span>
+
+    <span class="c1"># Time axis</span>
+    <span class="n">time</span> <span class="o">=</span> <span class="n">str1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">taxis</span>
+
+    <span class="c1"># Initialize figure</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="o">**</span><span class="n">figure_kwargs</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+
+    <span class="c1"># Get more control on subplots</span>
+    <span class="n">ax1</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.83</span><span class="p">])</span>
+    <span class="n">ax2</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.83</span><span class="p">])</span>
+    <span class="n">ax3</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.83</span><span class="p">])</span>
+
+    <span class="n">axes</span> <span class="o">=</span> <span class="p">[</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">,</span> <span class="n">ax3</span><span class="p">]</span>
+    <span class="n">streams</span> <span class="o">=</span> <span class="p">[</span><span class="n">str1</span><span class="p">,</span> <span class="n">str2</span><span class="p">,</span> <span class="n">str3</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="n">st</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">streams</span><span class="p">):</span>
+
+        <span class="k">for</span> <span class="n">tr</span> <span class="ow">in</span> <span class="n">st</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">scale</span><span class="p">:</span>
+                <span class="n">maxval</span> <span class="o">=</span> <span class="n">scale</span>
+                <span class="c1"># Define y axis</span>
+                <span class="k">if</span> <span class="n">btyp</span> <span class="o">==</span> <span class="s1">&#39;baz&#39;</span><span class="p">:</span>
+                    <span class="n">y</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">baz</span>
+                <span class="k">elif</span> <span class="n">btyp</span> <span class="o">==</span> <span class="s1">&#39;slow&#39;</span><span class="p">:</span>
+                    <span class="n">y</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">slow</span>
+                <span class="k">elif</span> <span class="n">btyp</span> <span class="o">==</span> <span class="s1">&#39;dist&#39;</span><span class="p">:</span>
+                    <span class="n">y</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">slow</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Define y axis</span>
+                <span class="k">if</span> <span class="n">btyp</span> <span class="o">==</span> <span class="s1">&#39;baz&#39;</span><span class="p">:</span>
+                    <span class="n">y</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">baz</span>
+                    <span class="n">maxval</span> <span class="o">=</span> <span class="mi">100</span>
+                <span class="k">elif</span> <span class="n">btyp</span> <span class="o">==</span> <span class="s1">&#39;slow&#39;</span><span class="p">:</span>
+                    <span class="n">y</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">slow</span>
+                    <span class="n">maxval</span> <span class="o">=</span> <span class="mf">0.02</span>
+                <span class="k">elif</span> <span class="n">btyp</span> <span class="o">==</span> <span class="s1">&#39;dist&#39;</span><span class="p">:</span>
+                    <span class="n">y</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">slow</span>
+                    <span class="n">maxval</span> <span class="o">=</span> <span class="mi">20</span>
+
+            <span class="c1"># Fill positive in red, negative in blue</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span>
+                <span class="n">time</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">y</span><span class="o">+</span><span class="n">tr</span><span class="o">.</span><span class="n">data</span><span class="o">*</span><span class="n">maxval</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="n">tr</span><span class="o">.</span><span class="n">data</span><span class="o">+</span><span class="mf">1e-6</span> <span class="o">&lt;=</span> <span class="mf">0.</span><span class="p">,</span>
+                <span class="n">facecolor</span><span class="o">=</span><span class="n">ncolor</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">interpolate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span>
+                <span class="n">time</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">y</span><span class="o">+</span><span class="n">tr</span><span class="o">.</span><span class="n">data</span><span class="o">*</span><span class="n">maxval</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="n">tr</span><span class="o">.</span><span class="n">data</span><span class="o">+</span><span class="mf">1e-6</span> <span class="o">&gt;=</span> <span class="mf">0.</span><span class="p">,</span>
+                <span class="n">facecolor</span><span class="o">=</span><span class="n">pcolor</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">interpolate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">y</span><span class="o">+</span><span class="n">tr</span><span class="o">.</span><span class="n">data</span><span class="o">*</span><span class="n">maxval</span><span class="p">,</span> <span class="o">**</span><span class="n">plot_kwargs</span><span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">tmin</span><span class="p">,</span> <span class="n">tmax</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">btyp</span> <span class="o">==</span> <span class="s1">&#39;baz&#39;</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">370</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Back-azimuth (degree)&#39;</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">btyp</span> <span class="o">==</span> <span class="s1">&#39;slow&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">wvtype</span> <span class="o">==</span> <span class="s1">&#39;P&#39;</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mf">0.038</span><span class="p">,</span> <span class="mf">0.082</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">wvtype</span> <span class="o">==</span> <span class="s1">&#39;S&#39;</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mf">0.07</span><span class="p">,</span> <span class="mf">0.125</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">wvtype</span> <span class="o">==</span> <span class="s1">&#39;SKS&#39;</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mf">0.03</span><span class="p">,</span> <span class="mf">0.06</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Slowness (s/km)&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">btyp</span> <span class="o">==</span> <span class="s1">&#39;dist&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">wvtype</span> <span class="o">==</span> <span class="s1">&#39;P&#39;</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mf">28.</span><span class="p">,</span> <span class="mf">92.</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">wvtype</span> <span class="o">==</span> <span class="s1">&#39;S&#39;</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mf">53.</span><span class="p">,</span> <span class="mf">107.</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">wvtype</span> <span class="o">==</span> <span class="s1">&#39;SKS&#39;</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mf">83.</span><span class="p">,</span> <span class="mf">117.</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Distance (degree)&#39;</span><span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time (seconds)&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">st</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">channel</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">ls</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Remove labels on axes 2 and 3</span>
+    <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">ax3</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">ax2</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(())</span>
+    <span class="n">ax3</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(())</span>
+
+    <span class="k">if</span> <span class="n">save</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">ftitle</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="o">+</span><span class="n">fmt</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">fmt</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">fig</span></div>
+
+
+<div class="viewcode-block" id="seis_wiggles"><a class="viewcode-back" href="../../api.html#pyraysum.plot.seis_wiggles">[docs]</a><span class="k">def</span> <span class="nf">seis_wiggles</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=-</span><span class="mf">5.</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="mf">20.</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">ftitle</span><span class="o">=</span><span class="s1">&#39;Figure_pw_wiggles_3c&#39;</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;png&#39;</span><span class="p">,</span> <span class="n">figure_kwargs</span><span class="o">=</span><span class="p">{}):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plots 3-component wiggles.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        stream (`obspy.core.Stream &lt;https://tinyurl.com/3u8dv8s8&gt;`_):</span>
+<span class="sd">            Stream containing 3 traces</span>
+<span class="sd">        tmin (float):</span>
+<span class="sd">            Lower bound of time axis (s)</span>
+<span class="sd">        tmax (float, optional):</span>
+<span class="sd">            Upper bound of time axis (s)</span>
+<span class="sd">        save (bool):</span>
+<span class="sd">            Whether or not to save the figure</span>
+<span class="sd">        ftitle (str):</span>
+<span class="sd">            Filename of figure to be saved (without format suffix, see fmt)</span>
+<span class="sd">        fmt (str):</span>
+<span class="sd">            Output format (&#39;png&#39;, &#39;jpg&#39;, or &#39;eps&#39;, etc.)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        :class:`matplotlib.pyplot.figure` :</span>
+<span class="sd">            Figure handle</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">nt</span> <span class="o">=</span> <span class="n">stream</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">npts</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="n">stream</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">delta</span>
+
+    <span class="c1"># Clear figure</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="o">**</span><span class="n">figure_kwargs</span><span class="p">)</span>
+
+    <span class="c1"># Time axis</span>
+    <span class="n">time</span> <span class="o">=</span> <span class="n">stream</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">taxis</span>
+
+    <span class="n">max1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">stream</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">))</span>
+    <span class="n">max2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">stream</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">))</span>
+    <span class="n">max3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">stream</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">))</span>
+
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">313</span><span class="p">)</span>
+    <span class="n">maxv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">max1</span><span class="p">,</span> <span class="n">max2</span><span class="p">,</span> <span class="n">max3</span><span class="p">]))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">stream</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">/</span><span class="n">maxv</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Vertical component&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.75</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">tmin</span><span class="p">,</span> <span class="n">tmax</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mf">1.1</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time following $P$-wave arrival (seconds)&#39;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">312</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">stream</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">/</span><span class="n">maxv</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="s1">&#39;North component&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.75</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">tmin</span><span class="p">,</span> <span class="n">tmax</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mf">1.1</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(())</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">311</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">stream</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">/</span><span class="n">maxv</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;East component&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.75</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">tmin</span><span class="p">,</span> <span class="n">tmax</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mf">1.1</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(())</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">save</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">ftitle</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="o">+</span><span class="n">fmt</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">fmt</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">fig</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, Pascal Audet.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Example 3: Invert a Receiver Function &mdash; pyraysum 0.2.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="prev" title="Example 2: Reproducing Receiver Functions for Dipping and Anisotropic Subsurface Structure" href="../2/2_reproduce_Porter-2011.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> pyraysum
+            <img src="../../_static/PyRaysum_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Quick Links</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../links.html">GitHub Repository</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../links.html#references">References</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../init.html">Licence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../init.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../init.html#usage">Usage</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html#modules">Modules</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../1/1_make_seismograms.html">Example 1: Compare PyRaysum with other synthetic and real data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../2/2_reproduce_Porter-2011.html">Example 2: Reproducing Receiver Functions for Dipping and Anisotropic Subsurface Structure</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Example 3: Invert a Receiver Function</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#definition-of-the-forward-computation">Definition of the Forward Computation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#definition-of-the-misfit-function">Definition of the Misfit Function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plotting-function-for-data-vs-model-prediction">Plotting Function for Data vs. Model Prediction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inversion-workflow">Inversion Workflow</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#recording-geometry">Recording Geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#loading-a-receiver-function">Loading a Receiver Function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#setup-of-starting-model-and-run-control-parameters">Setup of Starting Model and Run Control Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#definition-of-a-custom-phaselist">Definition of a Custom Phaselist</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#faster-array-based-postprocessing">Faster Array-Based Postprocessing</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#a-first-look-at-the-observed-and-predicted-data-vectors">A First Look at the Observed and Predicted Data Vectors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inverse-modeling-with-scipys-optimize-module">Inverse Modeling with Scipy’s Optimize Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#results">Results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#conclusion">Conclusion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Jupyter Notebooks</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://nbviewer.jupyter.org/github/paudetseis/PyRaysum/blob/main/pyraysum/examples/notebooks/1_make_seismograms.ipynb">Example 1: Compare PyRaysum with other synthetic and real data</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://nbviewer.jupyter.org/github/paudetseis/PyRaysum/blob/main/pyraysum/examples/notebooks/2_reproduce_Porter-2011.ipynb">Example 2: Reproducing Figure 2 in Porter et al. (2011)</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://nbviewer.jupyter.org/github/paudetseis/PyRaysum/blob/main/pyraysum/examples/notebooks/3_invert_rf.ipynb">Example 3: Invert a receiver function</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pyraysum</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Example 3: Invert a Receiver Function</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/tutorials/3/3_invert_rf.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="example-3-invert-a-receiver-function">
+<h1>Example 3: Invert a Receiver Function<a class="headerlink" href="#example-3-invert-a-receiver-function" title="Permalink to this heading"></a></h1>
+<p>In this example we are going to load receiver functions that have been
+created from seismograms recorded at station Hyderabad, India, from 3
+earthquakes that occurred in the Philippines. The source station
+configuration is identical to the one in example 1. We are going to use
+<code class="docutils literal notranslate"><span class="pre">pyraysum</span></code> to generate receiver function, as in example 2. This
+example explores the provisions of <code class="docutils literal notranslate"><span class="pre">pyraysum</span></code> for time optimized
+execution. We are going to directly invoke the Fortran routine
+<code class="docutils literal notranslate"><span class="pre">run_bare()</span></code> from the <code class="docutils literal notranslate"><span class="pre">fraysum</span></code> module with <code class="docutils literal notranslate"><span class="pre">python</span></code> convenience
+functions from the <code class="docutils literal notranslate"><span class="pre">prs</span></code> module. The inversion will be carried out by
+the <code class="docutils literal notranslate"><span class="pre">dual_annealing()</span></code> function from <code class="docutils literal notranslate"><span class="pre">scipy.optimize</span></code>. The filtering
+and spectral division that is required to create receiver functions from
+the synthetic seismograms is carried out using <code class="docutils literal notranslate"><span class="pre">numpy</span></code> array methods.
+finally, we will plot the results with <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code>.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from pyraysum import prs
+from fraysum import run_bare
+import numpy as np
+import scipy.optimize as spo
+import matplotlib.pyplot as mp
+</pre></div>
+</div>
+<section id="definition-of-the-forward-computation">
+<h2>Definition of the Forward Computation<a class="headerlink" href="#definition-of-the-forward-computation" title="Permalink to this heading"></a></h2>
+<p>We predict waveforms inside a function <code class="docutils literal notranslate"><span class="pre">predictRF()</span></code> that accepts
+<code class="docutils literal notranslate"><span class="pre">Model</span></code>, <code class="docutils literal notranslate"><span class="pre">Geometry</span></code>, and <code class="docutils literal notranslate"><span class="pre">RC</span></code> objects, which completely define the
+synthetic seismograms to be computed. Only the <code class="docutils literal notranslate"><span class="pre">fthickn</span></code> and <code class="docutils literal notranslate"><span class="pre">fvs</span></code>
+attributes of the <code class="docutils literal notranslate"><span class="pre">Model</span></code> will be varied when trying different
+parameter combinations. The post-processing is determined by the
+bandpass filter corner frequencies <code class="docutils literal notranslate"><span class="pre">freqs</span></code> and the boolean time window
+mask <code class="docutils literal notranslate"><span class="pre">ist</span></code> (“is time”). Post processing is performed on the
+<code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> variable <code class="docutils literal notranslate"><span class="pre">rfarray</span></code>. Two post-processing functions
+are provided. <code class="docutils literal notranslate"><span class="pre">filtered_rf_array</span></code> divides the SV- and SH-spectra by
+the P-spectra (i.e., computes a receiver function) and filters the data,
+whereas <code class="docutils literal notranslate"><span class="pre">filtered_array</span></code> returns the filtered SV and SH data.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def predictRF(model, geometry, rc, freqs, rfarray, ist, rf=True):
+
+    # Compute synthetic seismograms
+    traces = run_bare(
+        model.fthickn,
+        model.frho,
+        model.fvp,
+        model.fvs,
+        model.fflag,
+        model.fani,
+        model.ftrend,
+        model.fplunge,
+        model.fstrike,
+        model.fdip,
+        model.nlay,
+        *geometry.parameters,
+        *rc.parameters
+    )
+
+    if rf:
+        # Perfrom spectral division and filtering
+        prs.filtered_rf_array(
+            traces, rfarray, geometry.ntr, rc.npts, rc.dt, freqs[0], freqs[1]
+        )
+    else:
+        # Perfrom filtering only
+        prs.filtered_array(
+            traces, rfarray, geometry.ntr, rc.npts, rc.dt, freqs[0], freqs[1]
+        )
+
+    # Window traces and flatten array
+    # This creates alternating radial and transverse RFs for all traces:
+    # R[0] - T[0] - R[1] - T[1] ...
+    prediction = rfarray[:, :, ist].reshape(-1)
+
+    return prediction
+</pre></div>
+</div>
+</section>
+<section id="definition-of-the-misfit-function">
+<h2>Definition of the Misfit Function<a class="headerlink" href="#definition-of-the-misfit-function" title="Permalink to this heading"></a></h2>
+<p>Here, we define the misfit function that <code class="docutils literal notranslate"><span class="pre">dual_annealing</span></code> will
+minimize. The misfit function requires a model vector <code class="docutils literal notranslate"><span class="pre">theta</span></code> as first
+argument. We define the first element of the model vector to be the
+crustal thickness and the second one the P-to-S-wave velocity ratio.
+<span class="math notranslate nohighlight">\(V_P/V_S\)</span> gets projected to the S-wave velocity assuming a
+constant P-wave velocity. After that, we define the misfit <code class="docutils literal notranslate"><span class="pre">cost</span></code>
+between the predicted and observed receiver functions (<code class="docutils literal notranslate"><span class="pre">pred</span></code> and
+<code class="docutils literal notranslate"><span class="pre">obs</span></code>, respectively) as 1. minus the cross correlation coefficient. A
+status message is printed so the user can follow the inversion process.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def misfit(theta, model, geometry, rc, freqs, rfarray, ist, obs):
+
+    # Set parameters to model object
+    model.fthickn[0] = theta[0]
+    model.fvs[0] = model.fvp[0] / theta[1]
+
+    # predict receiver functions
+    pred = predictRF(model, geometry, rc, freqs, rfarray, ist)
+
+    # Calculate cross correlation cost function
+    cost = 1.0 - np.corrcoef(obs, pred)[0][1]
+
+    msg = &quot;h ={: 5.0f}, vpvs ={: 5.3f}, cc ={: 5.3f}&quot;.format(
+        theta[0], theta[1], 1. - cost
+    )
+
+    print(msg)
+
+    return cost
+</pre></div>
+</div>
+</section>
+<section id="plotting-function-for-data-vs-model-prediction">
+<h2>Plotting Function for Data vs. Model Prediction<a class="headerlink" href="#plotting-function-for-data-vs-model-prediction" title="Permalink to this heading"></a></h2>
+<p>This plot function allows us to compare the observed and predicted data
+vectors:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def plot(obs, pred):
+    fig, ax = mp.subplots(nrows=1, ncols=1)
+    fig.suptitle(&quot;Observed and modeled data vector&quot;)
+
+    imid = len(obs)//2
+    cc = np.corrcoef(obs, pred)[0][1]
+    title = &quot;cc = {:.3f}&quot;.format(cc)
+
+    ax.plot(obs, color=&quot;dimgray&quot;, linewidth=2, label=&quot;observed&quot;)
+    ax.plot(pred, color=&quot;crimson&quot;, linewidth=1, label=&quot;modeled&quot;)
+    ax.text(imid, min(pred), &#39;Radial &#39;, ha=&#39;right&#39;)
+    ax.text(imid, min(pred), &#39; Transverse&#39;, ha=&#39;left&#39;)
+    ax.axvline(imid, ls=&#39;:&#39;)
+    ax.legend(title=title)
+    ax.spines[[&quot;top&quot;, &quot;left&quot;, &quot;right&quot;]].set_visible(False)
+    ax.set_yticks([])
+    ax.set_xlabel(&quot;Sample&quot;)
+</pre></div>
+</div>
+</section>
+<section id="inversion-workflow">
+<h2>Inversion Workflow<a class="headerlink" href="#inversion-workflow" title="Permalink to this heading"></a></h2>
+<section id="recording-geometry">
+<h3>Recording Geometry<a class="headerlink" href="#recording-geometry" title="Permalink to this heading"></a></h3>
+<p>Now it is time to run the workflow. We define the back-azimuth and
+slowness of seismic rays arriving at Hyderabad from the Philippines. The
+time window should span the interval between 0 and 25 seconds after the
+arrival of the direct P-wave. Data should be bandpassed filtered between
+periods of 20 and 2 seconds.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>if __name__ == &quot;__main__&quot;:
+    baz = 90
+    slow = 0.06
+
+    twind = (0, 25)  # seconds time window
+    freqs = (1 / 20, 1 / 2)  # Hz bandpass filter
+</pre></div>
+</div>
+</section>
+<section id="loading-a-receiver-function">
+<h3>Loading a Receiver Function<a class="headerlink" href="#loading-a-receiver-function" title="Permalink to this heading"></a></h3>
+<p>We load the radial and transverse receiver functions from file. The
+receiver function has been created from 3 high-quality earthquake
+recordings from the Philippines. Note that <code class="docutils literal notranslate"><span class="pre">rfr</span></code> and <code class="docutils literal notranslate"><span class="pre">rft</span></code> here need
+to be structured such that the arrival of the direct P-wave is located
+in the middle of the array. In other words, the acausal part (earlier
+than direct P) must be as long as the causal part (later than direct P).
+In this way, the definition of the time window mask <code class="docutils literal notranslate"><span class="pre">ist</span></code> is such that
+it can be reused for post-processing of the synthetic receiver
+functions. The windowed receiver function are concatenated to yield the
+data vector.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Load saved stream
+time, rfr, rft = np.loadtxt(&quot;../data/rf_hyb.dat&quot;, unpack=True)
+ist = (time &gt; twind[0]) &amp; (time &lt; twind[1])
+
+observed = np.concatenate((rfr[ist], rft[ist]))
+</pre></div>
+</div>
+</section>
+<section id="setup-of-starting-model-and-run-control-parameters">
+<h3>Setup of Starting Model and Run Control Parameters<a class="headerlink" href="#setup-of-starting-model-and-run-control-parameters" title="Permalink to this heading"></a></h3>
+<p>We set up the starting subsurface velocity model using Saul et
+al. (2000), as well as the recording geometry.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>thickn = [30000, 0]
+rho = [2800, 3600]
+vp = [6400, 8100]
+vs = [3600, 4600]
+
+model = prs.Model(thickn, rho, vp, vs)
+geometry = prs.Geometry([baz], [slow])
+</pre></div>
+</div>
+<p>We choose the RC parameters so that they match the processing of the
+receiver functions. In the present case, the receiver functions are
+rotated to the P-SV-SH ray coordinate system (<code class="docutils literal notranslate"><span class="pre">rot=2</span></code>), and the
+sampling interval (<code class="docutils literal notranslate"><span class="pre">dt</span></code>) and number of samples (<code class="docutils literal notranslate"><span class="pre">npts</span></code>) are set to
+match the input. The <code class="docutils literal notranslate"><span class="pre">align=1</span></code> option (together with <code class="docutils literal notranslate"><span class="pre">shift=None</span></code>,
+which is the default) ensures that the direct P wave is located at the
+first sample. <code class="docutils literal notranslate"><span class="pre">mults=3</span></code> is required to pre-set the list of phases to
+be computed. This is the recommended option for all time-sensitive
+applications, as <code class="docutils literal notranslate"><span class="pre">mults=2</span></code> computes many multiples, many of which
+might not be used at all.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>rc = prs.RC(
+    verbose=False,
+    rot=2,
+    dt=time[1] - time[0],
+    npts=len(rfr),
+    align=1,
+    mults=3,
+)
+</pre></div>
+</div>
+</section>
+<section id="definition-of-a-custom-phaselist">
+<h3>Definition of a Custom Phaselist<a class="headerlink" href="#definition-of-a-custom-phaselist" title="Permalink to this heading"></a></h3>
+<p>The phaselist is defined as a list of phase descriptors, which can be
+read from a previous forward calculation (e.g. example 1). Each ray
+segment is described by a number-letter pair, where the number is the
+layer index and the letter the phase descriptor, where uppercase
+indicates upgoing rays and lowercase downgoing rays. See the
+<code class="docutils literal notranslate"><span class="pre">rc.set_phaselist</span></code> documentation for details.</p>
+<p>This phaselist restricts the phases to be computed to:</p>
+<ol class="arabic simple" start="0">
+<li><p>direct P (<em>P</em>)</p></li>
+<li><p>P-to-S converted (<em>PS</em>)</p></li>
+<li><p>P reflected at the surface to downgoing S, reflected at Moho to S
+(<em>PpP</em>)</p></li>
+<li><p>P reflected at the surface to downgoing P, reflected at Moho to S
+(<em>PpS</em>)</p></li>
+<li><p>P reflected at the surface to downgoing S, reflected at Moho to P
+(<em>PsP</em>)</p></li>
+</ol>
+<p>You can try the effect of incorporating <em>PsS</em> by adding <code class="docutils literal notranslate"><span class="pre">&quot;1P0P0s0S&quot;</span></code>
+to the phaselist. The <code class="docutils literal notranslate"><span class="pre">equivalent=True</span></code> keyword implicitly adds such
+<em>equivalent</em> phases.</p>
+<blockquote>
+<div><p>Note: <em>PpS</em> and <em>PsP</em> phases arrive at the same time, but only phases
+that end in <em>S</em> are directly visible on the receiver function. Phases
+ending in <em>P</em> end up on the <em>P</em> polarized trace of the synthetic
+seismogram, where they become part of the denominator of spectral
+division when computing the receiver function.)</p>
+</div></blockquote>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>rc.set_phaselist([&quot;1P0P&quot;, &quot;1P0S&quot;, &quot;1P0P0p0P&quot;, &quot;1P0P0p0S&quot;, &quot;1P0P0s0P&quot;], equivalent=True)
+</pre></div>
+</div>
+</section>
+<section id="faster-array-based-postprocessing">
+<h3>Faster Array-Based Postprocessing<a class="headerlink" href="#faster-array-based-postprocessing" title="Permalink to this heading"></a></h3>
+<p>Swift post processing of the synthetic receiver function is done on the
+<code class="docutils literal notranslate"><span class="pre">rfarray</span></code> using numpy array methods, which is initialized here. It has
+shape <code class="docutils literal notranslate"><span class="pre">(geometry.ntr,</span> <span class="pre">2,</span> <span class="pre">rc.npts)</span></code>.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>rfarray = prs.rfarray(geometry, rc)
+</pre></div>
+</div>
+</section>
+</section>
+<section id="a-first-look-at-the-observed-and-predicted-data-vectors">
+<h2>A First Look at the Observed and Predicted Data Vectors<a class="headerlink" href="#a-first-look-at-the-observed-and-predicted-data-vectors" title="Permalink to this heading"></a></h2>
+<p>Let’s see how well the starting model predicts the data. See what
+changes if you set <code class="docutils literal notranslate"><span class="pre">rf=False</span></code>, in which case no spectral division is
+performed and the model prediction is the synthetic seismogram. This
+expedites the computation, but is less exact.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>predicted = predictRF(model, geometry, rc, freqs, rfarray, ist, rf=True)
+plot(observed, predicted)
+</pre></div>
+</div>
+<img alt="../../_images/output_21_01.png" src="../../_images/output_21_01.png" />
+<p>The first half of the data vector is the radial component and the second
+half is the transverse component of the receiver function. In this
+example, without dip or anisotropy, energy only gets converted to the
+radial, not the transverse component. The first positive wiggle is <em>PS</em>,
+the second one <em>PpS</em>. Note the slight mis-alignment between observation
+(gray) and prediction (red). The smaller wiggles that arrive later
+result from the deconvolution of <em>PpP</em>.</p>
+</section>
+<section id="inverse-modeling-with-scipys-optimize-module">
+<h2>Inverse Modeling with Scipy’s Optimize Module<a class="headerlink" href="#inverse-modeling-with-scipys-optimize-module" title="Permalink to this heading"></a></h2>
+<p>We now define the search bounds for dual annealing. This definition
+prescribes that the first element of the model vector is the <em>thickness
+of layer 0</em> and is searched in an interval of
+$:raw-latex:<cite>pm</cite><span class="math notranslate nohighlight">\(5000 m, and its second element is the *\)</span>V_P/V_S$
+ratio of layer 0*, searched in an interval of $:raw-latex:<a href="#id1"><span class="problematic" id="id2">`</span></a>pm`$0.1.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>bounds = [
+    (model.thickn[0] - 5000, model.thickn[0] + 5000),
+    (model.vpvs[0] - 0.1, model.vpvs[0] + 0.1),
+]
+</pre></div>
+</div>
+<p>Now we are ready to perform the inversion using <code class="docutils literal notranslate"><span class="pre">scipy</span></code>’s <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.dual_annealing.html">dual
+annealing</a>
+function. It seeks a minimum in the <code class="docutils literal notranslate"><span class="pre">misfit</span></code> function defined above.
+The call is in principle interchangeable with other <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/optimize.html#global-optimization">global search
+methods from the optimization
+module</a>.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>result = spo.dual_annealing(
+    misfit,
+    bounds,
+    args=(model, geometry, rc, freqs, rfarray, ist, observed),
+    maxiter=20,
+)
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">h</span> <span class="o">=</span> <span class="mi">27230</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.787</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=-</span><span class="mf">0.378</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">26412</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.719</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=-</span><span class="mf">0.072</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">33902</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.845</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.171</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">32013</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.845</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.585</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">32013</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.777</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.717</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">32013</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.777</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.717</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">32013</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.777</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.717</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">32013</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.777</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.717</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">27616</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.873</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=-</span><span class="mf">0.601</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">30877</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.817</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.695</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">34103</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.817</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.254</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">34103</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.867</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.048</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">32598</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.740</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.701</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">27766</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.716</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=-</span><span class="mf">0.167</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">31823</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.716</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.602</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">31823</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.679</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.445</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">32878</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.823</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.465</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">29106</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.730</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.071</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">32862</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.730</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.689</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">32862</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.737</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.694</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">26056</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.811</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=-</span><span class="mf">0.331</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">34397</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.719</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.507</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">31124</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.719</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.463</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">31124</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.800</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.696</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">27141</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.839</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=-</span><span class="mf">0.533</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">30405</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.739</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.362</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">33226</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.739</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.660</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">33226</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.740</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.647</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">28428</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.849</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.288</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">27428</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.822</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=-</span><span class="mf">0.494</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">26327</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.822</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=-</span><span class="mf">0.428</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">26327</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.877</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=-</span><span class="mf">0.595</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">27400</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.738</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=-</span><span class="mf">0.215</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">33523</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.850</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.225</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">27095</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.850</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=-</span><span class="mf">0.561</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">27095</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.870</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=-</span><span class="mf">0.594</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">28923</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.806</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.266</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">28537</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.782</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.137</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">31991</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.782</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.715</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">31991</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.735</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.670</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">26950</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.823</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=-</span><span class="mf">0.464</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">26075</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.868</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=-</span><span class="mf">0.555</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">27720</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.868</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=-</span><span class="mf">0.609</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">27720</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.813</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=-</span><span class="mf">0.521</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">31534</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.805</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.718</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">26975</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.860</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=-</span><span class="mf">0.582</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">28031</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.860</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=-</span><span class="mf">0.605</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">28031</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.684</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=-</span><span class="mf">0.069</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">31534</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.805</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.718</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">31534</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.805</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.718</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">31534</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.805</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.718</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">29798</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.691</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.043</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">25034</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.850</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=-</span><span class="mf">0.358</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">27721</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.850</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=-</span><span class="mf">0.586</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">27721</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.844</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=-</span><span class="mf">0.585</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">26925</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.685</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=-</span><span class="mf">0.005</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">32180</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.730</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.677</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">28527</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.730</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.052</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">28527</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.851</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.313</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">34647</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.768</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.340</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">32073</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.787</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.707</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">27404</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.787</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=-</span><span class="mf">0.378</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">27404</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.853</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=-</span><span class="mf">0.575</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">28120</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.750</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.062</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">30329</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.860</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.685</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">28710</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.860</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.382</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">28710</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.803</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.220</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">26101</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.729</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=-</span><span class="mf">0.078</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">27190</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.795</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=-</span><span class="mf">0.418</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">28120</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.795</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.133</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">28120</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.802</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.152</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">33588</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.815</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.342</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">32824</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.707</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.670</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">28498</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.707</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.003</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">28498</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.709</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.024</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">25576</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.801</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=-</span><span class="mf">0.239</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">31878</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.744</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.682</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">30201</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.744</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.336</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">30201</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.785</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.498</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">26411</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.725</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=-</span><span class="mf">0.072</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">31224</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.716</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.487</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">27578</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.716</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=-</span><span class="mf">0.124</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">27578</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.822</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=-</span><span class="mf">0.521</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">28709</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.790</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.192</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">27904</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.812</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=-</span><span class="mf">0.490</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">31033</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.790</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.682</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">31033</span><span class="p">,</span> <span class="n">vpvs</span> <span class="o">=</span> <span class="mf">1.858</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="mf">0.687</span>
+</pre></div>
+</div>
+</section>
+<section id="results">
+<h2>Results<a class="headerlink" href="#results" title="Permalink to this heading"></a></h2>
+<p>Let’s have a look at the result</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>print(result)
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="n">fun</span><span class="p">:</span> <span class="mf">0.28171931741915945</span>
+<span class="n">message</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Maximum number of iteration reached&#39;</span><span class="p">]</span>
+   <span class="n">nfev</span><span class="p">:</span> <span class="mi">87</span>
+   <span class="n">nhev</span><span class="p">:</span> <span class="mi">0</span>
+    <span class="n">nit</span><span class="p">:</span> <span class="mi">20</span>
+   <span class="n">njev</span><span class="p">:</span> <span class="mi">2</span>
+ <span class="n">status</span><span class="p">:</span> <span class="mi">0</span>
+<span class="n">success</span><span class="p">:</span> <span class="kc">True</span>
+      <span class="n">x</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span>  <span class="mf">3.15340451e+04</span><span class="p">,</span>   <span class="mf">1.80457150e+00</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>And assign it to the model</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>model.thickn[0] = result.x[0]
+model.vpvs[0] = result.x[1]
+model.update(change=&#39;vs&#39;)
+
+msg = &quot;Result found with dual annealing&quot;
+print(msg)
+print(model)
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Result</span> <span class="n">found</span> <span class="k">with</span> <span class="n">dual</span> <span class="n">annealing</span>
+<span class="c1"># thickn     rho      vp      vs  flag aniso   trend plunge strike   dip</span>
+ <span class="mf">31534.0</span>  <span class="mf">2800.0</span>  <span class="mf">6400.0</span>  <span class="mf">3546.5</span>    <span class="mi">1</span>    <span class="mf">0.0</span>     <span class="mf">0.0</span>    <span class="mf">0.0</span>    <span class="mf">0.0</span>   <span class="mf">0.0</span>
+     <span class="mf">0.0</span>  <span class="mf">3600.0</span>  <span class="mf">8100.0</span>  <span class="mf">4600.0</span>    <span class="mi">1</span>    <span class="mf">0.0</span>     <span class="mf">0.0</span>    <span class="mf">0.0</span>    <span class="mf">0.0</span>   <span class="mf">0.0</span>
+</pre></div>
+</div>
+<p>The optimal crustal thickness is closer to 32 km, as suggested by Saul
+et al. (2000), and the <span class="math notranslate nohighlight">\(V_P/V_S\)</span> ratio closer to 1.8. Note,
+however, that we only looked at one receiver function from one
+direction. We also did not make any attempt to estimate uncertainties on
+the solution.</p>
+<p>Finally, we can look at how well the optimized model predicts the data.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>predicted = predictRF(model, geometry, rc, freqs, rfarray, ist)
+plot(observed, predicted)
+</pre></div>
+</div>
+<img alt="../../_images/output_32_0.png" src="../../_images/output_32_0.png" />
+</section>
+<section id="conclusion">
+<h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this heading"></a></h2>
+<p>In this example we looked into some basic functions that can be helpful
+when using <em>PyRaysum</em> in parameter estimation problems. We defined a
+function <code class="docutils literal notranslate"><span class="pre">predictRF</span></code> to predict a receiver function from a given input
+model, as well as a <code class="docutils literal notranslate"><span class="pre">misfit</span></code> function whose scalar output should be
+minimized through inverse modeling. We then plugged these functions into
+<em>SciPy</em>’s <code class="docutils literal notranslate"><span class="pre">optimize</span></code> toolbox to estimate the thickness and <em>S</em>-wave
+velocity of the cratonic crust in Hyderabad, India.</p>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Saul, J., Kumar, M. R., &amp; Sarkar, D. (2000). Lithospheric and upper
+mantle structure of the Indian Shield, from teleseismic receiver
+functions. Geophysical Research Letters, 27(16), 2357-2360.
+<a class="reference external" href="https://doi.org/10.1029/1999GL011128">https://doi.org/10.1029/1999GL011128</a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../2/2_reproduce_Porter-2011.html" class="btn btn-neutral float-left" title="Example 2: Reproducing Receiver Functions for Dipping and Anisotropic Subsurface Structure" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, Pascal Audet.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
