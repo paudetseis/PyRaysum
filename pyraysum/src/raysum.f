@@ -320,8 +320,9 @@ c multiplier (mult)
           call rcmatvec3(Rt,evecin_list(1,seg),evecin_r)
           call evec_check(evec1,evecin_r,phase1,mult,errflag)
           if (errflag) then
-            write (*,*) 'evaltop:',evaltop
-            write (*,*) 'evalbot:',evalbot
+            bailout = .true.
+c           write (*,*) 'evaltop:',evaltop
+c           write (*,*) 'evalbot:',evalbot
           end if
           
 c Find new slowness vector. By Snell's law, interface-parallel
@@ -436,7 +437,8 @@ c    Eigenvectors, again:
         phase1=mod(phase(nseg,2)+2,6)+1
         call evec_check(evectop,evecin_list(1,nseg),phase1,mult,errflag)
         if (errflag) then
-          write (*,*) 'surface evals:',evaltop
+          bailout = .true.
+c         write (*,*) 'surface evals:',evaltop
         end if
 
 c  Get amplitude, from free-surface transfer, as follows:
@@ -575,11 +577,11 @@ c          write (*,*) 'evec_check: Sign mismatch'
         end if
 c       check if the evecs don't line up. This shouldn't happen.
         if (maxval .lt. 0.99) then
-          write (*,*) 'ERROR in evec_check, maxval: ',maxval,
-     &                ' (should be 1)'
-          write (*,*) 'evec_check -- comp_list is',comp_list
+          write (*,*) 'WARNING in evec_check, maxval: ',maxval,
+     &                ' (should be 1). Ignoring phase.'
+c         write (*,*) 'evec_check -- comp_list is',comp_list
           errflag=.true.
-          write (*,*) 'invec is',invec
+c         write (*,*) 'invec is',invec
         end if
         
       end

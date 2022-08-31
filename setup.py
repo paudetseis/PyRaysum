@@ -12,7 +12,7 @@ ext = Extension(name='fraysum',
                            'pyraysum/src/phaselist.f',
                            'pyraysum/src/raysum.f',
                            'pyraysum/src/readwrite.f',
-                           'pyraysum/src/call-seis-spread.f',
+                           'pyraysum/src/seis-spread.f',
                            'pyraysum/src/trace.f'],
                 extra_compile_args=['-O3'])
 
@@ -39,13 +39,14 @@ setup(
         'Programming Language :: Fortran',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8'],
-    install_requires=['numpy>=1.15', 'obspy>=1.0.0', 'matplotlib', 'pandas'],
+    install_requires=['numpy>=1.15', 'obspy>=1.0.0', 'matplotlib'],
     python_requires='>=3.7',
     ext_modules = [ext],
     packages=setuptools.find_packages(),
     include_package_data=True,
     package_data={
         'pyraysum': [
-            'examples/models/*.txt',
-            'examples/Notebooks/*.ipynb']},
+            'examples/data/*.txt',
+            'examples/data/*.dat',
+            'examples/notebooks/*.ipynb']},
 )

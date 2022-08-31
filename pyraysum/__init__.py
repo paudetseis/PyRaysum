@@ -20,6 +20,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-__version__ = '0.1.1'
+__version__ = '0.2.0'
 
-from .prs import Model, Geometry, StreamList
+from .prs import Model, Geometry, RC, Seismogram, run
