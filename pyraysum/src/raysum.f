@@ -341,7 +341,7 @@ c            Partition N: Nu=evecbot(4:6,4:6), Nd=evecbot(4:6,1:3)
 c Free-surface reflection matrix: MM=-Nd^(-1)*Nu
             call cmatinv3(Nd,wrk3)
             call cmatmul3(wrk3,Nu,MM)
-            call cmatconst3(MM,-1.)           
+            call cmatconst3(MM,(-1.,0.))           
           else
 c          Layer interaction
 c            scattering matrix QQ=evecbot^(-1)*evectop
@@ -362,7 +362,7 @@ c                Rd = -inv(Q(4:6,4:6))*Q(4:6,1:3)
                 call cextractblock(QQ,Nd,4,6,1,3,6,6)
                 call cmatinv3(Nu,wrk3)
                 call cmatmul3(wrk3,Nd,MM)
-                call cmatconst3(MM,-1.)
+                call cmatconst3(MM,(-1.,0.))
               end if
             else
               if (upflag) then
@@ -431,7 +431,7 @@ c    Eigenvectors, again:
           call isotroc(aa(1,1,1,1,1),rho(1),p(1,nseg),
      &           p(2,nseg),evaltop,evectop)
         else
-          call anisotroc(aa(1,1,1,1,2),rho(1),p(1,nseg),
+          call anisotroc(aa(1,1,1,1,1),rho(1),p(1,nseg),
      &           p(2,nseg),evaltop,evectop)
         end if
         phase1=mod(phase(nseg,2)+2,6)+1
