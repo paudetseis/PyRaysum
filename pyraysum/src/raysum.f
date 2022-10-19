@@ -320,7 +320,14 @@ c multiplier (mult)
           call rcmatvec3(Rt,evecin_list(1,seg),evecin_r)
           call evec_check(evec1,evecin_r,phase1,mult,errflag)
           if (errflag) then
+            amp(1)=0
+            amp(2)=0
+            amp(3)=0
+            tt=0
+            tt_list(seg+1)=0
+            amp_list(seg+1)=0
             bailout = .true.
+            return
 c           write (*,*) 'evaltop:',evaltop
 c           write (*,*) 'evalbot:',evalbot
           end if
@@ -437,7 +444,14 @@ c    Eigenvectors, again:
         phase1=mod(phase(nseg,2)+2,6)+1
         call evec_check(evectop,evecin_list(1,nseg),phase1,mult,errflag)
         if (errflag) then
+          amp(1)=0
+          amp(2)=0
+          amp(3)=0
+          tt=0
+          tt_list(seg+1)=0
+          amp_list(seg+1)=0
           bailout = .true.
+          return
 c         write (*,*) 'surface evals:',evaltop
         end if
 

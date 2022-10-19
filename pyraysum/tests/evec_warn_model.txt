@@ -1,0 +1,50 @@
+# Raysum velocity model created with PyRaysum
+# on: 2022-10-03 23:59:09
+# Search bounds computed from ./models/CN.LZB.m02a.txt
+# with mminc t0-12; vs0=3.50; psp0=1.67; t1=0.0; vs1=1.31; psp1=1.77; d1-10; s1-20; vs2=3.26; psp2=1.77; t3=0.0; vs3=2.38; psp3=1.71; pl3=0; tr3=0; a3=-30;
+
+# with mmaxc t0+12; vs0=3.96; psp0=1.86; t1=5.5; vs1=3.1; psp1=3.50; d1+10; s1+20; vs2=4.05; psp2=1.91; t3=15.0; vs3=4.90; psp3=2.18; pl3=30; tr3=360; a3=30;
+
+# with octhick [5500, 8000]
+# Parameters: 17
+# octhick[0]:   5500.00 -   8000.00
+# vs     [0]:   3500.00 -   3960.00
+# vs     [1]:   1310.00 -   3100.00
+# vs     [2]:   3260.00 -   4050.00
+# vs     [3]:   2380.00 -   4900.00
+# trend  [3]:      0.00 -    360.00
+# thickn [0]:  26665.20 -  50665.20
+# thickn [1]:      0.00 -   5500.00
+# thickn [3]:      0.00 -  15000.00
+# strike [1]:    294.90 -    334.90
+# psp    [0]:      1.67 -      1.86
+# psp    [1]:      1.77 -      3.50
+# psp    [2]:      1.77 -      1.91
+# psp    [3]:      1.71 -      2.18
+# plunge [3]:      0.00 -     30.00
+# dip    [1]:     -0.40 -     19.60
+# ani    [3]:    -30.00 -     30.00
+
+# The data conists of 102 traces, 1101 points each.
+# Traces: 102
+# ann_maxit: 1000
+# ann_twind: [0.5, 27]
+# ann_bandp: [0.05, 0.4]
+#
+# Simulated annealing started at
+# 2022-10-03 10:58:45
+# ...
+# 2022-10-03 23:59:09
+# finished in 13:00:25
+#
+# Time: 46825 seconds
+# Evaluations: 56141
+# Rate: 1.20 per second.
+#
+# cc: 0.239
+# thickn     rho      vp      vs  flag aniso   trend plunge strike   dip
+ 29427.5  2881.1  6301.4  3726.3    1    0.0     0.0    0.0    0.0   0.0
+  4921.0  2600.0  7157.6  3070.5    1    0.0     0.0    0.0  319.2  16.4
+   676.7  2600.0  6578.4  3446.5    1    0.0     0.0    0.0  319.2  16.4
+ 10366.8  3200.0  5826.0  3044.6    0   -0.0   120.4   29.1  319.2  16.4
+     0.0  3200.0  7600.0  4100.0    1    0.0     0.0    0.0  319.2  16.4

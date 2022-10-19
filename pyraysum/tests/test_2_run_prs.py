@@ -159,3 +159,25 @@ def test_rfs():
     streamlist2 = prs.run(model, geom, rc)
     rflist = streamlist2.calculate_rfs()
     [rf.filter('lowpass', freq=1., corners=2, zerophase=True) for rf in streamlist2.rfs]
+
+def test_bailout():
+    """
+    The given model produces the 'WARNING in evec_check'. Make sure phases are bailed out
+    """
+
+    modf = "evec_warn_model.txt"
+    mod = prs.read_model(modf)
+    rc = prs.RC(rot=2)
+
+    geom1 = prs.Geometry(7.5, 0.045)
+
+    seis = prs.run(mod, geom1, rc)
+
+    amps = seis.streams[0][1].stats.phase_amplitudes
+
+    assert all(abs(amps) < 2.5)
+
+    geom2 = prs.Geometry(135, 0.06)
+    seis = prs.run(mod, geom2, rc)
+
+    assert all(abs(amps) < 2.5)
