@@ -34,7 +34,7 @@ from obspy import Stream, Trace
 
 def stack_all(stream, pws=False):
     """
-    Stacks all traces in ``Stream`` objects.
+    Stack all traces in ``Stream`` objects.
 
     Args:
         stream (:class:`~obspy.core.Stream`):
@@ -84,12 +84,12 @@ def rf_wiggles(rflist, btyp='baz', wvtype='P', pws=False, tmin=-5., tmax=20,
                fmt='png', plot_kwargs={'linewidth': 0.1, 'color': 'black'},
                figure_kwargs={}):
     """
-    Plots receiver function seismograms sorted by back-azimuth or slowness.
+    Plot receiver function seismograms sorted by back-azimuth or slowness.
 
     Args:
         rflist (list or prs.Seismogram):
-            list of :class:`~obspy.core.Stream` objects containing receiver
-            functions
+            list of `obspy.core.Stream <https://tinyurl.com/3u8dv8s8>`_ objects 
+            containing receiver functions
         btyp (str):
             Type of sorting for panel
         wvtype (str):
@@ -113,12 +113,14 @@ def rf_wiggles(rflist, btyp='baz', wvtype='P', pws=False, tmin=-5., tmax=20,
         fmt (str):
             Output format ('png', 'jpg', or 'eps', etc.)
         plot_kwargs (dict):
-            Keyword arguments passed to :meth:`~matplotlib.pyplot.plot()`
+            Keyword arguments passed to 
+            `matplotlib.pyplot.plot() <https://tinyurl.com/2p9xy7hs>`_
         figure (dict):
-            Keyword arguments passed to :meth:`~matplotlib.pyplot.figure()`
+            Keyword arguments passed to 
+            `matplotlib.pyplot.figure() <https://tinyurl.com/yc3w956b>`_
 
     Returns:
-        :class:`~matplotlib.pyplot`:
+        :class:`matplotlib.pyplot.figure` :
             Figure handle
     """
 
@@ -254,12 +256,12 @@ def stream_wiggles(streamlist, btyp='baz', wvtype='P', tmin=-5., tmax=20.,
                    fmt='png', plot_kwargs={'linewidth': 0.1, 'color': 'black'},
                    figure_kwargs={}):
     """
-    Plots displacement seismograms sorted by back-azimuth or slowness.
+    Plot displacement seismograms sorted by back-azimuth or slowness.
 
     Args:
         streamlist (list or prs.Seismogram):
-            list of :class:`~obspy.core.Stream` objects containing displacement
-            seismograms
+            list of `obspy.core.Stream <https://tinyurl.com/3u8dv8s8>`_ objects 
+            containing displacement seismograms
         btyp (str):
             Type of sorting for panel
         wvtype (str):
@@ -281,12 +283,14 @@ def stream_wiggles(streamlist, btyp='baz', wvtype='P', tmin=-5., tmax=20.,
         fmt (str):
             Output format ('png', 'jpg', or 'eps', etc.)
         plot_kwargs (dict):
-            Keyword arguments passed to :meth:`~matplotlib.pyplot.plot()`
+            Keyword arguments passed to 
+            `matplotlib.pyplot.plot() <https://tinyurl.com/2p9xy7hs>`_
         figure (dict):
-            Keyword arguments passed to :meth:`~matplotlib.pyplot.figure()`
+            Keyword arguments passed to 
+            `matplotlib.pyplot.figure() <https://tinyurl.com/yc3w956b>`_
 
     Returns:
-        :class:`~matplotlib.pyplot`:
+        :class:`matplotlib.pyplot.figure` :
             Figure handle
     """
 
@@ -394,7 +398,7 @@ def seis_wiggles(stream, tmin=-5., tmax=20., save=False,
     Plots 3-component wiggles.
 
     Args:
-        stream (:class:`~obspy.core.Stream`):
+        stream (`obspy.core.Stream <https://tinyurl.com/3u8dv8s8>`_):
             Stream containing 3 traces
         tmin (float):
             Lower bound of time axis (s)
@@ -408,7 +412,7 @@ def seis_wiggles(stream, tmin=-5., tmax=20., save=False,
             Output format ('png', 'jpg', or 'eps', etc.)
 
     Returns:
-        :class:`~matplotlib.pyplot`:
+        :class:`matplotlib.pyplot.figure` :
             Figure handle
     """
 

@@ -10,6 +10,12 @@ We’ll use ``obspy`` to download and process seismic data, ``numpy`` to
 read the provided ``telewavesim`` output and ``matplotlib`` to make a
 comparison plot.
 
+   **NOTE:** To load the data included in the PyRaysum package, you
+   first need to install the ``Examples`` folder following the notes
+   described
+   `here <https://paudetseis.github.io/PyRaysum/init.html#usage>`__, and
+   execute the notebook from the Examples/notebooks/ directory.
+
 .. code:: ipython3
 
     import obspy
@@ -22,11 +28,11 @@ Loading earthquake data
 -----------------------
 
 The event we will be looking at is an intermediate depth, magnitude 6.3
-earthquake that occurred in the Philippines. The recording comes from
-station ``HYB`` in Hyderabad, India, which is located on a seismically
-transparent (i.e., homogeneous) cratonic crust. The earthquake arrives
-due east (back-azimuth equal to 90°), so that the east component in the
-seismogram is in the radial direction.
+earthquake that occurred in the Philippines in 2002. The recording comes
+from station ``HYB`` in Hyderabad, India, which is located on a
+seismically transparent (i.e., homogeneous) cratonic crust. The
+earthquake arrives due east (back-azimuth equal to 90°), so that the
+east component in the seismogram is in the radial direction.
 
 .. code:: ipython3
 
@@ -329,7 +335,7 @@ Comparison with real data
 .. code:: ipython3
 
     fig = plot(hybd, prsd)
-    _ = fig.suptitle("Comparision between Pyraysum and Seismogram recored at G.HYB")
+    _ = fig.suptitle("Comparison between Pyraysum and seismogram recored at G.HYB")
 
 
 
@@ -345,7 +351,7 @@ long phase descriptors consist of layer numbers and phase letters.
    layer **1** as an **upgoing P**-wave, layer **0** as an **upgoing
    P**-wave, gets reflected, travels through layer **0** as a
    **downgoing S**-wave, gets again reflected and finally travels
-   through layer **0** as an **upgoing S**-wave". The timing and
+   through layer **0** as an **upgoing S**-wave”. The timing and
    amplitude of such reverberations will be used in example 3 to invert
    for subsurface properties instead of assuming them, as we did here.
 
@@ -362,22 +368,22 @@ Comparison with synthetic data
 .. image:: output_22_0.png
 
 
-The comparisson with synthetic data from Telewavesim shows a good match
+The comparison with synthetic data from Telewavesim shows a good match
 of the major phases. Note that the data need to be filtered, because raw
 telewavesim data suffer from aliasing at infinite frequencies.
 
 Computing equivalent phases
 ---------------------------
 
-The amplitude of the *PpS* phase is apparently overestimated on the N
+The amplitude of the *PpS* phase is apparently overestimated on the E
 component and underestimated on the Z component. This is the case,
 because the RC parameter ``mults=2`` only computes first-order
 multiples, i.e. reflections of the direct *P* wave. Reflections from
 *PS* are missing, most notably *PSpP*. To address this problem, we will
 next use the ``RC.set_phaselist()`` method to explicitly name the phases
-we wish to compute. The methods implicitly sets ``mults=3``.
+we wish to compute. The method implicitly sets ``mults=3``.
 ``Seismogram`` has a dedicated method ``descriptors()`` to list unique
-phases present in the synthetics.
+phases present in the synthetic waveforms.
 
 .. code:: ipython3
 
@@ -396,7 +402,7 @@ phases present in the synthetics.
     ['1P0P', '1P0P0p0P', '1P0P0p0S', '1P0P0s0S', '1P0S']
     
     Dynamically equivalent phases:
-    ['1P0P0s0P', '1P0S0s0P', '1P0S0p0P', '1P0S0p0S']
+    ['1P0S0s0P', '1P0P0s0P', '1P0S0p0P', '1P0S0p0S']
 
 
 We will now set a phaselist that includes these phases using the
@@ -436,9 +442,9 @@ And run *PyRaysum* and the post processing again:
 .. image:: output_29_0.png
 
 
-The amplitudes of the reflected phases now match better. To explore the
-actual amplitude contributions of the equivalent phases, we look them up
-in the metadata of the synthetic seismic trace:
+The amplitudes of the reflected phases are now better matched. To
+explore the actual amplitude contributions of the equivalent phases, we
+look them up in the metadata of the synthetic seismic trace:
 
 .. code:: ipython3
 
@@ -467,10 +473,10 @@ Conclusion
 ----------
 
 This example demonstrated how ``PyRaysum`` can be used to compute the
-timing of amplitude of P-wave energy converted and reflected at the base
-of a cratonic crust. We compared the modelling results with a real data
-example from the Indian craton and a synthetic example that has been
-generated with an independent computational method.
+timing and amplitude of P-wave energy converted and reflected at the
+base of a cratonic crust. We compared the modelling results with a real
+data example from the Indian craton and a synthetic example that has
+been generated with an independent waveform simulation method.
 
 References
 ----------

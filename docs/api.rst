@@ -2,13 +2,13 @@
    :align: center
 
 Synthetic seismograms are computed from three classes: :class:`Model`,
-:class:`Geometry`, and :class:`RC` using :func:`prs.run` and stored in
-:class:`Seismogram`.
+:class:`Geometry`, and :class:`RC` using :func:`prs.run`, and are stored in
+an instance of class :class:`Seismogram`.
 
 Classes
 =======
 
-:mod:`~pyraysum` defines the following base classes:
+:mod:`~pyraysum` defines the following classes:
 
 - :class:`~pyraysum.prs.Model`
 - :class:`~pyraysum.prs.Geometry`
@@ -60,8 +60,8 @@ Module :mod:`fraysum`
 These are the the access points to the low-level fortran routines.
 
 .. tip::
-   The functions can more briefly be called with the unpacked :attr:`parameters` lists,
-   like so:
+   The corresponding functions can be more succinctly called with the unpacked 
+   lists of :attr:`parameters`, like this:
    ``fraysum.run_bare(*model.parameters, *geometry.parameters, *rc.parameters)``.
 
 .. py:function:: tr_ph = fraysum.run_bare(thick, rho, alpha, beta, isoflag, pct, trend,\

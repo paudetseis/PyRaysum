@@ -16,8 +16,8 @@ Start by importing the necessary packages:
 Dipping Layers
 --------------
 
-Define the arrays of slowness and back-azimuth values of the incident
-``P`` wave to use as input in the simulation
+First we define the arrays of slowness and back-azimuth values of the
+incident ``P`` wave to use as input in the simulation
 
 .. code:: ipython3
 
@@ -31,10 +31,11 @@ Define the arrays of slowness and back-azimuth values of the incident
 .. image:: output_3_0.png
 
 
-Define the model object. The values used are found in the caption of
-Figure 3. Note that :math:`V_S` can be parameterized either directly or
-as :math:`V_P/V_S`, which is what we do here. Also note that values that
-are constant for all layers can be given as floats.
+Next we define the model object. These values are found in the caption
+of Figure 3 in `Porter et al. (2011) <#references>`__. Note that
+:math:`V_S` can be parameterized either directly or as :math:`V_P/V_S`,
+which is what we do here. Also note that values that are constant for
+all layers can be given as floats.
 
 .. code:: ipython3
 
@@ -63,21 +64,22 @@ are constant for all layers can be given as floats.
     
 
 
-Here we specify the argument ``rot=1`` to produce seismograms aligned in
-the ``R-T-Z`` coordinate system. The default value is ``rot=0``, which
-produces seismograms aligned in the ``N-E-Z`` coordinate system that
-**should not** be used to calculate receiver functions. Furthermore, we
-are interested only in the direct conversions, and therefore specify
-``mults=0`` to avoid dealing with multiples. This is required to
-reproduce the published examples, although it is good practice to keep
-all first-order multiples to properly simulate all possible phase
-arrivals.
+Now we specify the run-control parameters. Here we use the argument
+``rot=1`` to produce seismograms aligned in the ``R-T-Z`` coordinate
+system. The default value is ``rot=0``, which produces seismograms
+aligned in the ``N-E-Z`` coordinate system that **should not** be used
+to calculate receiver functions. Furthermore, we are interested only in
+the direct conversions, and therefore specify ``mults=0`` to avoid
+dealing with multiples. This is required to reproduce the published
+examples, although it is good practice to keep all first-order multiples
+to properly simulate all possible phase arrivals.
 
 .. code:: ipython3
 
-    rc = RC(rot=1, mults=0, verbose=False, npts=600, dt=0.0125)
+    rc = RC(rot=1, mults=0, verbose=False, npts=1200, dt=0.0125)
 
-Now, let’s run the simulation. All book-keeping is handled internally.
+Finally, let’s run the simulation. All book-keeping is handled
+internally.
 
 .. code:: ipython3
 
@@ -142,15 +144,16 @@ Anisotropic Layers
 
 Now let’s reproduce the second case with the anisotropic lower crustal
 layer. Here, the second layer (``1`` in python indexing) is not dipping,
-but has a strong anisotropy of -20%. The anisotropy axis trends south
+but has a strong anisotropy of -20% (a negative value means a slow axis
+of hexagonal symmetry). The anisotropy axis trends south
 (``trend = 180``) and plunges 45 degree (``plunge = 45``). The *P*-wave
 velocity is 6.2 km/s. We could define a new model as above. Another
 possibility is to use use a short command string to change the existing
 model.
 
-Note that when we change the *P* wave velocity and want to maintain a
+Note that when we change the *P*-wave velocity and want to maintain a
 constant :math:`V_P/V_S` ratio, we must explicitly change ``vpvs`` by
-changing ``vs``. This is archived using the ``'pss'`` attribute
+changing ``vs``. This is achieved using the ``'pss'`` attribute
 indicator below.
 
 .. code:: ipython3
@@ -203,19 +206,9 @@ and use the ``rf`` argument to process the receiver functions as well.
 Understanding Fast and Slow S-Waves
 -----------------------------------
 
-To understand the different phases present we can look at, e.g., the
-receiver function at back-azimuth 150°. We look into how the individual
+To understand the different phases displayed, we can look at, e.g., the
+receiver function at back-azimuth 150°. We look at how the individual
 phases are called and when they arrive.
-
-The following command tells us that the negative wiggle arriving at 2.5
-seconds is a P-to-S conversion at the bottom of layer 0 (i.e. the top of
-the anisotropic layer), whereas the positive wiggle at 3s consists of
-two S-waves arriving shortly after one another: The smaller wiggle is
-the P-to-S1 conversion at the bottom of layer 1 (the anisotropic layer),
-and the larger one is the P-to-S2 conversion at the same interface.
-(Note that the slow S-wave is denoted *T*, to avoid ambiguity with the
-layer indices.) Both phases travel as an S-wave (here again named *T*)
-in the topmost layer 0, but at different speeds.
 
 .. code:: ipython3
 
@@ -234,6 +227,16 @@ in the topmost layer 0, but at different speeds.
 
 .. image:: output_23_1.png
 
+
+The commands above tell us that the negative wiggle arriving at 2.5
+seconds is a P-to-S conversion at the bottom of layer 0 (i.e. the top of
+the anisotropic layer), whereas the positive wiggle at 3s consists of
+two S-waves arriving shortly after one another: The smaller wiggle is
+the P-to-S1 conversion at the bottom of layer 1 (the anisotropic layer),
+and the larger one is the P-to-S2 conversion at the same interface.
+(Note that the slow S-wave is denoted *T*, to avoid ambiguity with the
+layer indices.) Both phases travel as an S-wave (here again named *T*)
+in the topmost layer 0, but at different speeds.
 
 On the transverse component, the P-to-S1 conversion has a negative
 amplitude, while the P-to-S2 conversion has a larger, positive one.
@@ -401,7 +404,7 @@ We see that the Waveforms of *Pyraysum* (red) and *Teleweavesim* (gray)
 match pretty well. The *Telewavsim* data has some additional energy at
 about 0.9 seconds, which is a reflection from the top of the anisotropic
 layer. This reflections has explicitly not been computed
-(``RC.mults = 0``), but could using ``RC.set_phaselist()``.
+(``RC.mults = 0``), but this could be done using ``RC.set_phaselist()``.
 
 Conclusion
 ----------

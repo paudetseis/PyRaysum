@@ -107,22 +107,23 @@ Jupyter Notebooks
 +++++++++++++++++
 
 Included in this package is a set of Jupyter Notebooks (see Table of Content),
-which give examples on how to call the various routines and obtain plane wave
+that give examples on how to call the various routines and obtain plane wave
 seismograms and receiver functions.
 In particular, the Notebooks describe how to reproduce published examples 
 of synthetic data from `Porter et al. (2011) <https://doi.org/10.1130/L126.1>`_.
 
 
 After ``pyraysum`` is installed, these notebooks can be locally installed
-(i.e., in a local folder ``Notebooks``) from the package
+(i.e., in a local folder ``Examples``) from the package
 by typing in a ``python`` window:
 
 .. sourcecode :: python
 
    from pyraysum import doc
-   doc.install_doc(path='Notebooks')
+   doc.install_doc(path='Examples')
 
-To run the notebooks you will have to further install ``jupyter``.
+This will also install packaged data that are necessary to run the notebooks. 
+Note that to run the notebooks, you will have to further install ``jupyter``.
 From the terminal, type:
 
 .. sourcecode :: bash
@@ -145,7 +146,7 @@ Seismic velocity models
 Loading a model file
 ~~~~~~~~~~~~~~~~~~~~
 
-In the Jupiter notebooks you will find a folder named ``models`` where a
+In the Jupiter notebooks you will find a folder named ``data`` where a
 few examples are provided. The header of the file ``model_Porter2011_dip.txt``
 looks like:
 
@@ -182,7 +183,7 @@ looks like:
     #
     ################################################
 
-The header is not required and can be deleted when you become familiar
+This header is not required and can be deleted when you become familiar
 with the various definitions. Note that the code requires 10 entries per
 layer (i.e., per line), regardless of whether or not the variable is required 
 (it will simply be ignored if it's not).
@@ -192,18 +193,18 @@ Let us break down each line, depending on how you set ``Layer flag``:
 Layer flag set to ``1``
 *************************
 
-This flag represents a case where the layer is isotropic.
+This case represents a case where the medium is isotropic.
 
-- Set column 0 (``Thickness``), column 1 (``Density``), column 2 (``P-wave velocity``), column 3 (``S-wave velocity``) and column 4 (as ``iso``)
+- Set column 0 (``Thickness``), column 1 (``Density``), column 2 (``P-wave velocity``), column 3 (``S-wave velocity``) and column 4 (set to ``1``)
 
-- Set columns 5 to 7 to ``0.`` or any other numerical value - they will be ignored by the software.
+- Set columns 5 to 7 to ``0.`` or any other numerical value - they will be ignored by the code.
 
-- Set columns 8 and 9 to the strike and dip angles of the layer in degrees (0. by default)
+- Set columns 8 and 9 to the strike and dip angles of the top interface in degrees (0. by default)
 
 Layer flag set to ``0``
 *************************
 
-This flag represents a transversely isotropic layer. We adhere with
+This case represents a transversely isotropic medium. We adhere with
 the definition in
 `Porter et al. (2011) <https://doi.org/10.1130/L126.1>`_,
 whereby the parameter :math:`\eta`, which describes the curvature of the
@@ -211,15 +212,14 @@ velocity “ellipsoid” between the :math:`V_P`-fast and :math:`V_P`-slow axes,
 with anisotropy for a 2-:math:`\psi` model and is not fixed.
 
 The column 5 in this case sets the percent anisotropy for both
-:math:`V_P` and :math:`V_S` (equal anisotropy for both :math:`V_P` and :math:`V_S`) and is the only
-instance where this column is required.
+:math:`V_P` and :math:`V_S` (equal anisotropy for both :math:`V_P` and :math:`V_S`).
 
-- Set all columns to the required numerical value (and column 4 to ``1``)
+- Set all columns to the required numerical value (and column 4 to ``0``)
 
 Creating a ``Model`` class instance
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Models can also be defined on the fly in Python using lists that contain
+Models can also be defined on the fly in Python using arrays or lists that contain
 the relevant information as input into an instance of the
 :class:`~pyraysum.prs.Model` class.
 
@@ -230,17 +230,17 @@ Examples
 
    >>> from pyraysum import Model
 
-- Define a two-layer model with isotropic properties and no dip
+- Define a model with two flat, isotropic layers (i.e., layer over half-space)
 
 .. sourcecode:: python
 
-   >>> thick = [20000., 0.]       # Second layer thickness is irrelevant
+   >>> thick = [20000., 0.]       # Second layer thickness is irrelevant (half-space)
    >>> rho = [2800., 3300.]
    >>> vp = [4600., 6000.]
    >>> vs = [2600., 3600.]
    >>> model = Model(thick, rho, vp, vs)
 
-- Define a two-layer model with transversely isotropic crust over isotropic half-space
+- Define a model with transversely isotropic crust over isotropic half-space
 
 .. sourcecode:: python
 
@@ -272,12 +272,12 @@ In the model setup, it is more appropriate to think of the layer strike and
 dip angles as the angles of the *top interface*. For a truly dipping 
 *layer*, bounded above and below by dipping interfaces, the strike and dip 
 angles should also be applied to the top interface of the *underlying* 
-layer. Note that if those angles are not the across the layers, dipping 
+layer. Note that if those angles are not the same across the layers, dipping 
 layer thickness is not conserved and the code may produce 
 aberrant results. For instance, the dipping layer model of `Porter et al. 
 (2011) <https://doi.org/10.1130/L126.1>`_ where a lower-crustal 
 low-velocity layer has a strike of 90 degrees and dip angle of 20 degrees, 
-is specified in `pyraysum` as:
+is specified as:
 
 .. sourcecode:: python
 
@@ -293,7 +293,14 @@ is specified in `pyraysum` as:
 Plotting a model
 ~~~~~~~~~~~~~~~~
 
-When a :class:`~pyraysum.prs.Model` is created (from either method detailed above), the ``model`` instance has methods to generate plots of the seismic velocity model that it contains. The simplest option is to use the ``plot()`` method, which will produce a figure with three subplots: 1) a stair-case plot of the seismic velocity and density profiles, 2) a layered (stratigraphic-like) representation of the model, and 3) a geometric representation of layer angles. These subplots can be created separately using the ``plot_profile()``, ``plot_layers()`` and ``plot_interfaces()`` methods directly.
+When a :class:`~pyraysum.prs.Model` is created (or read from a file as above), 
+the ``model`` instance has methods to generate plots of the seismic velocity model 
+that it describes. The simplest option is to use the ``plot()`` method, which will 
+produce a figure with three subplots: 1) a stair-case plot of the seismic velocity 
+and density profiles, 2) a layered (stratigraphic-like) representation of the model, 
+and 3) a labeled geometric representation of layer properties. These subplots can 
+be created separately using the ``plot_profile()``, ``plot_layers()`` and 
+``plot_interfaces()`` methods directly.
 
 Example
 *******
@@ -327,21 +334,29 @@ Basic usage
 
 These examples are extracted from the :func:`~pyraysum.prs.run` function.
 
-The default type of the incoming teleseismic body wave is ``'P'`` for compressional wave. Other options are ``'SV'`` or ``'SH'`` for vertically-polarized shear wave or horizontally-polarized shear wave, respectively. Incident wave modes cannot be mixed.
+The default type of the incoming teleseismic body wave is ``'P'`` for compressional wave. Other options are ``'SV'`` or ``'SH'`` for vertically-polarized or horizontally-polarized shear wave, respectively. Incident wave types cannot be mixed.
 
 Modeling a single event
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Here we model P waveforms from a single event, characterized by a back-azimuth of 30 degrees and slowness of 0.05 s/km. Let's examine the synthetic waveforms that would be recorded in a Z-N-E coordinate system (``rot=0``) from the P wave propagating through a simple homogeneous crust over a mantle half-space:
+Here we model P waveforms from a single event, characterized by a back-azimuth of 30 degrees and slowness of 0.05 s/km. Let's examine the synthetic waveforms that would be recorded in a Z-N-E coordinate system (``rot=0``) from the P-wave propagating through a simple homogeneous crust over a mantle half-space:
 
 .. sourcecode:: python
 
    >>> from pyraysum import prs, Model, Geometry, RC
-   >>> # Define two-layer model with isotropic crust over isotropic half-space
+   >>> # Define model with isotropic crust over isotropic half-space mantle
    >>> model = Model([30000., 0], [2800., 3300.], [6000., 8000.], [3600., 4500.])
+   >>> # Define the ray geometry for one event
    >>> geom = Geometry(30., 0.05) # baz = 30 deg; slow = 0.05 s/km
-   >>> rc = RC(dt=0.025, npts=1500, mults=1, rot=0)
+   >>> # Define the run-control parameters
+   >>> # sampling of 0.025 s; 1500 samples; with multiples; in Z-N-E coordinate system
+   >>> rc = RC(dt=0.025, npts=1500, mults=1, rot=0) 
+   >>> # Run Raysum for this setup
    >>> streamlist = prs.run(model, geom, rc)
+
+Examine the resulting three-component stream
+
+.. sourcecode:: python
 
    >>> st = streamlist.streams[0]
    >>> type(st)
@@ -367,7 +382,7 @@ Modeling multiple events
 
 We again model P waveforms but this time for multiple event origins. The example above 
 can be slightly modified to use an array of back-azimuth values (and/or array of slowness
-vectors). Let's examine both options. Here we only modified the lines ``geom =`` and 
+values). Let's examine both options. Here we only modify the lines ``geom =`` and 
 keep the rest of the code snippet unchanged. We also modify the time limits in the plot
 of amplitude versus slowness to emphasize the effect on delay times.
 
@@ -376,10 +391,15 @@ Array of back-azimuth values
 
 .. sourcecode:: python
 
-   >>> geom = Geometry(np.arange(0., 360., 10.), 0.05) # baz from 0 to 360 deg; slow = 0.05 s/km
+   >>> import numpy as np
+   >>> # baz from 0 to 360 deg; slow = 0.05 s/km
+   >>> geom = Geometry(np.arange(0., 360., 10.), 0.05)
    >>> streamlist = prs.run(model, geom, rc)
    >>> streamlist.filter('streams', 'lowpass', freq=1., corners=2, zerophase=True)
    >>> prs.plot.stream_wiggles(streamlist)
+
+.. figure:: ../pyraysum/examples/picture/Figure_baz_ZNE.png
+   :align: center
 
 Note that the same figure could be obtained with:
 
@@ -392,10 +412,14 @@ Array of slowness values
 
 .. sourcecode:: python
 
-   >>> geom = Geometry(30., np.arange(0.04, 0.08, 0.002)) # baz = 30 deg; slow from 0.04 to 0.08 s/km
+   >>> # baz = 30 deg; slow from 0.04 to 0.08 s/km
+   >>> geom = Geometry(30., np.arange(0.04, 0.08, 0.002)) 
    >>> streamlist = prs.run(model, geom, rc)
    >>> streamlist.filter('streams', 'lowpass', freq=1., corners=2, zerophase=True)
    >>> prs.plot.stream_wiggles(streamlist, btyp='slow', tmin=0., tmax=10.)
+
+.. figure:: ../pyraysum/examples/picture/Figure_slow_ZNE.png
+   :align: center
 
 Note that the same figure could be obtained with:
 
@@ -406,17 +430,20 @@ Note that the same figure could be obtained with:
 Modeling receiver functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Receiver functions can only be calculated for component rotation equal to '1' (R-T-Z system)
+Receiver functions can only be calculated for component rotations equal to '1' (R-T-Z system)
 or '2' (P-SV-SH system). There are two ways to calculate receiver functions - either directly
 from the function ``run()`` with the argument ``rf=True`` (default is ``rf=False``), or after
-you have obtained the 3-component seismograms from ``run()`` with ``rot=1`` or ``rot=2``. Here we calculate receiver functions for a single event. Other examples that include receiver function calculation for multiple events are included in the accompanying Jupyter notebook tutorials.
+you have obtained the 3-component seismograms from ``run()`` with ``rot=1`` or ``rot=2``. 
+Here we calculate receiver functions for a single event. Other examples that describe receiver 
+function calculation for multiple events are included in the accompanying Jupyter notebook 
+tutorials.
 
-Let's first define a simple 2-layer model:
+Let's first setup a simulation for a simple 2-layer model:
 
 .. sourcecode:: python
 
    >>> from pyraysum import prs, Model, Geometry, RC
-   >>> # Define two-layer model with isotropic crust over isotropic half-space
+   >>> # Define model with isotropic crust over isotropic half-space mantle
    >>> model = Model([30000., 0], [2800., 3300.], [6000., 8000.], [3600., 4500.])
    >>> geom = Geometry(0., 0.06) # baz = 0 deg; slow = 0.06 s/km
    >>> rc = RC(dt=0.025, npts=1500, mults=1, rot=1)
@@ -427,12 +454,12 @@ Method 1
 .. sourcecode:: python
 
    >>> streamlist1 = prs.run(model, geom, rc, rf=True)
-   
+   >>> # Print stream of receiver functions
    >>> print(streamlist1.rfs[0])
    2 Trace(s) in Stream:
    .prs..RFR | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples
    .prs..RFT | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples
-
+   >>> # Filter and plot
    >>> streamlist1.filter('rfs', 'lowpass', freq=1., corners=2, zerophase=True)
    >>> streamlist1.rfs[0].plot()
 
@@ -443,16 +470,19 @@ Method 2
 
    >>> streamlist2 = prs.run(model, geom, rc)
    >>> streamlist2.calculate_rfs()
-
+   >>> # Print stream of receiver functions
    >>> print(streamlist2.rfs[0])
    2 Trace(s) in Stream:
    .prs..RFR | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples
    .prs..RFT | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples
-
+   >>> # Filter and plot
    >>> streamlist2.filter('rfs', 'lowpass', freq=1., corners=2, zerophase=True)
    >>> streamlist2.rfs[0].plot()
 
-Both methods will produce the same receiver function figure. Notice the zero lag time is located at the center of the time axis. You can also observe wrap-around effects (weak arrivals before zero-lag time). Be careful when selecting time sampling parameters when running ``Raysum`` to minimize those.
+Both methods will produce the same receiver function figure. Notice the zero lag time is 
+located at the center of the time axis. You can also observe wrap-around effects (weak 
+arrivals before zero-lag time). Be careful when selecting time sampling parameters when 
+running ``Raysum`` to minimize those.
 
 .. figure:: ../pyraysum/examples/picture/Figure_RF_Moho.png
    :align: center

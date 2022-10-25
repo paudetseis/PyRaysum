@@ -20,11 +20,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-"""
-
-Functions to interact with ``Raysum`` software
-
-"""
 import re
 from datetime import datetime
 import numpy as np
@@ -45,41 +40,41 @@ class Model(object):
     Model of the subsurface seismic velocity structure
 
     Parameters:
-        thickn (list):
+        thickn (array_like):
           Thickness of layers (m)
-        rho (float or list):
+        rho (float or array_like):
           Density (kg/m^3)
-        vp (float or list):
+        vp (float or array_like):
           P-wave velocity (m/s)
-        vs (float or list, optional):
+        vs (float or array_like, optional):
           S-wave velocity (m/s)
           If None, computed from :const:`vpvs`
-        flag (list of str, optional):
+        flag (array_like of str, optional):
           :const:`1` for isotropic, :const:`0` for anisotropic
-        ani (float or list, optional):
+        ani (float or array_like, optional):
           Anisotropy (percent)
-        trend (float or list, optional):
+        trend (float or array_like, optional):
           Trend of symmetry axis (degree)
-        plunge (float or list, optional):
+        plunge (float or array_like, optional):
           Plunge of symmetry axis (degree)
-        strike (float or list, optional):
+        strike (float or array_like, optional):
           azimuth of interface in RHR (degree clockwise from north)
-        dip (float or list, optional):
+        dip (float or array_like, optional):
           dip of interface in RHR (degree down from horizontal)
-        vpvs (float or list, optional):
+        vpvs (float or array_like, optional):
           P-to-S velocity ratio.
           Defaults to 1.73. Ignored if :const:`vs` is set.
         maxlay (int):
           Maximum number of layers defined in params.h
 
-    The following attributes are set on initialization and when executing
+    The following attributes are set upon initialization and when executing
     :meth:`update()`. `f` prefixes indicate attributes used for interaction with
     `fraysum.run_bare()` and `fraysum.run_full()`.
 
         nlay
           Number of layers
         parameters
-          Convenience attribute gathers the below `f`-attributes in the order expected
+          Convenience attribute that collects the `f`-attributes in the order expected
           by `fraysum.run_bare()` and `fraysum.run_full()`
         fthickn
           Thickness of layers (m)
@@ -219,7 +214,7 @@ class Model(object):
 
     def update(self, change="vpvs"):
         """
-        Update all attributes after one was changed by the user.
+        Update all attributes after one of them was changed by the user.
 
         Parameters:
             change (str):
@@ -241,14 +236,14 @@ class Model(object):
         elif change == "vpvs":
             self.vpvs = self.vp / self.vs
         else:
-            msg = "Unknown value for fix keyword: " + change
+            msg = "Unknown value for keyword: " + change
             raise ValueError(msg)
 
         self._set_fattributes()
 
     def change(self, command, verbose=True):
         """
-        Change model layers using a command string.
+        Change layer properties using a command string.
 
         Args:
             command (str):
@@ -378,7 +373,7 @@ class Model(object):
 
     def split_layer(self, n):
         """
-        Split layer n into two with half the thickness each, but otherwise
+        Split layer `n` into two with half the thickness each, but otherwise
         identical parameters.
 
         Args:
@@ -397,7 +392,7 @@ class Model(object):
 
     def remove_layer(self, n):
         """
-        Remove layer n
+        Remove layer `n`
 
         Args:
             n (int):
@@ -412,17 +407,17 @@ class Model(object):
 
     def average_layers(self, top, bottom):
         """
-        Combine layers between top and bottom index into one with summed
-        thickness and average vp, vs, and rho.
+        Combine layers between top and bottom indices into one with summed
+        thicknesses and averaged vp, vs, and rho.
 
         Args:
             top (int):
-                Index before topmost layer to include in combination
+                Index before top-most layer to include in combination
             bottom (int):
-                Index after bottommost layer to include in combination
+                Index after bottom-most layer to include in combination
 
         Raises:
-            IndexError: if bottom less or equal top
+            IndexError: if bottom is less or equal to top
             ValueError: if any layer is anisotropic
             ValueError: if any layer has a difference in strike or dip
         """
@@ -466,10 +461,10 @@ class Model(object):
 
     def write(self, fname="sample.mod", comment=""):
         """
-        Write seismic velocity model to disk as raysum ASCII model file
+        Write seismic velocity model to disk as Raysum ASCII model file
 
         Args:
-            fname (str): Name of the output file
+            fname (str): Name of the output file (including extension)
             comment (str): String to write into file header
 
         """
@@ -493,7 +488,7 @@ class Model(object):
 
     def plot(self, zmax=75.0):
         """
-        Plot model as both stair case and layers - show it
+        Plot model as stair case, layers and labeled interfaces, and show it
 
         Args:
             zmax (float): Maximum depth of model to plot (km)
@@ -595,11 +590,6 @@ class Model(object):
                 Axis handle for plotting
         """
 
-        #       TODO for this method:
-        #       - paint background with top layer
-        #       - paint layer 1 from top to bottom (incl. dip layer)
-        #       - continue until bottom of model
-
         # Defaults to not show the plot
         show = False
 
@@ -644,7 +634,7 @@ class Model(object):
 
     def plot_interfaces(self, zmax=75, info=["vp", "vs", "vpvs", "rho"], ax=None):
         """
-        Plot model as interfaces with possibly dipping layers
+        Plot model as labeled interfaces with possibly dipping layers
 
         Args:
             zmax (float):
@@ -748,29 +738,29 @@ class Model(object):
 
 class Geometry(object):
     """
-    Recording geometry at the seismic station. Compute one synthetic trace for
-    each array element.
+    Recording geometry of rays and events at the seismic station. 
+    One set of synthetic traces will be computed for each array element.
 
     Parameters:
-        baz (float or np.ndarray):
+        baz (float or array_like):
           Ray back-azimuths (deg)
-        slow (float or np.ndarray):
+        slow (float or array_like):
           Ray slownesses (s/km)
-        dn (np.ndarray):
+        dn (array_like):
           North-offset of the seismic station (m)
-        de (np.ndarray):
+        de (array_like):
           East-offset of the seismic station (m)
         maxtr (int):
           Maximum number of traces defined in params.h
 
-
-    The following attributes are set on initialization. `f` prefixes indicate attributes
-    used for interaction with `fraysum.run_bare()` and `fraysum.run_full()`.
+    The following attributes are set upon initialization. `f` prefixes indicate 
+    attributes used for interaction with `fraysum.run_bare()` and 
+    `fraysum.run_full()`.
 
         ntr (int):
           Number of traces
         parameters (list):
-          Convenience attribute gathers the below `f`-attributes in the order expected
+          Convenience attribute that collects the `f`-attributes in the order expected
           by `fraysum.run_bare()` and `fraysum.run_full()`
         fbaz (np.ndarray):
           Ray back-azimuth (radians)
@@ -883,9 +873,9 @@ class RC(object):
         mults (int):
             ID for calculating free surface multiples
 
-                * 0: no multiples
+                * 0: no multiple
                 * 1: First interface multiples only
-                * 2: all first-order multiple (once reflected from the surface)
+                * 2: all first-order multiples (once reflected from the surface)
                 * 3: supply phases to be computed via meth:`RC.set_phaselist()`
 
         npts (int):
@@ -925,7 +915,7 @@ class RC(object):
     Attributes:
 
         parameters (list):
-          Convinience attribute gathers the above attributes in the order expected
+          Convenience attribute that collects the attributes in the order expected
           by :meth:`fraysum.run_bare()` and :meth:`fraysum.run_full()`
 
     Warning:
@@ -968,7 +958,7 @@ class RC(object):
             raise ValueError(msg)
 
         if rot not in [0, 1, 2, "0", "1", "2"]:
-            msg = "align must be 0, 1, or 2, not: " + str(rot)
+            msg = "rot must be 0, 1, or 2, not: " + str(rot)
             raise ValueError(msg)
 
         self.verbose = int(verbose)
@@ -1036,7 +1026,7 @@ class RC(object):
                 SEGMENT is the index of the model layer.
 
             equivalent (bool):
-                Augment phaselist by equivalent phases
+                Augment phaselist by equivalent phases (e.g., '1P0P0s0P'; '1P0S0p0P')
 
             kinematic (bool):
                 Limit equivalent phases to those with same polarity as input phases
@@ -1045,17 +1035,16 @@ class RC(object):
             IndexError: If resulting phaselist is longer than :const:`maxph`.
 
         Hint:
-            In a two layer model (layer 1 is the underlying half-space, layer 0 is the
-            topmost subsurface layer) the :const:`descriptors` compute the phases:
+            In a two layer model (index `0` is the topmost subsurface layer, index `1` 
+            is the underlying half-space) the :const:`descriptors` compute the phases:
 
             * ``['1P0P']``: direct P-wave
             * ``['1P0S']``: P-to-S converted wave
             * ``['1P0P', '1P0S']``: direct P-wave and P-to-S converted wave
-            * ``['1P0P0s0S']``: P reflected s at the surface, reflected S at the top of
-            the half-space
+            * ``['1P0P0s0S']``: P reflected s at the surface, reflected S at the top of the half-space
 
         Caution:
-            Using :const:`equivalent=False` may result in wrong amplitudes, because
+            Using :const:`equivalent=False` may produce incorrect amplitudes, because
             contributions of equivalent phases may be missing.
 
         See also:
@@ -1106,6 +1095,7 @@ class RC(object):
         """
         Explicitly update :attr:`parameters`
         """
+
         self.parameters = [
             self.iphase,
             self.mults,
@@ -1124,6 +1114,7 @@ class RC(object):
         """
         Alias for :class:`~pyraysum.prs.RC.write()`
         """
+
         self.write(fname=fname)
 
     def write(self, fname="raysum-param"):
@@ -1147,11 +1138,11 @@ class Seismogram(object):
 
     Parameters:
         model (:class:`~pyraysum.prs.Model`):
-            The subsurface model used
+            Subsurface velocity model
         geom (:class:`~pyraysum.prs.Geometry`):
-            The ray geometry used
+            Recording geometry
         rc (:class:`~pyraysum.prs.RC`):
-            The run controll parameters used
+            Run-control parameters
         streams (List):
             List of :class:`~obspy.core.Stream` objects.
 
@@ -1183,8 +1174,8 @@ class Seismogram(object):
 
     def calculate_rfs(self):
         """
-        Generate receiver functions from displacement traces. Will be stored in
-        :attr:`rflist`.
+        Generate receiver functions from spectral division of displacement traces. 
+        Will be stored in :attr:`rflist`.
 
         Raises:
             ValueError: In case :class:`RC` parameters a unsuitable.
@@ -1286,8 +1277,9 @@ class Seismogram(object):
 
         Parameters:
             fname (str):
-                Name of the output file
+                Name of the output file (including extension)
         """
+
         buf = "#{:>11s}{:>11s}{:>11s}{:>11s}{:>11s}\n".format(
             "#traces", "#samples", "dt (s)", "align", "shift"
         )
@@ -1315,7 +1307,7 @@ class Seismogram(object):
 
     def plot(self, typ, **kwargs):
         """
-        Plots the displacement seismograms and/or receiver functions stored in
+        Plot the displacement seismograms and/or receiver functions stored in
         :class:`~pyraysum.prs.Seismogram` streams.
 
         Parameters:
@@ -1333,6 +1325,7 @@ class Seismogram(object):
 
 
         """
+
         if typ == "streams":
             self.plot_streams(**kwargs)
         elif typ == "rfs":
@@ -1356,9 +1349,11 @@ class Seismogram(object):
                 :const:`'rfs'`, or :const:`'all'` for the displacement seismograms,
                 receiver functions, or both
             ftype (str):
-                Type of filter to use in `~obspy.Trace.filter`
+                Type of filter to use in 
+                `obspy.Trace.filter <https://tinyurl.com/45dkyvwy>`_
             **kwargs:
-                Are passed to the underlying `~obspy.Trace.filter`
+                Keyword arguments passed to 
+                `obspy.Trace.filter <https://tinyurl.com/45dkyvwy>`_
 
         """
         if typ == "streams":
@@ -1390,17 +1385,18 @@ class Seismogram(object):
 
 def run(model, geometry, rc, mode="full", rf=False):
     """
-    Run a wave-field simulation. Calls the compiled :mod:`fraysum` binaries.
+    Run a wave-field simulation. This function calls the compiled :mod:`fraysum` 
+    binaries.
 
     Parameters:
         model (:class:`~pyraysum.prs.Model`):
-            Subsurface velocity structure model
+            Subsurface velocity model
         geometry (:class:`~pyraysum.prs.Geometry`):
             Recording geometry
         rc (:class:`~pyraysum.prs.RC`):
-            Run control parameters
+            Run-control parameters
         mode (str):
-            * :const:`'full'`: Compute seismograms and phase arrivals and descriptors (slower)
+            * :const:`'full'`: Compute seismograms, phase arrivals and descriptors (slower)
             * :const:`'bare'`: Only compute seismograms (faster)
         rf (bool):
             Whether or not to calculate receiver functions
@@ -1424,8 +1420,6 @@ def run(model, geometry, rc, mode="full", rf=False):
     .prs..BHN | 2020-11-30T21:04:43.890339Z - 2020-11-30T21:05:21.365339Z | 40.0 Hz, 1500 samples
     .prs..BHE | 2020-11-30T21:04:43.891418Z - 2020-11-30T21:05:21.366418Z | 40.0 Hz, 1500 samples
     .prs..BHZ | 2020-11-30T21:04:43.891692Z - 2020-11-30T21:05:21.366692Z | 40.0 Hz, 1500 samples
-    >>> st.plot(size=(600, 450))
-
     """
 
     if rf and rc.rot == 0:
@@ -1500,13 +1494,13 @@ def read_geometry(geomfile, encoding=None):
 
 def read_rc(paramfile):
     """
-    Reads raysum run control parameters from file and returns an
-    instance of class :class:`~pyraysum.prs.RC`.
+    Read Raysum run control parameters from file.
 
     Returns:
         :class:`~pyraysum.prs.RC`:
-            Run controll parameters
+            Run control parameters
     """
+
     with open(paramfile, "r") as f:
         lines = f.readlines()
 
@@ -1522,7 +1516,7 @@ def read_rc(paramfile):
 def equivalent_phases(descriptors, kinematic=False):
     """
     Return descriptors of equivalent phases, i.e. those arriving at the same time as
-    input phases
+    the input phases
 
     Parameters:
         descriptors (list of strings):
@@ -1622,12 +1616,12 @@ def equivalent_phases(descriptors, kinematic=False):
 
 def read_traces(traces, rc, geometry, arrivals=None):
     """
-    Creates a :class:`Seismogram` from the traces produced by :meth:`fraysum.run_bare()`
+    Create a :class:`Seismogram` from the array produced by :meth:`fraysum.run_bare()`
     and :meth:`fraysum.run_full`.
 
     Parameters:
         rc (:class:`RC`):
-            Run controll parameters
+            Run-control parameters
         geometry (:class:`Geometry`):
             Geometry parameters
         arrivals (list):
@@ -1737,6 +1731,7 @@ def read_arrivals(ttimes, amplitudes, phaselist, geometry):
     Returns:
         list:
             3-component phase arrival lists, where indices translate to:
+
             * :const:`0`: phase arrival times
             * :const:`1`: phase amplitudes
             * :const:`2`: (long) phase descriptors, e.g. "1P0S"
@@ -1815,17 +1810,17 @@ def read_arrivals(ttimes, amplitudes, phaselist, geometry):
 
 def rfarray(geometry, rc):
     """
-    Initialize array for `NumPy` based post processing
+    Initialize array for `NumPy`-based post processing
 
     Parameters:
         geometry (:class:`prs.Geometry`):
-            Geometry of the problem
+            Recording geometry
         rc (:class:`prs.RC`):
-            RC parameters
+            Run-control parameters
 
     Returns:
         :const:`numpy.zeros((geometry.ntr, 2, rc.npts))`:
-            Array in shape to be used by :meth`filterd_rf_array` and
+            Array in shape to be used by :meth:`filterd_rf_array` and
             :meth:`filtered_array`.
     """
     return np.zeros((geometry.ntr, 2, rc.npts))
@@ -1845,12 +1840,12 @@ def _get_cached_bandpass_coefs(order, corners):
 
 def filtered_rf_array(traces, rfarray, ntr, npts, dt, fmin, fmax):
     """
-    Fast, `NumPy` based, receiver function computation and filtering of
+    Fast, `NumPy`-based, receiver function computation and filtering of
     :meth:`fraysum.run_bare()` output
 
     Roughly equivalent to subsequent calls to :func:`read_traces()`,
-    :meth:`Seismogram.calculate_rfs()`, and :meth:`Seismogram.filter()`, stripped down
-    for inversion purposes:
+    :meth:`Seismogram.calculate_rfs()` and :meth:`Seismogram.filter()`, stripped down
+    for computational efficiency, for use in inversion/probabilistic approaches.
 
     Parameters:
         traces (np.ndarray):
@@ -1863,18 +1858,18 @@ def filtered_rf_array(traces, rfarray, ntr, npts, dt, fmin, fmax):
         npts (int):
             Number of points per trace (:attr:`RC.npts`)
         dt (float):
-            Sampling intervall (:attr:`RC.dt`)
+            Sampling interval (:attr:`RC.dt`)
         fmin (float):
-            Lower bandpass filter corner
+            Lower bandpass frequency corner (Hz)
         fmax (float):
-            Upper bandpass filter corner
+            Upper bandpass frequency corner (Hz)
 
     Returns:
         None:
             Output is written to :const:`rfarray`
 
     Warning:
-        Assumes traces is aligned PVH (ray-polarization) axes, i.e. :attr:`RC.rot=2`.
+        Assumes PVH alignment (ray-polarization), i.e. :attr:`RC.rot=2`.
     """
 
     order = 2
@@ -1904,10 +1899,11 @@ def filtered_rf_array(traces, rfarray, ntr, npts, dt, fmin, fmax):
 
 def filtered_array(traces, rfarray, ntr, npts, dt, fmin, fmax):
     """
-    Fast, `NumPy` based filtering of :meth:`fraysum.run_bare()` output
+    Fast, `NumPy`-based filtering of :meth:`fraysum.run_bare()` output
 
     Roughly equivalent to subsequent calls to :func:`read_traces()`, and
-    :meth:`Seismogram.filter()`, stripped down for inversion purposes.
+    :meth:`Seismogram.filter()`, stripped down for computational efficiency, 
+    for use in inversion/probabilistic approaches.
 
     Parameters:
         traces (np.ndarray):
@@ -1922,16 +1918,16 @@ def filtered_array(traces, rfarray, ntr, npts, dt, fmin, fmax):
         dt (float):
             Sampling intervall (:attr:`RC.dt`)
         fmin (float):
-            Lower bandpass filter corner
+            Lower bandpass frequency corner (Hz)
         fmax (float):
-            Upper bandpass filter corner
+            Upper bandpass frequency corner (Hz)
 
     Returns:
         None:
             Output is written to :const:`rfarray`
 
     Warning:
-        Assumes traces is aligned PVH (ray-polarization) axes, i.e. :attr:`RC.rot=2`.
+        Assumes PVH alignment (ray-polarization), i.e. :attr:`RC.rot=2`.
     """
 
     npts2 = npts // 2
