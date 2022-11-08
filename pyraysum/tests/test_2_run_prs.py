@@ -1,4 +1,4 @@
-from pyraysum import prs, Model, Geometry, RC
+from pyraysum import prs, Model, Geometry, Control
 from fraysum import run_full, run_bare
 import numpy as np
 import pytest
@@ -19,7 +19,7 @@ def test_Porter2011():
     # Read first model with dipping lower crustal layer
     model = mod.test_read_model_dip()
     geom = Geometry(baz, slow)
-    rc = RC(rot=1, mults=0)
+    rc = Control(rot=1, mults=0)
 
     print('model', model.__dict__)
     print('geom', geom.__dict__)
@@ -54,7 +54,7 @@ def test_frs():
     # Read first model with dipping lower crustal layer
     model = mod.test_read_model_dip()
     geom = Geometry(baz, slow)
-    rc = RC(rot=1, mults=0)
+    rc = Control(rot=1, mults=0)
 
     # Run Raysum with most default values and `rot=1` and `mults=0`
     # to reproduce the results of Porter et al., 2011
@@ -86,7 +86,7 @@ def test_filtered_rf_array():
     # Read first model with dipping lower crustal layer
     model = mod.test_read_model_dip()
     geom = Geometry(baz, slow)
-    rc = RC(dt=dt, rot=rot, mults=mults, align=align, wvtype=wvtype, verbose=verbose,
+    rc = Control(dt=dt, rot=rot, mults=mults, align=align, wvtype=wvtype, verbose=verbose,
             npts=npts)
 
     rfarray = np.zeros((geom.ntr, 2, npts))
@@ -128,13 +128,13 @@ def test_single_event():
     model = mod.test_def_model()
     geom = Geometry(baz=0, slow=0.06)
     for wvtype in ['P', 'SV', 'SH']:
-        rc = RC(npts=1500, dt=0.025, rot=2, wvtype=wvtype)
+        rc = Control(npts=1500, dt=0.025, rot=2, wvtype=wvtype)
         streamlist = prs.run(model, geom, rc)
 
 def test_rfs():
 
     model = mod.test_def_model()
-    rc = RC(npts=1500, dt=0.025, rot=0)
+    rc = Control(npts=1500, dt=0.025, rot=0)
     geom = Geometry(slow=0.06, baz=0.)
 
     # test 1
@@ -166,8 +166,14 @@ def test_bailout():
     """
 
     modf = "evec_warn_model.txt"
-    mod = prs.read_model(modf)
-    rc = prs.RC(rot=2)
+    try:
+        mod = prs.read_model(modf)
+    except OSError:
+        # VSCode starts tests from root directory
+        modf = "pyraysum/tests/" + modf
+        mod = prs.read_model(modf)
+        
+    rc = prs.Control(rot=2)
 
     geom1 = prs.Geometry(7.5, 0.045)
 

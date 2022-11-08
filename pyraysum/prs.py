@@ -30,6 +30,8 @@ from numpy.fft import fft, ifft, fftshift
 from pyraysum import plot
 import fraysum
 
+_align = {0: "None", 1: "P", 2: "SV", 3: "SH"}
+_rot = {0: "ZNE", 1: "RTZ", 2: "PVH"}
 _iphase = {"P": 1, "SV": 2, "SH": 3}
 _phnames = {1: "P", 2: "S", 3: "T", 4: "p", 5: "s", 6: "t"}
 _phids = {_phnames[k]: k for k in _phnames}  # inverse dictionary
@@ -811,7 +813,7 @@ class Geometry(object):
         return self.ntr
 
     def __str__(self):
-        out = ""
+        out = "#Back-azimuth, Slowness, N-offset, E-offset"
         form = "{: 7.2f} {: 8.4f} {:7.2f} {:7.2f}\n"
         for bb, ss, xx, yy in zip(self.baz, self.slow, self.dn, self.de):
             out += form.format(bb, ss, xx, yy)
@@ -863,7 +865,7 @@ class Geometry(object):
         return ax
 
 
-class RC(object):
+class Control(object):
     """
     Run Control parameters for :meth:`prs.run()`.
 
@@ -876,7 +878,7 @@ class RC(object):
                 * 0: no multiple
                 * 1: First interface multiples only
                 * 2: all first-order multiples (once reflected from the surface)
-                * 3: supply phases to be computed via meth:`RC.set_phaselist()`
+                * 3: supply phases to be computed via meth:`Control.set_phaselist()`
 
         npts (int):
             Number of samples in time series
@@ -987,6 +989,26 @@ class RC(object):
         self.update()
 
     def __str__(self):
+        out = "Run control parameters:\n\n"
+        out += "Verbosity: "
+        out += "{:}\n".format(self.verbose)
+        out += "Incoming wave type: "
+        out += "{:}\n".format(self.wvtype)
+        out += "Multiples: "
+        out += "{:}\n".format(self.mults)
+        out += "Number of samples per trace: "
+        out += "{:}\n".format(self.npts)
+        out += "Sample rate (seconds): "
+        out += "{:}\n".format(self.dt)
+        out += "Alignment: "
+        out += "{:}\n".format(_align[self.align])
+        out += "Shift of traces (seconds): "
+        out += "{:}\n".format(self.shift)
+        out += "Rotation to output: "
+        out += "{:}".format(_rot[self.rot])
+        return out
+
+    def __repr__(self):
         out = "# Verbosity\n"
         out += "{:}\n".format(int(self.verbose))
         out += "# Phase name\n"
@@ -1078,7 +1100,7 @@ class RC(object):
 
         Args:
             mults (int):
-                Set :attr:`RC.mults` to this value.
+                Set :attr:`Control.mults` to this value.
         """
 
         if mults > 2:
@@ -1112,7 +1134,7 @@ class RC(object):
 
     def save(self, fname="raysum-param"):
         """
-        Alias for :class:`~pyraysum.prs.RC.write()`
+        Alias for :class:`~pyraysum.prs.Control.write()`
         """
 
         self.write(fname=fname)
@@ -1127,7 +1149,7 @@ class RC(object):
         """
 
         with open(fname, "w") as f:
-            f.write(self.__str__())
+            f.write(self.__repr__())
 
 
 class Seismogram(object):
@@ -1141,7 +1163,7 @@ class Seismogram(object):
             Subsurface velocity model
         geom (:class:`~pyraysum.prs.Geometry`):
             Recording geometry
-        rc (:class:`~pyraysum.prs.RC`):
+        rc (:class:`~pyraysum.prs.Control`):
             Run-control parameters
         streams (List):
             List of :class:`~obspy.core.Stream` objects.
@@ -1178,7 +1200,7 @@ class Seismogram(object):
         Will be stored in :attr:`rflist`.
 
         Raises:
-            ValueError: In case :class:`RC` parameters a unsuitable.
+            ValueError: In case :class:`Control` parameters a unsuitable.
         """
 
         if self.rc.rot == 0:
@@ -1251,10 +1273,10 @@ class Seismogram(object):
 
         Example
         -------
-        >>> from pyraysum import Model, RC, Geometry, run
+        >>> from pyraysum import Model, Control, Geometry, run
         >>> model = Model([30000., 0], [2800., 3300.], [6000., 8000.], [3600., 4500.])
         >>> geom = Geometry(0., 0.06)
-        >>> rc = RC(mults=1)
+        >>> rc = Control(mults=1)
         >>> seismogram = run(model, geom, rc)
         >>> seismogram.descriptors()
         ['1P0P', '1P0S']
@@ -1393,7 +1415,7 @@ def run(model, geometry, rc, mode="full", rf=False):
             Subsurface velocity model
         geometry (:class:`~pyraysum.prs.Geometry`):
             Recording geometry
-        rc (:class:`~pyraysum.prs.RC`):
+        rc (:class:`~pyraysum.prs.Control`):
             Run-control parameters
         mode (str):
             * :const:`'full'`: Compute seismograms, phase arrivals and descriptors (slower)
@@ -1407,11 +1429,11 @@ def run(model, geometry, rc, mode="full", rf=False):
 
     Example
     -------
-    >>> from pyraysum import prs, Model, Geometry, RC
+    >>> from pyraysum import prs, Model, Geometry, Control
     >>> # Define two-layer model with isotropic crust over isotropic half-space
     >>> model = Model([30000., 0], [2800., 3300.], [6000., 8000.], [3600., 4500.])
     >>> geom = Geometry(0., 0.06) # baz = 0 deg; slow = 0.06 x/km
-    >>> rc = RC(npts=1500, dt=0.025)
+    >>> rc = Control(npts=1500, dt=0.025)
     >>> seismogram = prs.run(model, geom, rc)
     >>> type(seismogram.streams[0])
     <class 'obspy.core.stream.Stream'>
@@ -1497,7 +1519,7 @@ def read_rc(paramfile):
     Read Raysum run control parameters from file.
 
     Returns:
-        :class:`~pyraysum.prs.RC`:
+        :class:`~pyraysum.prs.Control`:
             Run control parameters
     """
 
@@ -1510,7 +1532,7 @@ def read_rc(paramfile):
         if line.startswith("#"):
             continue
         values.append(line)
-    return RC(*values)
+    return Control(*values)
 
 
 def equivalent_phases(descriptors, kinematic=False):
@@ -1520,7 +1542,7 @@ def equivalent_phases(descriptors, kinematic=False):
 
     Parameters:
         descriptors (list of strings):
-            Phase descriptors as in :meth:`RC.set_phaselist`
+            Phase descriptors as in :meth:`Control.set_phaselist`
 
         kinematic (boolean):
             If True, restrict to kinematically equivalent phases, i.e. those that have
@@ -1620,7 +1642,7 @@ def read_traces(traces, rc, geometry, arrivals=None):
     and :meth:`fraysum.run_full`.
 
     Parameters:
-        rc (:class:`RC`):
+        rc (:class:`Control`):
             Run-control parameters
         geometry (:class:`Geometry`):
             Geometry parameters
@@ -1815,7 +1837,7 @@ def rfarray(geometry, rc):
     Parameters:
         geometry (:class:`prs.Geometry`):
             Recording geometry
-        rc (:class:`prs.RC`):
+        rc (:class:`prs.Control`):
             Run-control parameters
 
     Returns:
@@ -1856,9 +1878,9 @@ def filtered_rf_array(traces, rfarray, ntr, npts, dt, fmin, fmax):
         ntr (int):
             Number of traces (:attr:`Geometry.ntr`)
         npts (int):
-            Number of points per trace (:attr:`RC.npts`)
+            Number of points per trace (:attr:`Control.npts`)
         dt (float):
-            Sampling interval (:attr:`RC.dt`)
+            Sampling interval (:attr:`Control.dt`)
         fmin (float):
             Lower bandpass frequency corner (Hz)
         fmax (float):
@@ -1869,7 +1891,7 @@ def filtered_rf_array(traces, rfarray, ntr, npts, dt, fmin, fmax):
             Output is written to :const:`rfarray`
 
     Warning:
-        Assumes PVH alignment (ray-polarization), i.e. :attr:`RC.rot=2`.
+        Assumes PVH alignment (ray-polarization), i.e. :attr:`Control.rot=2`.
     """
 
     order = 2
@@ -1914,9 +1936,9 @@ def filtered_array(traces, rfarray, ntr, npts, dt, fmin, fmax):
         ntr (int):
             Number of traces (:attr:`Geometry.ntr`)
         npts (int):
-            Number of points per trace (:attr:`RC.npts`)
+            Number of points per trace (:attr:`Control.npts`)
         dt (float):
-            Sampling intervall (:attr:`RC.dt`)
+            Sampling intervall (:attr:`Control.dt`)
         fmin (float):
             Lower bandpass frequency corner (Hz)
         fmax (float):
@@ -1927,7 +1949,7 @@ def filtered_array(traces, rfarray, ntr, npts, dt, fmin, fmax):
             Output is written to :const:`rfarray`
 
     Warning:
-        Assumes PVH alignment (ray-polarization), i.e. :attr:`RC.rot=2`.
+        Assumes PVH alignment (ray-polarization), i.e. :attr:`Control.rot=2`.
     """
 
     npts2 = npts // 2
