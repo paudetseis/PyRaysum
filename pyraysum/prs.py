@@ -28,6 +28,7 @@ import matplotlib.pyplot as plt
 from obspy import Trace, Stream, UTCDateTime
 from numpy.fft import fft, ifft, fftshift
 from pyraysum import plot
+from copy import deepcopy
 import fraysum
 
 _align = {0: "None", 1: "P", 2: "SV", 3: "SH"}
@@ -38,8 +39,7 @@ _phids = {_phnames[k]: k for k in _phnames}  # inverse dictionary
 
 
 class Model(object):
-    """
-    Model of the subsurface seismic velocity structure
+    """Model of the subsurface seismic velocity structure.
 
     Parameters:
         thickn (array_like):
@@ -68,6 +68,9 @@ class Model(object):
           Defaults to 1.73. Ignored if :const:`vs` is set.
         maxlay (int):
           Maximum number of layers defined in params.h
+
+    Warning:
+        When setting :att:`vpvs`, :att:`vs` is adjusted to satisfy vs = vp / vpvs.
 
     The following attributes are set upon initialization and when executing
     :meth:`update()`. `f` prefixes indicate attributes used for interaction with
@@ -98,6 +101,46 @@ class Model(object):
           azimuth of interface in RHR (radians)
         fdip
           dip of interface in RHR (radians)
+
+    Example
+    -------
+        >>> from pyraysum import Model
+        >>> model = Model([10000, 0], [3000, 4500], [6000, 8000], [3500, 4600])
+        >>> print(model)
+        # thickn     rho      vp      vs  flag aniso   trend plunge strike   dip
+         10000.0  3000.0  6000.0  3500.0    1    0.0     0.0    0.0    0.0   0.0
+             0.0  4500.0  8000.0  4600.0    1    0.0     0.0    0.0    0.0   0.0
+        <BLANKLINE>
+        >>> model[0]["thickn"]
+        10000.0
+        >>> model[1, "vp"]
+        8000.0
+        >>> model[1, "vp"] = 7400.
+        >>> model[1, "vp"]
+        7400.0
+        >>> model[1] = {"vs": 4200., "rho": 4000.}
+        >>> model[1]["vs"]
+        4200.0
+        >>> model[1, "rho"]
+        4000.0
+        >>> model[1] = {"thickn": 5000, "vp": 8000., "vpvs": 2.}
+        >>> model[1]["vs"]
+        4000.0
+        >>> model += [5000, 3600, 8000, 4000]  # thickn, rho, vp, vs
+        >>> print(model)
+        # thickn     rho      vp      vs  flag aniso   trend plunge strike   dip
+         10000.0  3000.0  6000.0  3500.0    1    0.0     0.0    0.0    0.0   0.0
+          5000.0  4000.0  8000.0  4000.0    1    0.0     0.0    0.0    0.0   0.0
+          5000.0  3600.0  8000.0  4000.0    1    0.0     0.0    0.0    0.0   0.0
+        <BLANKLINE>
+        >>> model += {"thickn": 0, "rho": 3800, "vp": 8500., "dip": 20, "strike": 90}
+        >>> print(model)
+        # thickn     rho      vp      vs  flag aniso   trend plunge strike   dip
+         10000.0  3000.0  6000.0  3500.0    1    0.0     0.0    0.0    0.0   0.0
+          5000.0  4000.0  8000.0  4000.0    1    0.0     0.0    0.0    0.0   0.0
+          5000.0  3600.0  8000.0  4000.0    1    0.0     0.0    0.0    0.0   0.0
+             0.0  3800.0  8500.0  4913.3    1    0.0     0.0    0.0   90.0  20.0
+        <BLANKLINE>
     """
 
     def __init__(
@@ -123,8 +166,12 @@ class Model(object):
             else:
                 return np.array([0.0] * self.nlay)
 
-        self.nlay = len(thickn)
-        self.thickn = np.array(thickn)
+        try:
+            self.nlay = len(thickn)
+        except TypeError:
+            self.nlay = 1
+
+        self.thickn = _get_val(thickn)
         self.rho = _get_val(rho)
         self.vp = _get_val(vp)
 
@@ -132,7 +179,7 @@ class Model(object):
             self.vpvs = _get_val(vpvs)
             self.vs = self.vp / self.vpvs
         else:
-            self.vs = np.array(vs)
+            self.vs = _get_val(vs)
             self.vpvs = self.vp / self.vs
 
         self.flag = np.array(
@@ -145,8 +192,6 @@ class Model(object):
         self.dip = _get_val(dip)
 
         self.maxlay = maxlay
-
-        self._set_fattributes()
 
         self._useratts = [
             "thickn",
@@ -161,6 +206,49 @@ class Model(object):
             "strike",
             "dip",
         ]
+
+        self._set_fattributes()
+        self._set_layers()
+
+    def __getitem__(self, layer):
+        try:
+            # model[0, "thickn"]
+            return self._layers[layer[0]][layer[1]]
+        except TypeError:
+            # model[0]
+            return self._layers[layer]
+
+    def __setitem__(self, layatt, value):
+
+        lays = []
+        atts = []
+        vals = []
+        try:
+            # model[0] = {"plunge": 10} syntax
+            # layatt is layer and value is {"att": value}
+            atts = value.keys()
+            for att in atts:
+                vals.append(value[att])
+            lays = [layatt] * len(vals)
+        except AttributeError:
+            # model[0, "plunge"] = 10 syntax
+            # layatt[0] is layer, layatt[1] is attribute, value is value
+            lays = [layatt[0]]
+            atts = [layatt[1]]
+            vals = [value]
+            
+        for lay, att, val in zip(lays, atts, vals):
+            if att not in self._useratts:
+                msg = f"Unknown attribute: '{att}'. Must be one of: "
+                msg += ", ".join(self._useratts)
+                raise ValueError(msg)
+
+            self.__dict__[att][lay] = val
+
+            if att == "vpvs":
+                self.update(change="vs")
+            else:
+                self.update()
 
     def __len__(self):
         return self.nlay
@@ -187,6 +275,32 @@ class Model(object):
             buf += f.format(th, r, vp, vs, fl, a, tr, p, s, d)
 
         return buf
+
+    def __add__(self, other):
+        if not isinstance(other, Model):
+            try:
+                other = Model(**other)
+            except TypeError:
+                other = Model(*other)
+            except Exception:
+                msg = "Can only add Model, dict, or list to Model."
+                raise TypeError(msg)
+
+        third = deepcopy(self)
+
+        for att in third._useratts:
+            third.__dict__[att] = np.append(self.__dict__[att], other.__dict__[att])
+
+        third.nlay += other.nlay
+        third._set_fattributes()
+        third._set_layers()
+        return third
+            
+    def _set_layers(self):
+        self._layers = [
+            {att: self.__dict__[att][lay] for att in self._useratts}
+            for lay in range(self.nlay)
+        ]
 
     def _set_fattributes(self):
         tail = np.zeros(self.maxlay - self.nlay)
@@ -242,6 +356,7 @@ class Model(object):
             raise ValueError(msg)
 
         self._set_fattributes()
+        self._set_layers()
 
     def change(self, command, verbose=True):
         """
@@ -740,7 +855,7 @@ class Model(object):
 
 class Geometry(object):
     """
-    Recording geometry of rays and events at the seismic station. 
+    Recording geometry of rays and events at the seismic station.
     One set of synthetic traces will be computed for each array element.
 
     Parameters:
@@ -755,8 +870,8 @@ class Geometry(object):
         maxtr (int):
           Maximum number of traces defined in params.h
 
-    The following attributes are set upon initialization. `f` prefixes indicate 
-    attributes used for interaction with `fraysum.run_bare()` and 
+    The following attributes are set upon initialization. `f` prefixes indicate
+    attributes used for interaction with `fraysum.run_bare()` and
     `fraysum.run_full()`.
 
         ntr (int):
@@ -1057,7 +1172,7 @@ class Control(object):
             IndexError: If resulting phaselist is longer than :const:`maxph`.
 
         Hint:
-            In a two layer model (index `0` is the topmost subsurface layer, index `1` 
+            In a two layer model (index `0` is the topmost subsurface layer, index `1`
             is the underlying half-space) the :const:`descriptors` compute the phases:
 
             * ``['1P0P']``: direct P-wave
@@ -1196,7 +1311,7 @@ class Seismogram(object):
 
     def calculate_rfs(self):
         """
-        Generate receiver functions from spectral division of displacement traces. 
+        Generate receiver functions from spectral division of displacement traces.
         Will be stored in :attr:`rflist`.
 
         Raises:
@@ -1260,7 +1375,7 @@ class Seismogram(object):
 
         self.rfs = rflist
 
-        return 
+        return
 
     def descriptors(self):
         """
@@ -1276,7 +1391,7 @@ class Seismogram(object):
         >>> from pyraysum import Model, Control, Geometry, run
         >>> model = Model([30000., 0], [2800., 3300.], [6000., 8000.], [3600., 4500.])
         >>> geom = Geometry(0., 0.06)
-        >>> rc = Control(mults=1)
+        >>> rc = Control(mults=0)
         >>> seismogram = run(model, geom, rc)
         >>> seismogram.descriptors()
         ['1P0P', '1P0S']
@@ -1311,12 +1426,12 @@ class Seismogram(object):
         for itr, stream in enumerate(self.streams):
             arr = np.vstack((stream[0].data, stream[1].data, stream[2].data)).T
             buf += "#-------------------\n"
-            buf += "# Trace number {:5d}\n".format(itr+1)  # Fortran indexing
+            buf += "# Trace number {:5d}\n".format(itr + 1)  # Fortran indexing
             buf += "#-------------------\n"
             buf += (
                 np.array2string(
                     arr,
-                    threshold=3*arr.shape[0] + 1,
+                    threshold=3 * arr.shape[0] + 1,
                     formatter={"float": lambda i: "{:15.7e}".format(i)},
                 )
                 .replace("[", " ")
@@ -1371,10 +1486,10 @@ class Seismogram(object):
                 :const:`'rfs'`, or :const:`'all'` for the displacement seismograms,
                 receiver functions, or both
             ftype (str):
-                Type of filter to use in 
+                Type of filter to use in
                 `obspy.Trace.filter <https://tinyurl.com/45dkyvwy>`_
             **kwargs:
-                Keyword arguments passed to 
+                Keyword arguments passed to
                 `obspy.Trace.filter <https://tinyurl.com/45dkyvwy>`_
 
         """
@@ -1407,7 +1522,7 @@ class Seismogram(object):
 
 def run(model, geometry, rc, mode="full", rf=False):
     """
-    Run a wave-field simulation. This function calls the compiled :mod:`fraysum` 
+    Run a wave-field simulation. This function calls the compiled :mod:`fraysum`
     binaries.
 
     Parameters:
@@ -1439,9 +1554,9 @@ def run(model, geometry, rc, mode="full", rf=False):
     <class 'obspy.core.stream.Stream'>
     >>> print(seismogram.streams[0])
     3 Trace(s) in Stream:
-    .prs..BHN | 2020-11-30T21:04:43.890339Z - 2020-11-30T21:05:21.365339Z | 40.0 Hz, 1500 samples
-    .prs..BHE | 2020-11-30T21:04:43.891418Z - 2020-11-30T21:05:21.366418Z | 40.0 Hz, 1500 samples
-    .prs..BHZ | 2020-11-30T21:04:43.891692Z - 2020-11-30T21:05:21.366692Z | 40.0 Hz, 1500 samples
+    .prs..R | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples
+    .prs..T | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples
+    .prs..Z | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples
     """
 
     if rf and rc.rot == 0:
@@ -1633,7 +1748,7 @@ def equivalent_phases(descriptors, kinematic=False):
 
                     ndscrs.append(ndscr)
 
-    return list(set(ndscrs))
+    return sorted(list(set(ndscrs)))
 
 
 def read_traces(traces, rc, geometry, arrivals=None):
@@ -1924,7 +2039,7 @@ def filtered_array(traces, rfarray, ntr, npts, dt, fmin, fmax):
     Fast, `NumPy`-based filtering of :meth:`fraysum.run_bare()` output
 
     Roughly equivalent to subsequent calls to :func:`read_traces()`, and
-    :meth:`Seismogram.filter()`, stripped down for computational efficiency, 
+    :meth:`Seismogram.filter()`, stripped down for computational efficiency,
     for use in inversion/probabilistic approaches.
 
     Parameters:
