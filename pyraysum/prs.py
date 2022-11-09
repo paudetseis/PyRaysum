@@ -41,6 +41,9 @@ _phids = {_phnames[k]: k for k in _phnames}  # inverse dictionary
 class Model(object):
     """Model of the subsurface seismic velocity structure.
 
+    .. note::
+       This object holds the infromation of the .mod file in classic Raysum
+
     Parameters:
         thickn (array_like):
           Thickness of layers (m)
@@ -110,7 +113,6 @@ class Model(object):
         # thickn     rho      vp      vs  flag aniso   trend plunge strike   dip
          10000.0  3000.0  6000.0  3500.0    1    0.0     0.0    0.0    0.0   0.0
              0.0  4500.0  8000.0  4600.0    1    0.0     0.0    0.0    0.0   0.0
-        <BLANKLINE>
         >>> model[0]["thickn"]
         10000.0
         >>> model[1, "vp"]
@@ -132,7 +134,6 @@ class Model(object):
          10000.0  3000.0  6000.0  3500.0    1    0.0     0.0    0.0    0.0   0.0
           5000.0  4000.0  8000.0  4000.0    1    0.0     0.0    0.0    0.0   0.0
           5000.0  3600.0  8000.0  4000.0    1    0.0     0.0    0.0    0.0   0.0
-        <BLANKLINE>
         >>> model += {"thickn": 0, "rho": 3800, "vp": 8500., "dip": 20, "strike": 90}
         >>> print(model)
         # thickn     rho      vp      vs  flag aniso   trend plunge strike   dip
@@ -140,7 +141,6 @@ class Model(object):
           5000.0  4000.0  8000.0  4000.0    1    0.0     0.0    0.0    0.0   0.0
           5000.0  3600.0  8000.0  4000.0    1    0.0     0.0    0.0    0.0   0.0
              0.0  3800.0  8500.0  4913.3    1    0.0     0.0    0.0   90.0  20.0
-        <BLANKLINE>
     """
 
     def __init__(
@@ -236,7 +236,7 @@ class Model(object):
             lays = [layatt[0]]
             atts = [layatt[1]]
             vals = [value]
-            
+
         for lay, att, val in zip(lays, atts, vals):
             if att not in self._useratts:
                 msg = f"Unknown attribute: '{att}'. Must be one of: "
@@ -274,7 +274,7 @@ class Model(object):
         ):
             buf += f.format(th, r, vp, vs, fl, a, tr, p, s, d)
 
-        return buf
+        return buf.strip("\n")
 
     def __add__(self, other):
         if not isinstance(other, Model):
@@ -283,7 +283,7 @@ class Model(object):
             except TypeError:
                 other = Model(*other)
             except Exception:
-                msg = "Can only add Model, dict, or list to Model."
+                msg = "Can only add Model, or valid dict or list to Model."
                 raise TypeError(msg)
 
         third = deepcopy(self)
@@ -295,7 +295,15 @@ class Model(object):
         third._set_fattributes()
         third._set_layers()
         return third
-            
+
+    def __eq__(self, other):
+        issame = [
+            slay[att] == olay[att]
+            for slay, olay in zip(self._layers, other._layers)
+            for att in self._useratts
+        ]
+        return all(issame)
+
     def _set_layers(self):
         self._layers = [
             {att: self.__dict__[att][lay] for att in self._useratts}
@@ -303,6 +311,13 @@ class Model(object):
         ]
 
     def _set_fattributes(self):
+        if self.nlay > self.maxlay:
+            msg = f"The object is larger (nlay={self.nlay}) than the memory allocated "
+            msg += f"at compile time (maxlay={self.maxlay}). "
+            msg += (
+                f"Increase maxlay in params.h and when constucting this Model object."
+            )
+            raise IndexError(msg)
         tail = np.zeros(self.maxlay - self.nlay)
         self.fthickn = np.asfortranarray(np.append(self.thickn, tail))
         self.frho = np.asfortranarray(np.append(self.rho, tail))
@@ -854,18 +869,21 @@ class Model(object):
 
 
 class Geometry(object):
-    """
-    Recording geometry of rays and events at the seismic station.
+    """Ray geometry of seismic events and station configuration.
+
     One set of synthetic traces will be computed for each array element.
+
+    .. note::
+       This object holds the infromation of the .geom file in classic Raysum
 
     Parameters:
         baz (float or array_like):
           Ray back-azimuths (deg)
         slow (float or array_like):
           Ray slownesses (s/km)
-        dn (array_like):
+        dn (float):
           North-offset of the seismic station (m)
-        de (array_like):
+        de (float):
           East-offset of the seismic station (m)
         maxtr (int):
           Maximum number of traces defined in params.h
@@ -887,9 +905,34 @@ class Geometry(object):
           North-offset of the seismic station (m)
         fde (np.ndarray):
           East-offset of the seismic station (m)
+
+    Example
+    -------
+        >>> from pyraysum import Geometry
+        >>> geom = Geometry(60, 0.06)
+        >>> print(geom)
+        #Back-azimuth, Slowness, N-offset, E-offset
+                60.00    0.0600      0.00      0.00
+        >>> geom += [[90, 120], 0.04]
+        >>> print(geom)
+        #Back-azimuth, Slowness, N-offset, E-offset
+                60.00    0.0600      0.00      0.00
+                90.00    0.0400      0.00      0.00
+               120.00    0.0400      0.00      0.00
+        >>> geom = Geometry(range(0, 360, 90), [0.04, 0.08], 10, 35)
+        >>> print(geom)
+        #Back-azimuth, Slowness, N-offset, E-offset
+                 0.00    0.0400     10.00     35.00
+                90.00    0.0400     10.00     35.00
+               180.00    0.0400     10.00     35.00
+               270.00    0.0400     10.00     35.00
+                 0.00    0.0800     10.00     35.00
+                90.00    0.0800     10.00     35.00
+               180.00    0.0800     10.00     35.00
+               270.00    0.0800     10.00     35.00
     """
 
-    def __init__(self, baz, slow, dn=[0], de=[0], maxtr=500):
+    def __init__(self, baz, slow, dn=0, de=0, maxtr=500):
 
         if type(baz) == int or type(baz) == float:
             baz = [baz]
@@ -908,31 +951,66 @@ class Geometry(object):
 
         self.ntr = len(self.baz)
 
-        self.dn = np.array(dn)
-        self.de = np.array(de)
+        self.dn = np.full(self.ntr, dn)
+        self.de = np.full(self.ntr, de)
 
-        if len(self.dn) != self.ntr:
-            self.dn = np.full(self.ntr, self.dn[0])
+        self.maxtr = maxtr
+        self._set_fattributes()
 
-        if len(self.de) != self.ntr:
-            self.de = np.full(self.ntr, self.de[0])
+    def __len__(self):
+        return self.ntr
 
-        tail = np.zeros(maxtr - self.ntr)
+    def __add__(self, other):
+        if not isinstance(other, Geometry):
+            try:
+                other = Geometry(**other)
+            except TypeError:
+                other = Geometry(*other)
+            except Exception:
+                msg = "Can only add Geometry, or valid dict or list to Geometry."
+                raise TypeError(msg)
+
+        third = deepcopy(self)
+
+        third.baz = np.append(self.baz, other.baz)
+        third.slow = np.append(self.slow, other.slow)
+        third.dn = np.append(self.dn, other.dn)
+        third.de = np.append(self.de, other.de)
+        third.geom = np.append(self.geom, other.geom)
+        third.ntr += other.ntr
+        third._set_fattributes()
+
+        return third
+
+    def __eq__(self, other):
+        return (
+            all(np.equal(self.baz, other.baz))
+            and all(np.equal(self.slow, other.slow))
+            and all(np.equal(self.dn, other.dn))
+            and all(np.equal(self.de, other.de))
+        )
+
+    def __str__(self):
+        out = "#Back-azimuth, Slowness, N-offset, E-offset\n"
+        form = "{: 13.2f} {: 9.4f} {:9.2f} {:9.2f}\n"
+        for bb, ss, xx, yy in zip(self.baz, self.slow, self.dn, self.de):
+            out += form.format(bb, ss, xx, yy)
+        return out.strip("\n")
+
+    def _set_fattributes(self):
+        if self.ntr > self.maxtr:
+            msg = f"The object is larger (ntr={self.ntr}) than the memory allocated "
+            msg += f"at compile time (maxtr={self.maxtr}). "
+            msg += (
+                f"Increase maxtr in params.h and when constucting this Geometry object."
+            )
+            raise IndexError(msg)
+        tail = np.zeros(self.maxtr - self.ntr)
         self.fbaz = np.asfortranarray(np.append(self.baz, tail) * np.pi / 180)
         self.fslow = np.asfortranarray(np.append(self.slow, tail) * 1e-3)
         self.fdn = np.asfortranarray(np.append(self.dn, tail))
         self.fde = np.asfortranarray(np.append(self.de, tail))
         self.parameters = [self.fbaz, self.fslow, self.fdn, self.fde, self.ntr]
-
-    def __len__(self):
-        return self.ntr
-
-    def __str__(self):
-        out = "#Back-azimuth, Slowness, N-offset, E-offset"
-        form = "{: 7.2f} {: 8.4f} {:7.2f} {:7.2f}\n"
-        for bb, ss, xx, yy in zip(self.baz, self.slow, self.dn, self.de):
-            out += form.format(bb, ss, xx, yy)
-        return out
 
     def save(self, fname="sample.geom"):
         """
@@ -1760,7 +1838,7 @@ def read_traces(traces, rc, geometry, arrivals=None):
         rc (:class:`Control`):
             Run-control parameters
         geometry (:class:`Geometry`):
-            Geometry parameters
+            Ray parameters
         arrivals (list):
             Output of :meth:`read_arrivals`. List of arrival times, amplitudes, and
             names
