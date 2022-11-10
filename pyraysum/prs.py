@@ -36,6 +36,38 @@ _rot = {0: "ZNE", 1: "RTZ", 2: "PVH"}
 _iphase = {"P": 1, "SV": 2, "SH": 3}
 _phnames = {1: "P", 2: "S", 3: "T", 4: "p", 5: "s", 6: "t"}
 _phids = {_phnames[k]: k for k in _phnames}  # inverse dictionary
+_modhint = (
+    "################################################\n"
+    "#\n"
+    "#   Model file to use with `PyRaysum` for \n"
+    "#   modeling teleseismic body wave propagation \n"
+    "#   through dippin anisotropic media.\n"
+    "#\n"
+    "#   Lines starting with '#' are ignored. Each \n"
+    "#   line corresponds to a unique layer. The \n"
+    "#   bottom layer is assumed to be a half-space\n"
+    "#   (Thickness is irrelevant).\n"
+    "#\n"
+    "#   Format:\n"
+    "#       Column  Contents\n"
+    "#          0    Thickness (km)\n"
+    "#          1    Density (kg/m^3)\n"
+    "#          2    Layer P-wave velocity (km/s)\n"
+    "#          3    Layer S-wave velocity (km/s)\n"
+    "#          4    Layer flag \n"
+    "#                   1: isotropic\n"
+    "#                   0: transverse isotropy\n"
+    "#          5    % Transverse anisotropy (if Layer flag is set to 0)\n"
+    "#                   0: isotropic\n"
+    "#                   +: fast symmetry axis\n"
+    "#                   -: slow symmetry axis\n"
+    "#          6    Trend of symmetry axis (degrees)\n"
+    "#          7    Plunge of symmetry axis (degrees)\n"
+    "#		    8	 Interface strike (degrees)\n"
+    "#		    9	 Interface dip (degrees)\n"
+    "#\n"
+    "################################################\n"
+)
 
 
 class Model(object):
@@ -110,9 +142,9 @@ class Model(object):
         >>> from pyraysum import Model
         >>> model = Model([10000, 0], [3000, 4500], [6000, 8000], [3500, 4600])
         >>> print(model)
-        # thickn     rho      vp      vs  flag aniso   trend plunge strike   dip
-         10000.0  3000.0  6000.0  3500.0    1    0.0     0.0    0.0    0.0   0.0
-             0.0  4500.0  8000.0  4600.0    1    0.0     0.0    0.0    0.0   0.0
+        #  thickn     rho      vp      vs  flag aniso   trend plunge strike   dip
+          10000.0  3000.0  6000.0  3500.0    1    0.0     0.0    0.0    0.0   0.0
+              0.0  4500.0  8000.0  4600.0    1    0.0     0.0    0.0    0.0   0.0
         >>> model[0]["thickn"]
         10000.0
         >>> model[1, "vp"]
@@ -130,17 +162,17 @@ class Model(object):
         4000.0
         >>> model += [5000, 3600, 8000, 4000]  # thickn, rho, vp, vs
         >>> print(model)
-        # thickn     rho      vp      vs  flag aniso   trend plunge strike   dip
-         10000.0  3000.0  6000.0  3500.0    1    0.0     0.0    0.0    0.0   0.0
-          5000.0  4000.0  8000.0  4000.0    1    0.0     0.0    0.0    0.0   0.0
-          5000.0  3600.0  8000.0  4000.0    1    0.0     0.0    0.0    0.0   0.0
+        #  thickn     rho      vp      vs  flag aniso   trend plunge strike   dip
+          10000.0  3000.0  6000.0  3500.0    1    0.0     0.0    0.0    0.0   0.0
+           5000.0  4000.0  8000.0  4000.0    1    0.0     0.0    0.0    0.0   0.0
+           5000.0  3600.0  8000.0  4000.0    1    0.0     0.0    0.0    0.0   0.0
         >>> model += {"thickn": 0, "rho": 3800, "vp": 8500., "dip": 20, "strike": 90}
         >>> print(model)
-        # thickn     rho      vp      vs  flag aniso   trend plunge strike   dip
-         10000.0  3000.0  6000.0  3500.0    1    0.0     0.0    0.0    0.0   0.0
-          5000.0  4000.0  8000.0  4000.0    1    0.0     0.0    0.0    0.0   0.0
-          5000.0  3600.0  8000.0  4000.0    1    0.0     0.0    0.0    0.0   0.0
-             0.0  3800.0  8500.0  4913.3    1    0.0     0.0    0.0   90.0  20.0
+        #  thickn     rho      vp      vs  flag aniso   trend plunge strike   dip
+          10000.0  3000.0  6000.0  3500.0    1    0.0     0.0    0.0    0.0   0.0
+           5000.0  4000.0  8000.0  4000.0    1    0.0     0.0    0.0    0.0   0.0
+           5000.0  3600.0  8000.0  4000.0    1    0.0     0.0    0.0    0.0   0.0
+              0.0  3800.0  8500.0  4913.3    1    0.0     0.0    0.0   90.0  20.0
     """
 
     def __init__(
@@ -254,10 +286,10 @@ class Model(object):
         return self.nlay
 
     def __str__(self):
-        buf = "# thickn     rho      vp      vs  flag aniso   trend "
+        buf = "#  thickn     rho      vp      vs  flag aniso   trend "
         buf += "plunge strike   dip\n"
 
-        f = "{: 8.1f} {: 7.1f} {: 7.1f} {: 7.1f} {: 4.0f} {: 6.1f} {: 7.1f} "
+        f = "{: 9.1f} {: 7.1f} {: 7.1f} {: 7.1f} {: 4.0f} {: 6.1f} {: 7.1f} "
         f += "{: 6.1f} {: 6.1f} {: 5.1f}\n"
 
         for th, vp, vs, r, fl, a, tr, p, s, d in zip(
@@ -342,6 +374,30 @@ class Model(object):
             self.fdip,
             self.nlay,
         ]
+
+    def _v12str(self):
+        """Raysum version 1.2 .mod file convention """
+        buf = "#  thickn     rho      vp      vs  flag p-aniso  s-aniso   trend "
+        buf += "plunge strike   dip\n"
+
+        f = "{: 9.1f} {: 7.1f} {: 7.1f} {: 7.1f} {: 4.0f} {: 8.1f} {: 8.1f} {: 7.1f} "
+        f += "{: 6.1f} {: 6.1f} {: 5.1f}\n"
+
+        for th, vp, vs, r, fl, a, tr, p, s, d in zip(
+            self.thickn,
+            self.vp,
+            self.vs,
+            self.rho,
+            self.flag,
+            self.ani,
+            self.trend,
+            self.plunge,
+            self.strike,
+            self.dip,
+        ):
+            buf += f.format(th, r, vp, vs, fl, a, a, tr, p, s, d)
+
+        return buf.strip("\n")
 
     def update(self, change="vpvs"):
         """
@@ -585,20 +641,21 @@ class Model(object):
         self.nlay -= bottom - top - 1
         self.update()
 
-    def save(self, fname="sample.mod", comment=""):
+    def save(self, fname="sample.mod", comment="", hint=False, version="prs"):
         """
         Alias for :class:`write()`
         """
-        self.write(fname=fname, comment=comment)
+        self.write(fname=fname, comment=comment, hint=hint, version=version)
 
-    def write(self, fname="sample.mod", comment=""):
+    def write(self, fname="sample.mod", comment="", hint=False, version="prs"):
         """
         Write seismic velocity model to disk as Raysum ASCII model file
 
         Args:
             fname (str): Name of the output file (including extension)
             comment (str): String to write into file header
-
+            hint (bool): Include usage comment to model file
+            version ("prs" or "1.2"): Use PyRaysum or Raysum1.2 file format
         """
 
         if not comment.startswith("#"):
@@ -612,8 +669,19 @@ class Model(object):
 
         buf = "# Raysum velocity model created with PyRaysum\n"
         buf += "# on: {:}\n".format(datetime.now().isoformat(" ", "seconds"))
+
+        if hint:
+            buf += _modhint
+
         buf += comment
-        buf += self.__str__()
+
+        if version == "prs":
+            buf += self.__str__()
+        elif version == "1.2":
+            buf += self._v12str()
+        else:
+            msg = f"Unknown version: {version}"
+            raise ValueError(msg)
 
         with open(fname, "w") as fil:
             fil.write(buf)
@@ -997,6 +1065,13 @@ class Geometry(object):
             out += form.format(bb, ss, xx, yy)
         return out.strip("\n")
 
+    def _fstr(self):
+        out = "#Back-azimuth, Slowness, N-offset, E-offset\n"
+        form = "{: 13.2f} {: 9.1e} {:9.2f} {:9.2f}\n"
+        for bb, ss, xx, yy in zip(self.baz, self.slow, self.dn, self.de):
+            out += form.format(bb, ss*1e-3, xx, yy)
+        return out.strip("\n")
+
     def _set_fattributes(self):
         if self.ntr > self.maxtr:
             msg = f"The object is larger (ntr={self.ntr}) than the memory allocated "
@@ -1028,7 +1103,7 @@ class Geometry(object):
         """
 
         with open(fname, "w") as f:
-            f.write(self.__str__())
+            f.write(self._fstr())
 
         print("Geometry written to: " + fname)
 
@@ -1201,7 +1276,7 @@ class Control(object):
         out += "{:}".format(_rot[self.rot])
         return out
 
-    def __repr__(self):
+    def _prs_str(self):
         out = "# Verbosity\n"
         out += "{:}\n".format(int(self.verbose))
         out += "# Phase name\n"
@@ -1212,6 +1287,23 @@ class Control(object):
         out += "{:}\n".format(self.npts)
         out += "# Sample rate (seconds)\n"
         out += "{:}\n".format(self.dt)
+        out += "# Alignment: 0 is none, 1 aligns on P, 2 on SV, 3 on SH\n"
+        out += "{:}\n".format(self.align)
+        out += "# Shift of traces (seconds)\n"
+        out += "{:}\n".format(self.shift)
+        out += "# Rotation to output: 0 is ENZ, 1 is RTZ, 2 is PVH\n"
+        out += "{:}\n".format(self.rot)
+        return out
+
+    def _v12_str(self):
+        out = "# Multiples: 0 for none, 1 for Moho, 2 all first-order\n"
+        out += "{:}\n".format(self.mults)
+        out += "# Number of samples per trace\n"
+        out += "{:}\n".format(self.npts)
+        out += "# Sample rate (seconds)\n"
+        out += "{:}\n".format(self.dt)
+        out += "# Gaussian pulse width (seconds)\n"
+        out += "1.\n"
         out += "# Alignment: 0 is none, 1 aligns on P, 2 on SV, 3 on SH\n"
         out += "{:}\n".format(self.align)
         out += "# Shift of traces (seconds)\n"
@@ -1325,24 +1417,34 @@ class Control(object):
             self._phaselist,
         ]
 
-    def save(self, fname="raysum-param"):
+    def save(self, fname="raysum-param", version="prs"):
         """
         Alias for :class:`~pyraysum.prs.Control.write()`
         """
 
-        self.write(fname=fname)
+        self.write(fname=fname, version=version)
 
-    def write(self, fname="raysum-param"):
+    def write(self, fname="raysum-param", version="prs"):
         """
         Write parameter file to disk
 
         Args:
             fname: (str)
                 Name of file
+            version: ("prs" or "1.2")
+                Pyraysum or Raysum v1.2 compatible
         """
 
+        if version =="prs":
+            buf = self._prs_str()
+        elif version == "1.2":
+            buf = self._v12_str()
+        else:
+            msg = f"Unknown version: {version}"
+            raise ValueError(msg)
+            
         with open(fname, "w") as f:
-            f.write(self.__repr__())
+            f.write(buf)
 
 
 class Seismogram(object):
@@ -1675,7 +1777,7 @@ def run(model, geometry, rc, mode="full", rf=False):
     return seismogram
 
 
-def read_model(modfile, encoding=None):
+def read_model(modfile, encoding=None, version="prs"):
     """
     Reads model parameters from file
 
@@ -1685,6 +1787,10 @@ def read_model(modfile, encoding=None):
     """
 
     vals = np.genfromtxt(modfile, encoding=encoding).T
+    if version == "1.2":
+        # ignore s-anisotropy
+        vals = np.vstack((vals[:6], vals[7:]))
+        
     return Model(*vals)
 
 
@@ -1698,6 +1804,7 @@ def read_geometry(geomfile, encoding=None):
     """
 
     vals = np.genfromtxt(geomfile, dtype=None, encoding=encoding)
+    vals[:, 1] *= 1e3
 
     try:
         geom = Geometry(*zip(*vals))
@@ -1707,7 +1814,7 @@ def read_geometry(geomfile, encoding=None):
     return geom
 
 
-def read_rc(paramfile):
+def read_control(paramfile, version="prs"):
     """
     Read Raysum run control parameters from file.
 
@@ -1719,13 +1826,20 @@ def read_rc(paramfile):
     with open(paramfile, "r") as f:
         lines = f.readlines()
 
-    values = []
+    buf = []
     for line in lines:
         line = line.strip()
         if line.startswith("#"):
             continue
-        values.append(line)
-    return Control(*values)
+        buf.append(line)
+
+    if version == "prs":
+        return Control(*buf)
+    elif version == "1.2":
+        rc = Control(
+            mults=buf[0], npts=buf[1], dt=buf[2], align=buf[4], shift=buf[5], rot=buf[6]
+        )
+        return rc
 
 
 def equivalent_phases(descriptors, kinematic=False):

@@ -1,12 +1,12 @@
 from pkg_resources import resource_filename
 from pyraysum import prs, Model
 import pytest
+import tempfile
+from os import remove
 import numpy as np
 
-dipfile = resource_filename('pyraysum',
-                           'examples/data/model_Porter2011_dip.txt')
-anisofile = resource_filename('pyraysum',
-                           'examples/data/model_Porter2011_aniso.txt')
+dipfile = resource_filename("pyraysum", "examples/data/model_Porter2011_dip.txt")
+anisofile = resource_filename("pyraysum", "examples/data/model_Porter2011_aniso.txt")
 
 
 def test_read_model_dip():
@@ -14,34 +14,50 @@ def test_read_model_dip():
     assert isinstance(model, Model)
     return model
 
+
 def test_read_model_aniso():
     model = prs.read_model(anisofile)
     assert isinstance(model, Model)
     return model
 
+
+def test_write_read_model_v1_2():
+    """Write and read a raysum v1.2 model"""
+    model = prs.read_model(anisofile)
+    tmpf = tempfile.NamedTemporaryFile(delete=False)
+    model.write(tmpf.name, version="1.2")
+    model = prs.read_model(tmpf.name, version="1.2")
+    remove(tmpf.name)
+    assert isinstance(model, Model)
+    assert model[1, "ani"] == -20.0
+
+
 def test_def_model():
-    thick = [20000., 10000., 0.]
-    rho = [2800., 2950., 3300.]
-    vp = [4600., 5000., 6000.]
-    vs = [2600., 3000., 3600.]
+    thick = [20000.0, 10000.0, 0.0]
+    rho = [2800.0, 2950.0, 3300.0]
+    vp = [4600.0, 5000.0, 6000.0]
+    vs = [2600.0, 3000.0, 3600.0]
     flag = [1, 0, 1]
     ani = [0, 5, 0]
     model = Model(thick, rho, vp, vs, flag=flag, ani=ani)
     assert isinstance(model, Model)
     return model
 
+
 def test_plot_model():
     model = test_def_model()
     model.plot()
 
+
 def test_getitem_setitem_add():
+    # __getitem__
     model1 = prs.read_model(dipfile)
-    assert model1[0]["thickn"] == 20000.
-    assert model1[1]["rho"] == 2800.
-    assert model1[2]["vp"] == 7800.
-    assert model1[2]["vs"] == 4480.
+    assert model1[0]["thickn"] == 20000.0
+    assert model1[1]["rho"] == 2800.0
+    assert model1[2]["vp"] == 7800.0
+    assert model1[2]["vs"] == 4480.0
     assert model1[2]["flag"] == 1
-    assert model1[1]["dip"] == 20.
+    assert model1[1]["dip"] == 20.0
     assert model1[2]["strike"] == 90
 
     model2 = prs.read_model(anisofile)
@@ -50,6 +66,11 @@ def test_getitem_setitem_add():
     assert model2[1]["trend"] == 180
     assert model2[1]["plunge"] == 45
 
+    # __eq__
+    model22 = prs.read_model(anisofile)
+    assert model2 == model22
+
+    # __setitem__
     model2[1, "plunge"] = 10
     assert model2[1]["plunge"] == 10
     assert model2[1, "plunge"] == 10
@@ -64,6 +85,7 @@ def test_getitem_setitem_add():
         # Only can set user attributes
         model2[1, "fplunge"] = 10
 
+    # __add__
     model3 = model1 + model2
     assert model3[0, "thickn"] == model1[0, "thickn"]
     assert model3[3, "thickn"] == model2[0, "thickn"]
@@ -78,7 +100,3 @@ def test_getitem_setitem_add():
     with pytest.raises(TypeError):
         # Only can add another model
         model1 + 5
-        
-
-    
-    
