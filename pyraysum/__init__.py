@@ -22,4 +22,4 @@
 
 __version__ = '0.2.0'
 
-from .prs import Model, Geometry, Control, Seismogram, run
+from .prs import Model, Geometry, Control, Result, run

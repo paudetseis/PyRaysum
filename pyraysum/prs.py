@@ -1447,16 +1447,16 @@ class Control(object):
             f.write(buf)
 
 
-class Seismogram(object):
+class Result(object):
     """
-    List of streams of 3-component synthetic seismograms produced by Raysum.
-    Includes methods to calculate receiver functions, filter and plot the
-    streams.
+    Result of a PyRaysum wavefield simulation. 3-component synthetic seismograms
+    are strored as a list of streams in the stream attribute. Includes methods
+    to calculate receiver functions, filter and plot the results.
 
     Parameters:
         model (:class:`~pyraysum.prs.Model`):
             Subsurface velocity model
-        geom (:class:`~pyraysum.prs.Geometry`):
+        geometry (:class:`~pyraysum.prs.Geometry`):
             Recording geometry
         rc (:class:`~pyraysum.prs.Control`):
             Run-control parameters
@@ -1482,12 +1482,35 @@ class Seismogram(object):
 
     """
 
-    def __init__(self, model=None, geom=None, rc=None, streams=None):
+    def __init__(self, model=None, geometry=None, rc=[], streams=[]):
 
         self.model = model
-        self.geom = geom
+        self.geometry = geometry 
         self.streams = streams
         self.rc = rc
+        self.rfs = []
+
+    def __str__(self):
+        msg = "Result contains:\n"
+        msg += "{:d} synthetic {:}-seismogram(s)\n".format(len(self.streams), _rot[self.rc.rot])
+        msg += "{:d} synthetic receiver function(s)\n".format(len(self.rfs))
+        if self.model:
+            msg += "\nFrom subsurface model:\n"
+            msg += self.model.__str__()
+            msg += "\n"
+        else:
+            msg += "\nNo subsurface model stored\n"
+        if self.geometry:
+            baz = self.geometry.baz
+            slow = self.geometry.slow
+            msg += "\nBack-azimuth and slowness range is:\n"
+            msg += "{:f} - {:f}° and {:f} - {:f}s/km".format(
+                min(baz), max(baz), min(slow), max(slow)
+                )
+        else:
+            msg += "\nNo geometry stored."
+
+        return msg
 
     def calculate_rfs(self):
         """
@@ -1625,7 +1648,7 @@ class Seismogram(object):
     def plot(self, typ, **kwargs):
         """
         Plot the displacement seismograms and/or receiver functions stored in
-        :class:`~pyraysum.prs.Seismogram` streams.
+        :class:`~pyraysum.prs.Result` streams.
 
         Parameters:
             typ (str):
@@ -1636,9 +1659,9 @@ class Seismogram(object):
                 Are passed to the underlying :meth:`~pyraysum.plot.stream_wiggles` or
                 :meth:`~pyraysum.plot.rf_wiggles`
         Hint:
-            If :class:`Seismogram` contains only one event (i.e., single :attr:`baz` and
+            If :class:`Result` contains only one event (i.e., single :attr:`baz` and
             :attr:`slow` values), it is more appropriate to plot the waveforms using the
-            default :meth:`Stream.plot()` method on :attr:`Seismogram.streams[0]`.
+            default :meth:`Stream.plot()` method on :attr:`Result.streams[0]`.
 
 
         """
@@ -1658,7 +1681,7 @@ class Seismogram(object):
         """
 
         Filters the displacement seismograms and/or receiver functions stored
-        in :class:`~pyraysum.prs.Seismogram` streams.
+        in :class:`~pyraysum.prs.Result` streams.
 
         Parameters:
             typ (str):
@@ -1719,7 +1742,7 @@ def run(model, geometry, rc, mode="full", rf=False):
             Whether or not to calculate receiver functions
 
     Returns:
-        :class:`~pyraysum.prs.Seismogram`:
+        :class:`~pyraysum.prs.Result`:
             Synthetic seimograms
 
     Example
@@ -1734,9 +1757,9 @@ def run(model, geometry, rc, mode="full", rf=False):
     <class 'obspy.core.stream.Stream'>
     >>> print(seismogram.streams[0])
     3 Trace(s) in Stream:
-    .prs..R | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples
-    .prs..T | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples
-    .prs..Z | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples
+    ...SYR | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples
+    ...SYT | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples
+    ...SYZ | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples
     """
 
     if rf and rc.rot == 0:
@@ -1768,8 +1791,8 @@ def run(model, geometry, rc, mode="full", rf=False):
     # Read all traces and store them into a list of :class:`~obspy.core.Stream`
     streams = read_traces(traces, rc, geometry, arrivals=arrivals)
 
-    # Store everything into Seismogram object
-    seismogram = Seismogram(model=model, geom=geometry.geom, rc=rc, streams=streams)
+    # Store everything into Result object
+    seismogram = Result(model=model, geometry=geometry, rc=rc, streams=streams)
 
     if rf:
         seismogram.calculate_rfs()
@@ -1945,7 +1968,7 @@ def equivalent_phases(descriptors, kinematic=False):
 
 def read_traces(traces, rc, geometry, arrivals=None):
     """
-    Create a :class:`Seismogram` from the array produced by :meth:`fraysum.run_bare()`
+    Create a :class:`Result` from the array produced by :meth:`fraysum.run_bare()`
     and :meth:`fraysum.run_full`.
 
     Parameters:
@@ -1958,8 +1981,8 @@ def read_traces(traces, rc, geometry, arrivals=None):
             names
 
     Returns:
-        :class:`~pyraysum.prs.Seismogram`:
-            List of Stream objects
+        list:
+            List of :class:`obspy.Stream` objects
     """
 
     npts = rc.npts
@@ -2007,11 +2030,11 @@ def read_traces(traces, rc, geometry, arrivals=None):
             stats = {
                 "baz": geom[iitr][0],
                 "slow": geom[iitr][1],
-                "station": "prs",
+                "station": "",
                 "network": "",
                 "starttime": UTCDateTime(0),
                 "delta": dt,
-                "channel": component[ic],
+                "channel": "SY" + component[ic],
                 "taxis": taxis,
             }
 
@@ -2173,7 +2196,7 @@ def filtered_rf_array(traces, rfarray, ntr, npts, dt, fmin, fmax):
     :meth:`fraysum.run_bare()` output
 
     Roughly equivalent to subsequent calls to :func:`read_traces()`,
-    :meth:`Seismogram.calculate_rfs()` and :meth:`Seismogram.filter()`, stripped down
+    :meth:`Result.calculate_rfs()` and :meth:`Result.filter()`, stripped down
     for computational efficiency, for use in inversion/probabilistic approaches.
 
     Parameters:
@@ -2231,7 +2254,7 @@ def filtered_array(traces, rfarray, ntr, npts, dt, fmin, fmax):
     Fast, `NumPy`-based filtering of :meth:`fraysum.run_bare()` output
 
     Roughly equivalent to subsequent calls to :func:`read_traces()`, and
-    :meth:`Seismogram.filter()`, stripped down for computational efficiency,
+    :meth:`Result.filter()`, stripped down for computational efficiency,
     for use in inversion/probabilistic approaches.
 
     Parameters:

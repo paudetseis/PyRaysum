@@ -87,7 +87,7 @@ def rf_wiggles(rflist, btyp='baz', wvtype='P', pws=False, tmin=-5., tmax=20,
     Plot receiver function seismograms sorted by back-azimuth or slowness.
 
     Args:
-        rflist (list or prs.Seismogram):
+        rflist (list or prs.Result):
             list of `obspy.core.Stream <https://tinyurl.com/3u8dv8s8>`_ objects 
             containing receiver functions
         btyp (str):
@@ -259,7 +259,7 @@ def stream_wiggles(streamlist, btyp='baz', wvtype='P', tmin=-5., tmax=20.,
     Plot displacement seismograms sorted by back-azimuth or slowness.
 
     Args:
-        streamlist (list or prs.Seismogram):
+        streamlist (list or prs.Result):
             list of `obspy.core.Stream <https://tinyurl.com/3u8dv8s8>`_ objects 
             containing displacement seismograms
         btyp (str):

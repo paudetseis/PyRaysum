@@ -6,7 +6,7 @@ def test_imports():
     import numpy
     import matplotlib
     import pyraysum
-    from pyraysum import prs, Model, Seismogram
+    from pyraysum import prs, Model, Result
     import fraysum
     assert True
     return
