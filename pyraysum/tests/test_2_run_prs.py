@@ -1,5 +1,6 @@
-from pyraysum import prs, Model, Geometry, Control
-from fraysum import run_full, run_bare
+from pyraysum import Geometry, Control, run
+from pyraysum import prs, frs
+from fraysum import run_bare
 import numpy as np
 import pytest
 import matplotlib.pyplot as mp
@@ -26,7 +27,7 @@ def test_Porter2011():
     print('running run()')
     # Run Raysum with most default values and `rot=1` and `mults=0`
     # to reproduce the results of Porter et al., 2011
-    streamlist = prs.run(model, geom, rc)
+    streamlist = run(model, geom, rc)
 
     # Calculate receiver functions
     streamlist.calculate_rfs()
@@ -41,7 +42,7 @@ def test_Porter2011():
     # Now load a different model and repeat (lower crustal anisotropic layer)
     model = mod.test_read_model_aniso()
 
-    streamlist = prs.run(model, geom, rc)
+    streamlist = run(model, geom, rc)
     streamlist.calculate_rfs()
     streamlist.filter('all', 'lowpass', freq=1., zerophase=True, corners=2)
     streamlist.plot('all', tmin=-0.5, tmax=8.)
@@ -58,12 +59,12 @@ def test_frs():
 
     # Run Raysum with most default values and `rot=1` and `mults=0`
     # to reproduce the results of Porter et al., 2011
-    fstreamlist = prs.run(model, geom, rc)
+    fstreamlist = run(model, geom, rc)
 
     # Now load a different model and repeat (lower crustal anisotropic layer)
     model = mod.test_read_model_aniso()
 
-    fstreamlist = prs.run(model, geom, rc)
+    fstreamlist = run(model, geom, rc)
 
     fstreamlist.calculate_rfs()
 
@@ -95,7 +96,7 @@ def test_filtered_rf_array():
     # print(timeit('_run()', number=50, globals=globals()))
     # >> 21.00839215517044
     def _run():
-        streams = prs.run(model, geom, rc)
+        streams = run(model, geom, rc)
         streams.calculate_rfs()
         streams.filter('rfs', 'bandpass', freqmin=fmin, freqmax=fmax,
                        zerophase=True, corners=2)
@@ -108,7 +109,7 @@ def test_filtered_rf_array():
         ph_traces = run_bare(
             *model.parameters, *geom.parameters, *rc.parameters)
 
-        prs.filtered_rf_array(ph_traces, rfarray, geom.ntr, rc.npts, rc.dt, fmin, fmax)
+        frs.filtered_rf_array(ph_traces, rfarray, geom.ntr, rc.npts, rc.dt, fmin, fmax)
 
     streams = _run()
 
@@ -129,7 +130,7 @@ def test_single_event():
     geom = Geometry(baz=0, slow=0.06)
     for wvtype in ['P', 'SV', 'SH']:
         rc = Control(npts=1500, dt=0.025, rot=2, wvtype=wvtype)
-        streamlist = prs.run(model, geom, rc)
+        result = run(model, geom, rc)
 
 def test_rfs():
 
@@ -139,24 +140,24 @@ def test_rfs():
 
     # test 1
     with pytest.raises(ValueError):
-        assert prs.run(model, geom, rc, rf=True)
+        assert run(model, geom, rc, rf=True)
 
     rc.rot = 1
-    streamlist1 = prs.run(model, geom, rc, rf=True)
+    streamlist1 = run(model, geom, rc, rf=True)
 
     rc.rot = 2
-    streamlist1 = prs.run(model, geom, rc, rf=True)
+    streamlist1 = run(model, geom, rc, rf=True)
     streamlist1.filter('rfs', 'lowpass', freq=1., corners=2, zerophase=True)
     streamlist1.filter('streams', 'lowpass', freq=1., corners=2, zerophase=True)
 
     # test 2
     rc.rot = 0
-    streamlist2 = prs.run(model, geom, rc)
+    streamlist2 = run(model, geom, rc)
     with pytest.raises(ValueError):
         assert streamlist2.calculate_rfs()
 
     rc.rot = 1
-    streamlist2 = prs.run(model, geom, rc)
+    streamlist2 = run(model, geom, rc)
     rflist = streamlist2.calculate_rfs()
     [rf.filter('lowpass', freq=1., corners=2, zerophase=True) for rf in streamlist2.rfs]
 
@@ -173,17 +174,17 @@ def test_bailout():
         modf = "pyraysum/tests/" + modf
         mod = prs.read_model(modf)
         
-    rc = prs.Control(rot=2)
+    rc = Control(rot=2)
 
-    geom1 = prs.Geometry(7.5, 0.045)
+    geom1 = Geometry(7.5, 0.045)
 
-    seis = prs.run(mod, geom1, rc)
+    seis = run(mod, geom1, rc)
 
     amps = seis.streams[0][1].stats.phase_amplitudes
 
     assert all(abs(amps) < 2.5)
 
-    geom2 = prs.Geometry(135, 0.06)
-    seis = prs.run(mod, geom2, rc)
+    geom2 = Geometry(135, 0.06)
+    seis = run(mod, geom2, rc)
 
     assert all(abs(amps) < 2.5)
