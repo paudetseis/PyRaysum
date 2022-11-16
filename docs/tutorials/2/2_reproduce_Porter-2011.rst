@@ -10,7 +10,7 @@ Start by importing the necessary packages:
 
 .. code:: ipython3
 
-    from pyraysum import prs, Geometry, Model, RC
+    from pyraysum import prs, Geometry, Model, Control
     import numpy as np
 
 Dipping Layers
@@ -76,7 +76,7 @@ to properly simulate all possible phase arrivals.
 
 .. code:: ipython3
 
-    rc = RC(rot=1, mults=0, verbose=False, npts=1200, dt=0.0125)
+    rc = Control(rot=1, mults=0, verbose=False, npts=1200, dt=0.0125)
 
 Finally, let’s run the simulation. All book-keeping is handled
 internally.
@@ -85,7 +85,7 @@ internally.
 
     seismogram = prs.run(model, geom, rc)
 
-The function returns a ``Seismogram`` object whose attributes are the
+The function returns a ``Result`` object whose attributes are the
 ``Model``, ``Geometry`` of incoming rays, a list of ``Streams`` as well
 as all run-time arguments that are used by Raysum:
 
@@ -404,7 +404,7 @@ We see that the Waveforms of *Pyraysum* (red) and *Teleweavesim* (gray)
 match pretty well. The *Telewavsim* data has some additional energy at
 about 0.9 seconds, which is a reflection from the top of the anisotropic
 layer. This reflections has explicitly not been computed
-(``RC.mults = 0``), but this could be done using ``RC.set_phaselist()``.
+(``Control.mults = 0``), but this could be done using ``Control.set_phaselist()``.
 
 Conclusion
 ----------

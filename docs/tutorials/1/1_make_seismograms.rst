@@ -179,7 +179,7 @@ We again use the incident P-wave geometry of the Philippines earthquake:
     slow = 0.06
     geom = prs.Geometry(baz=[baz], slow=[slow])
 
-In the run control (RC) parameters, we specify that we would like to: 1)
+In the run control (Control) parameters, we specify that we would like to: 1)
 generate data in a seismometer coordinate system (east-north-up;
 ``rot=0``), 2) include all free surface reflections (``mults=2``); 3)
 and use a sampling rate of 100 Hz (``dt=1/100``) with 2500 samples
@@ -190,7 +190,7 @@ points *toward* the source.
 .. code:: ipython3
 
     # Set `run` parameters
-    rc = prs.RC(
+    rc = prs.Control(
         verbose=False,
         rot=0,
         mults=2,
@@ -377,12 +377,12 @@ Computing equivalent phases
 
 The amplitude of the *PpS* phase is apparently overestimated on the E
 component and underestimated on the Z component. This is the case,
-because the RC parameter ``mults=2`` only computes first-order
+because the Control parameter ``mults=2`` only computes first-order
 multiples, i.e. reflections of the direct *P* wave. Reflections from
 *PS* are missing, most notably *PSpP*. To address this problem, we will
-next use the ``RC.set_phaselist()`` method to explicitly name the phases
+next use the ``Control.set_phaselist()`` method to explicitly name the phases
 we wish to compute. The method implicitly sets ``mults=3``.
-``Seismogram`` has a dedicated method ``descriptors()`` to list unique
+``Result`` has a dedicated method ``descriptors()`` to list unique
 phases present in the synthetic waveforms.
 
 .. code:: ipython3

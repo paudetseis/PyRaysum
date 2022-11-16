@@ -27,7 +27,7 @@ Definition of the Forward Computation
 -------------------------------------
 
 We predict waveforms inside a function ``predictRF()`` that accepts
-``Model``, ``Geometry``, and ``RC`` objects, which completely define the
+``Model``, ``Geometry``, and ``Control`` objects, which completely define the
 synthetic seismograms to be computed. Only the ``fthickn`` and ``fvs``
 attributes of the ``Model`` will be varied when trying different
 parameter combinations. The post-processing is determined by the
@@ -197,7 +197,7 @@ al. (2000), as well as the recording geometry.
         model = prs.Model(thickn, rho, vp, vs)
         geometry = prs.Geometry([baz], [slow])    
 
-We choose the RC parameters so that they match the processing of the
+We choose the Control parameters so that they match the processing of the
 receiver functions. In the present case, the receiver functions are
 rotated to the P-SV-SH ray coordinate system (``rot=2``), and the
 sampling interval (``dt``) and number of samples (``npts``) are set to
@@ -210,7 +210,7 @@ might not be used at all.
 
 .. code:: ipython3
 
-        rc = prs.RC(
+        rc = prs.Control(
             verbose=False,
             rot=2,
             dt=time[1] - time[0],

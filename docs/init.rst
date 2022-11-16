@@ -343,14 +343,14 @@ Here we model P waveforms from a single event, characterized by a back-azimuth o
 
 .. sourcecode:: python
 
-   >>> from pyraysum import prs, Model, Geometry, RC
+   >>> from pyraysum import prs, Model, Geometry, Control
    >>> # Define model with isotropic crust over isotropic half-space mantle
    >>> model = Model([30000., 0], [2800., 3300.], [6000., 8000.], [3600., 4500.])
    >>> # Define the ray geometry for one event
    >>> geom = Geometry(30., 0.05) # baz = 30 deg; slow = 0.05 s/km
    >>> # Define the run-control parameters
    >>> # sampling of 0.025 s; 1500 samples; with multiples; in Z-N-E coordinate system
-   >>> rc = RC(dt=0.025, npts=1500, mults=1, rot=0) 
+   >>> rc = Control(dt=0.025, npts=1500, mults=1, rot=0) 
    >>> # Run Raysum for this setup
    >>> streamlist = prs.run(model, geom, rc)
 
@@ -442,11 +442,11 @@ Let's first setup a simulation for a simple 2-layer model:
 
 .. sourcecode:: python
 
-   >>> from pyraysum import prs, Model, Geometry, RC
+   >>> from pyraysum import prs, Model, Geometry, Control
    >>> # Define model with isotropic crust over isotropic half-space mantle
    >>> model = Model([30000., 0], [2800., 3300.], [6000., 8000.], [3600., 4500.])
    >>> geom = Geometry(0., 0.06) # baz = 0 deg; slow = 0.06 s/km
-   >>> rc = RC(dt=0.025, npts=1500, mults=1, rot=1)
+   >>> rc = Control(dt=0.025, npts=1500, mults=1, rot=1)
 
 Method 1
 ********
