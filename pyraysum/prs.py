@@ -341,7 +341,10 @@ class Model(object):
 
     def _set_layers(self):
         self.layers = [
-            {prop: self.__dict__[_prop][lay] for prop, _prop in zip(self.properties, self._properties)}
+            {
+                prop: self.__dict__[_prop][lay]
+                for prop, _prop in zip(self.properties, self._properties)
+            }
             for lay in range(self.nlay)
         ]
 
@@ -379,7 +382,7 @@ class Model(object):
         ]
 
     def _v12str(self):
-        """Raysum version 1.2 .mod file convention """
+        """Raysum version 1.2 .mod file convention"""
         buf = "#  thickn     rho      vp      vs  flag p-aniso  s-aniso   trend "
         buf += "plunge strike   dip\n"
 
@@ -1109,7 +1112,7 @@ class Geometry(object):
         out = "#Back-azimuth, Slowness, N-offset, E-offset\n"
         form = "{: 13.2f} {: 9.1e} {:9.2f} {:9.2f}\n"
         for bb, ss, xx, yy in zip(self._baz, self._slow, self._dn, self._de):
-            out += form.format(bb, ss*1e-3, xx, yy)
+            out += form.format(bb, ss * 1e-3, xx, yy)
         return out.strip("\n")
 
     def _set_fattributes(self):
@@ -1475,14 +1478,14 @@ class Control(object):
                 Pyraysum or Raysum v1.2 compatible
         """
 
-        if version =="prs":
+        if version == "prs":
             buf = self._prs_str()
         elif version == "1.2":
             buf = self._v12_str()
         else:
             msg = f"Unknown version: {version}"
             raise ValueError(msg)
-            
+
         with open(fname, "w") as f:
             f.write(buf)
 
@@ -1504,8 +1507,8 @@ class Result(object):
             List of :class:`~obspy.core.Stream` objects.
 
     If created with :const:`mode='full'` in :meth:`run()`, the :attr:`stats` attribute
-    of each :class:`~obspy.core.Trace` in each :class:`~obspy.core.Stream` holds the
-    additional attributes:
+    of each :class:`~obspy.core.Trace` in each :class:`~obspy.core.Stream` in
+    :attr:`Result.streams` holds the additional attributes:
 
         phase_times
             Arrival times of seismic phases
@@ -1525,14 +1528,16 @@ class Result(object):
     def __init__(self, model=None, geometry=None, rc=[], streams=[]):
 
         self.model = model
-        self.geometry = geometry 
+        self.geometry = geometry
         self.streams = streams
         self.rc = rc
         self.rfs = []
 
     def __str__(self):
         msg = "Result contains:\n"
-        msg += "{:d} synthetic {:}-seismogram(s)\n".format(len(self.streams), _rot[self.rc.rot])
+        msg += "{:d} synthetic {:}-seismogram(s)\n".format(
+            len(self.streams), _rot[self.rc.rot]
+        )
         msg += "{:d} synthetic receiver function(s)\n".format(len(self.rfs))
         if self.model:
             msg += "\nFrom subsurface model:\n"
@@ -1546,7 +1551,7 @@ class Result(object):
             msg += "\nBack-azimuth and slowness range is:\n"
             msg += "{:f} - {:f}° and {:f} - {:f}s/km".format(
                 min(baz), max(baz), min(slow), max(slow)
-                )
+            )
         else:
             msg += "\nNo geometry stored."
 
@@ -1841,6 +1846,7 @@ def run(model, geometry, rc, mode="full", rf=False):
 
     return seismogram
 
+
 def read_model(modfile, encoding=None, version="prs"):
     """
     Reads model parameters from file
@@ -1854,7 +1860,7 @@ def read_model(modfile, encoding=None, version="prs"):
     if version == "1.2":
         # ignore s-anisotropy
         vals = np.vstack((vals[:6], vals[7:]))
-        
+
     return Model(*vals)
 
 

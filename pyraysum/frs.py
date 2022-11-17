@@ -25,7 +25,9 @@ from scipy import signal
 from obspy import Trace, Stream, UTCDateTime
 from numpy.fft import fft, ifft, fftshift
 
-_phnames = {1: "P", 2: "S", 3: "T", 4: "p", 5: "s", 6: "t"} # Here to avoid circular import
+# Here to avoid circular import
+_phnames = {1: "P", 2: "S", 3: "T", 4: "p", 5: "s", 6: "t"}
+
 
 def read_traces(traces, rc, geometry, arrivals=None):
     """
