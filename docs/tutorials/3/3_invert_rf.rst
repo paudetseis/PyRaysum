@@ -263,7 +263,7 @@ shape ``(geometry.ntr, 2, rc.npts)``.
 
 .. code:: ipython3
 
-        rfarray = prs.rfarray(geometry, rc)
+        rfarray = prs.make_array(geometry, rc)
 
 A First Look at the Observed and Predicted Data Vectors
 -------------------------------------------------------

@@ -222,7 +222,7 @@ def read_arrivals(ttimes, amplitudes, phaselist, geometry):
     return tanss
 
 
-def rfarray(geometry, rc):
+def make_array(geometry, rc):
     """
     Initialize array for `NumPy`-based post processing
 
@@ -266,7 +266,7 @@ def filtered_rf_array(traces, rfarray, ntr, npts, dt, fmin, fmax):
             Output of :meth:`fraysum.run_bare()`
         rfarray (np.ndarray):
             Initialized array of shape (ntr, 2, npts) to store output (See:
-            :func:`rfarray()`)
+            :func:`make_array()`)
         ntr (int):
             Number of traces (:attr:`Geometry.ntr`)
         npts (int):
@@ -324,7 +324,7 @@ def filtered_array(traces, rfarray, ntr, npts, dt, fmin, fmax):
             Output of :meth:`fraysum.run_bare()`
         rfarray (np.ndarray):
             Initialized array of shape (ntr, 2, npts) to store output (See:
-            :func:`rfarray()`)
+            :func:`make_array()`)
         ntr (int):
             Number of traces (:attr:`Geometry.ntr`)
         npts (int):
