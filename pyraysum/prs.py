@@ -280,6 +280,11 @@ class Model(object):
 
             self.__dict__["_" + att][lay] = val
 
+            if att == "ani" and val != 0:
+                self.__dict__["_flag"][lay] = 0
+            if att == "ani" and val == 0:
+                self.__dict__["_flag"][lay] = 1
+                
             if att == "vpvs":
                 self._update(change="vs")
             else:

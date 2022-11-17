@@ -77,6 +77,14 @@ def test_getitem_setitem_add():
     assert model2._plunge[1] == 10
     assert model2.fplunge[1] == 10 * np.pi / 180
 
+    # Does anisotropy flag get (de-)activated automatically?
+    model1[0, "ani"] = 10
+    assert model1[0]["ani"] == 10
+    assert model1[0]["flag"] == 0
+    model1[0, "ani"] = 0
+    assert model1[0]["ani"] == 0
+    assert model1[0]["flag"] == 1
+
     model2[2] = {"plunge": 15, "thickn": 10000}
     assert model2[2, "plunge"] == 15
     assert model2[2, "thickn"] == 10000
