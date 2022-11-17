@@ -1557,7 +1557,17 @@ class Result(object):
 
         return msg
 
-    
+    def __getitem__(self, iray):
+        stream = self.streams[iray]
+        try:
+            rf = self.rfs[iray]
+        except IndexError:
+            rf = Stream()
+
+        return stream, rf
+
+    def __len__(self):
+        return len(self.streams)
 
     def calculate_rfs(self):
         """

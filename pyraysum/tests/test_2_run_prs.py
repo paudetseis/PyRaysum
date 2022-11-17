@@ -1,6 +1,7 @@
 from pyraysum import Geometry, Control, run
 from pyraysum import prs, frs
 from fraysum import run_bare
+from obspy import Stream
 import numpy as np
 import pytest
 import matplotlib.pyplot as mp
@@ -65,8 +66,12 @@ def test_frs():
     model = mod.test_read_model_aniso()
 
     fstreamlist = run(model, geom, rc)
+    assert len(fstreamlist[0][0]) == 3  # 3-components
+    assert len(fstreamlist[0][1]) == 0  # No RFs
+    assert len(fstreamlist) == len(geom)
 
     fstreamlist.calculate_rfs()
+    assert len(fstreamlist[0][1]) == 2  # No RFs
 
 
 def test_filtered_rf_array():
@@ -132,6 +137,11 @@ def test_single_event():
         rc = Control(npts=1500, dt=0.025, rot=2, wvtype=wvtype)
         result = run(model, geom, rc)
 
+    assert isinstance(result[0][0], Stream)
+    assert len(result[0][0]) == 3  # 3-components
+    assert len(result[0][1]) == 0  # No RFs
+    assert len(result) == 1
+
 def test_rfs():
 
     model = mod.test_def_model()
@@ -160,6 +170,9 @@ def test_rfs():
     streamlist2 = run(model, geom, rc)
     rflist = streamlist2.calculate_rfs()
     [rf.filter('lowpass', freq=1., corners=2, zerophase=True) for rf in streamlist2.rfs]
+
+    assert isinstance(streamlist2[0][1], Stream)
+    assert len(streamlist2[0][1]) == 2
 
 def test_bailout():
     """
