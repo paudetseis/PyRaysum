@@ -74,7 +74,7 @@ def test_getitem_setitem_add():
     model2[1, "plunge"] = 10
     assert model2[1]["plunge"] == 10
     assert model2[1, "plunge"] == 10
-    assert model2.plunge[1] == 10
+    assert model2._plunge[1] == 10
     assert model2.fplunge[1] == 10 * np.pi / 180
 
     model2[2] = {"plunge": 15, "thickn": 10000}

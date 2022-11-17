@@ -51,7 +51,6 @@ def read_traces(traces, rc, geometry, arrivals=None):
     rot = rc.rot
     shift = rc.shift
     ntr = geometry.ntr
-    geom = geometry.geom
 
     # Crop unused overhang of oversized fortran arrays
     trs = [
@@ -89,8 +88,8 @@ def read_traces(traces, rc, geometry, arrivals=None):
         stream = Stream()
         for ic in order:
             stats = {
-                "baz": geom[iitr][0],
-                "slow": geom[iitr][1],
+                "baz": geometry[iitr][0],
+                "slow": geometry[iitr][1],
                 "station": "",
                 "network": "",
                 "starttime": UTCDateTime(0),

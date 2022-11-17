@@ -115,7 +115,7 @@ def test_filtered_rf_array():
 
     _run_bare()
 
-    fig, ax = mp.subplots(len(geom.geom), 2, tight_layout=True)
+    fig, ax = mp.subplots(len(geom._geom), 2, tight_layout=True)
     for l, (stream, array)  in enumerate(zip(streams.rfs, rfarray)):
         for r, (scomp, acomp) in enumerate(zip(stream, array)):
             ax[l, r].plot(scomp.data)

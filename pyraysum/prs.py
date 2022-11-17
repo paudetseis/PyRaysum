@@ -205,29 +205,29 @@ class Model(object):
         except TypeError:
             self.nlay = 1
 
-        self.thickn = _get_val(thickn)
-        self.rho = _get_val(rho)
-        self.vp = _get_val(vp)
+        self._thickn = _get_val(thickn)
+        self._rho = _get_val(rho)
+        self._vp = _get_val(vp)
 
         if vs is None:
-            self.vpvs = _get_val(vpvs)
-            self.vs = self.vp / self.vpvs
+            self._vpvs = _get_val(vpvs)
+            self._vs = self._vp / self._vpvs
         else:
-            self.vs = _get_val(vs)
-            self.vpvs = self.vp / self.vs
+            self._vs = _get_val(vs)
+            self._vpvs = self._vp / self._vs
 
-        self.flag = np.array(
+        self._flag = np.array(
             [flag] * self.nlay if isinstance(flag, int) else list(flag)
         )
-        self.ani = _get_val(ani)
-        self.trend = _get_val(trend)
-        self.plunge = _get_val(plunge)
-        self.strike = _get_val(strike)
-        self.dip = _get_val(dip)
+        self._ani = _get_val(ani)
+        self._trend = _get_val(trend)
+        self._plunge = _get_val(plunge)
+        self._strike = _get_val(strike)
+        self._dip = _get_val(dip)
 
         self.maxlay = maxlay
 
-        self._useratts = [
+        self.properties = [
             "thickn",
             "rho",
             "vp",
@@ -240,17 +240,18 @@ class Model(object):
             "strike",
             "dip",
         ]
+        self._properties = ["_" + prop for prop in self.properties]
 
         self._set_fattributes()
         self._set_layers()
 
-    def __getitem__(self, layer):
+    def __getitem__(self, ilay):
         try:
             # model[0, "thickn"]
-            return self._layers[layer[0]][layer[1]]
+            return self.layers[ilay[0]][ilay[1]]
         except TypeError:
             # model[0]
-            return self._layers[layer]
+            return self.layers[ilay]
 
     def __setitem__(self, layatt, value):
 
@@ -272,17 +273,17 @@ class Model(object):
             vals = [value]
 
         for lay, att, val in zip(lays, atts, vals):
-            if att not in self._useratts:
+            if att not in self.properties:
                 msg = f"Unknown attribute: '{att}'. Must be one of: "
-                msg += ", ".join(self._useratts)
+                msg += ", ".join(self.properties)
                 raise ValueError(msg)
 
-            self.__dict__[att][lay] = val
+            self.__dict__["_" + att][lay] = val
 
             if att == "vpvs":
-                self.update(change="vs")
+                self._update(change="vs")
             else:
-                self.update()
+                self._update()
 
     def __len__(self):
         return self.nlay
@@ -295,16 +296,16 @@ class Model(object):
         f += "{: 6.1f} {: 6.1f} {: 5.1f}\n"
 
         for th, vp, vs, r, fl, a, tr, p, s, d in zip(
-            self.thickn,
-            self.vp,
-            self.vs,
-            self.rho,
-            self.flag,
-            self.ani,
-            self.trend,
-            self.plunge,
-            self.strike,
-            self.dip,
+            self._thickn,
+            self._vp,
+            self._vs,
+            self._rho,
+            self._flag,
+            self._ani,
+            self._trend,
+            self._plunge,
+            self._strike,
+            self._dip,
         ):
             buf += f.format(th, r, vp, vs, fl, a, tr, p, s, d)
 
@@ -322,7 +323,7 @@ class Model(object):
 
         third = deepcopy(self)
 
-        for att in third._useratts:
+        for att in third._properties:
             third.__dict__[att] = np.append(self.__dict__[att], other.__dict__[att])
 
         third.nlay += other.nlay
@@ -333,14 +334,14 @@ class Model(object):
     def __eq__(self, other):
         issame = [
             slay[att] == olay[att]
-            for slay, olay in zip(self._layers, other._layers)
-            for att in self._useratts
+            for slay, olay in zip(self.layers, other.layers)
+            for att in self.properties
         ]
         return all(issame)
 
     def _set_layers(self):
-        self._layers = [
-            {att: self.__dict__[att][lay] for att in self._useratts}
+        self.layers = [
+            {prop: self.__dict__[_prop][lay] for prop, _prop in zip(self.properties, self._properties)}
             for lay in range(self.nlay)
         ]
 
@@ -353,16 +354,16 @@ class Model(object):
             )
             raise IndexError(msg)
         tail = np.zeros(self.maxlay - self.nlay)
-        self.fthickn = np.asfortranarray(np.append(self.thickn, tail))
-        self.frho = np.asfortranarray(np.append(self.rho, tail))
-        self.fvp = np.asfortranarray(np.append(self.vp, tail))
-        self.fvs = np.asfortranarray(np.append(self.vs, tail))
-        self.fflag = np.asfortranarray(np.append(self.flag, tail))
-        self.fani = np.asfortranarray(np.append(self.ani, tail))
-        self.ftrend = np.asfortranarray(np.append(self.trend, tail) * np.pi / 180)
-        self.fplunge = np.asfortranarray(np.append(self.plunge, tail) * np.pi / 180)
-        self.fstrike = np.asfortranarray(np.append(self.strike, tail) * np.pi / 180)
-        self.fdip = np.asfortranarray(np.append(self.dip, tail) * np.pi / 180)
+        self.fthickn = np.asfortranarray(np.append(self._thickn, tail))
+        self.frho = np.asfortranarray(np.append(self._rho, tail))
+        self.fvp = np.asfortranarray(np.append(self._vp, tail))
+        self.fvs = np.asfortranarray(np.append(self._vs, tail))
+        self.fflag = np.asfortranarray(np.append(self._flag, tail))
+        self.fani = np.asfortranarray(np.append(self._ani, tail))
+        self.ftrend = np.asfortranarray(np.append(self._trend, tail) * np.pi / 180)
+        self.fplunge = np.asfortranarray(np.append(self._plunge, tail) * np.pi / 180)
+        self.fstrike = np.asfortranarray(np.append(self._strike, tail) * np.pi / 180)
+        self.fdip = np.asfortranarray(np.append(self._dip, tail) * np.pi / 180)
         self.parameters = [
             self.fthickn,
             self.frho,
@@ -386,24 +387,24 @@ class Model(object):
         f += "{: 6.1f} {: 6.1f} {: 5.1f}\n"
 
         for th, vp, vs, r, fl, a, tr, p, s, d in zip(
-            self.thickn,
-            self.vp,
-            self.vs,
-            self.rho,
-            self.flag,
-            self.ani,
-            self.trend,
-            self.plunge,
-            self.strike,
-            self.dip,
+            self._thickn,
+            self._vp,
+            self._vs,
+            self._rho,
+            self._flag,
+            self._ani,
+            self._trend,
+            self._plunge,
+            self._strike,
+            self._dip,
         ):
             buf += f.format(th, r, vp, vs, fl, a, a, tr, p, s, d)
 
         return buf.strip("\n")
 
-    def update(self, change="vpvs"):
+    def _update(self, change="vpvs"):
         """
-        Update all attributes after one of them was changed by the user.
+        Update all attributes after one of them was changed.
 
         Parameters:
             change (str):
@@ -419,11 +420,11 @@ class Model(object):
         """
 
         if change == "vp":
-            self.vp = self.vs * self.vpvs
+            self._vp = self._vs * self._vpvs
         elif change == "vs":
-            self.vs = self.vp / self.vpvs
+            self._vs = self._vp / self._vpvs
         elif change == "vpvs":
-            self.vpvs = self.vp / self.vs
+            self._vpvs = self._vp / self._vs
         else:
             msg = "Unknown value for keyword: " + change
             raise ValueError(msg)
@@ -548,11 +549,11 @@ class Model(object):
                 self.__dict__[attribute][lay] -= val
 
             # Set isotropy flag iff layer is isotropic
-            self.flag[lay] = 1
-            if self.ani[lay] != 0:
-                self.flag[lay] = 0
+            self._flag[lay] = 1
+            if self._ani[lay] != 0:
+                self._flag[lay] = 0
 
-            self.update(change=change)
+            self._update(change=change)
             changed.append((attribute, lay, self.__dict__[attribute][lay]))
 
             if verbose:
@@ -571,14 +572,14 @@ class Model(object):
                 Index of the layer to split
         """
 
-        for att in self._useratts:
+        for att in self.properties:
             self.__dict__[att] = np.insert(self.__dict__[att], n, self.__dict__[att][n])
 
-        self.thickn[n] /= 2
-        self.thickn[n + 1] /= 2
+        self._thickn[n] /= 2
+        self._thickn[n + 1] /= 2
         self.nlay += 1
 
-        self.update()
+        self._update()
 
     def remove_layer(self, n):
         """
@@ -589,11 +590,11 @@ class Model(object):
                 Index of the layer to remove
         """
 
-        for att in self._useratts:
+        for att in self.properties:
             self.__dict__[att] = np.delete(self.__dict__[att], n)
 
         self.nlay -= 1
-        self.update()
+        self._update()
 
     def average_layers(self, top, bottom):
         """
@@ -614,26 +615,26 @@ class Model(object):
         if bottom <= top:
             raise IndexError("bottom must be larger than top.")
 
-        if not all(self.flag[top:bottom]):
+        if not all(self._flag[top:bottom]):
             raise ValueError("Can only combine isotropic layers")
 
-        if not all(self.dip[top:bottom][0] == self.dip[top:bottom]):
+        if not all(self._dip[top:bottom][0] == self._dip[top:bottom]):
             raise ValueError("All layers must have the same dip")
 
-        if not all(self.strike[top:bottom][0] == self.strike[top:bottom]):
+        if not all(self._strike[top:bottom][0] == self._strike[top:bottom]):
             raise ValueError("All layers must have the same strike")
 
-        thickn = sum(self.thickn[top:bottom])
-        weights = self.thickn[top:bottom] / thickn
+        thickn = sum(self._thickn[top:bottom])
+        weights = self._thickn[top:bottom] / thickn
 
         layer = {
             "thickn": thickn,
-            "vp": sum(self.vp[top:bottom] * weights),
-            "vs": sum(self.vs[top:bottom] * weights),
-            "rho": sum(self.rho[top:bottom] * weights),
+            "vp": sum(self._vp[top:bottom] * weights),
+            "vs": sum(self._vs[top:bottom] * weights),
+            "rho": sum(self._rho[top:bottom] * weights),
         }
 
-        for att in self._useratts:
+        for att in self.properties:
             try:
                 self.__dict__[att][top] = layer[att]
             except KeyError:
@@ -641,7 +642,7 @@ class Model(object):
             self.__dict__[att] = np.delete(self.__dict__[att], range(top + 1, bottom))
 
         self.nlay -= bottom - top - 1
-        self.update()
+        self._update()
 
     def save(self, fname="sample.mod", comment="", hint=False, version="prs"):
         """
@@ -734,17 +735,17 @@ class Model(object):
         show = False
 
         # Find depths of all interfaces in km
-        thickn = self.thickn.copy()
+        thickn = self._thickn.copy()
         if thickn[-1] == 0.0:
             thickn[-1] = 50000.0
         depths = np.concatenate(([0.0], np.cumsum(thickn))) / 1000.0
 
         # Get corner coordinates of staircase representation of model
         depth = np.array(list(zip(depths[:-1], depths[1:]))).flatten()
-        vs = np.array(list(zip(self.vs, self.vs))).flatten()
-        vp = np.array(list(zip(self.vp, self.vp))).flatten()
-        rho = np.array(list(zip(self.rho, self.rho))).flatten()
-        ani = np.array(list(zip(self.ani, self.ani))).flatten()
+        vs = np.array(list(zip(self._vs, self._vs))).flatten()
+        vp = np.array(list(zip(self._vp, self._vp))).flatten()
+        rho = np.array(list(zip(self._rho, self._rho))).flatten()
+        ani = np.array(list(zip(self._ani, self._ani))).flatten()
 
         # Generate new plot if an Axis is not passed
         if ax is None:
@@ -758,7 +759,7 @@ class Model(object):
         ax.plot(rho, depth, color="C2", label=r"Density (kg m$^{-3}$)")
 
         # If there is anisotropy, show variability
-        if np.any([flag == 0 for flag in self.flag]):
+        if np.any([flag == 0 for flag in self._flag]):
             ax.plot(vs * (1.0 - ani / 100.0), depth, "--", color="C0")
             ax.plot(vs * (1.0 + ani / 100.0), depth, "--", color="C0")
             ax.plot(vp * (1.0 - ani / 100.0), depth, "--", color="C1")
@@ -796,7 +797,7 @@ class Model(object):
         show = False
 
         # Find depths of all interfaces
-        thickn = self.thickn.copy()
+        thickn = self._thickn.copy()
         if thickn[-1] == 0.0:
             thickn[-1] = 50000.0
         depths = np.concatenate(([0.0], np.cumsum(thickn))) / 1000.0
@@ -809,13 +810,13 @@ class Model(object):
 
         # Define color palette
         norm = plt.Normalize()
-        colors = plt.cm.GnBu(norm(self.vs))
+        colors = plt.cm.GnBu(norm(self._vs))
 
         # Cycle through layers
         for i in range(len(depths) - 1):
 
             # If anisotropic, add texture - still broken hatch
-            if not self.flag[i] == 1:
+            if not self._flag[i] == 1:
                 cax = ax.axhspan(depths[i], depths[i + 1], color=colors[i])
                 cax.set_hatch("o")
             # Else isotropic
@@ -859,7 +860,7 @@ class Model(object):
         show = False
 
         # Find depths of all interfaces
-        depths = np.concatenate(([0.0], np.cumsum(self.thickn))) / 1000.0
+        depths = np.concatenate(([0.0], np.cumsum(self._thickn))) / 1000.0
         maxdep = depths[-1] + 50
         xs = np.array([-maxdep / 2, maxdep / 2])
 
@@ -872,12 +873,12 @@ class Model(object):
         ax.scatter(0, -0.6, 60, marker="v", c="black")
         # Cycle through layers
         for i, depth in enumerate(depths[:-1]):
-            dzdx = np.sin(self.dip[i] * np.pi / 180)
+            dzdx = np.sin(self._dip[i] * np.pi / 180)
             zs = depth + xs * dzdx
             ax.plot(xs, zs, color="black")
-            dipdir = (self.strike[i] + 90) % 360
+            dipdir = (self._strike[i] + 90) % 360
 
-            if i == 0 or self.strike[i] != self.strike[i - 1]:
+            if i == 0 or self._strike[i] != self._strike[i - 1]:
                 ax.text(
                     xs[-1], zs[-1], ">{:.0f}°".format(dipdir), ha="left", va="center"
                 )
@@ -887,13 +888,13 @@ class Model(object):
 
             for n, inf in enumerate(info):
                 if inf == "vp":
-                    msg += "$V_P={:.1f}$km/s".format(self.vp[i] / 1000)
+                    msg += "$V_P={:.1f}$km/s".format(self._vp[i] / 1000)
                 elif inf == "vs":
-                    msg += "$V_S={:.1f}$km/s".format(self.vs[i] / 1000)
+                    msg += "$V_S={:.1f}$km/s".format(self._vs[i] / 1000)
                 elif inf == "vpvs":
-                    msg += "$V_P/V_S={:.2f}$".format(self.vpvs[i])
+                    msg += "$V_P/V_S={:.2f}$".format(self._vpvs[i])
                 elif inf == "rho":
-                    msg += "$\\rho={:.1f}$kg/m$^3$".format(self.rho[i] / 1000)
+                    msg += "$\\rho={:.1f}$kg/m$^3$".format(self._rho[i] / 1000)
                 else:
                     err = "Unknown argument to 'info': " + inf
                     raise ValueError(err)
@@ -904,19 +905,19 @@ class Model(object):
                 0,
                 depth + 1,
                 msg,
-                rotation=-self.dip[i],
+                rotation=-self._dip[i],
                 rotation_mode="anchor",
                 ha="center",
                 va="top",
             )
 
-            if self.flag[i] == 0:
-                aninfo = "-{:.0f}%-{:.0f}°".format(self.ani[i], self.trend[i])
+            if self._flag[i] == 0:
+                aninfo = "-{:.0f}%-{:.0f}°".format(self._ani[i], self._trend[i])
                 ax.text(
                     xs[-1],
-                    zs[-1] + self.thickn[i] / 2000,
+                    zs[-1] + self._thickn[i] / 2000,
                     aninfo,
-                    rotation=-self.plunge[i],
+                    rotation=-self._plunge[i],
                     ha="left",
                     va="center",
                 )
@@ -957,6 +958,10 @@ class Geometry(object):
           East-offset of the seismic station (m)
         maxtr (int):
           Maximum number of traces defined in params.h
+
+    .. hint::
+       If :attr:`baz` and :attr:`slow` do not have a different length, one ray will
+       be computed for each *combination* of :attr:`baz` and :attr:`slow` (See examples)
 
     The following attributes are set upon initialization. `f` prefixes indicate
     attributes used for interaction with `fraysum.run_bare()` and
@@ -1004,6 +1009,9 @@ class Geometry(object):
 
     def __init__(self, baz, slow, dn=0, de=0, maxtr=500):
 
+        self.maxtr = maxtr
+        self.properties = {"baz": 0, "slow": 1, "dn": 2, "de": 3}
+
         if type(baz) == int or type(baz) == float:
             baz = [baz]
 
@@ -1011,20 +1019,49 @@ class Geometry(object):
             slow = [slow]
 
         if len(baz) != len(slow):
-            self.geom = [(bb, ss) for ss in slow for bb in baz]
+            self._geom = [(bb, ss) for ss in slow for bb in baz]
         else:
-            self.geom = [(bb, ss) for bb, ss in zip(baz, slow)]
+            self._geom = [(bb, ss) for bb, ss in zip(baz, slow)]
 
-        baz, slow = zip(*self.geom)
-        self.baz = np.array(baz)
-        self.slow = np.array(slow)
+        baz, slow = zip(*self._geom)
+        self._baz = np.array(baz)
+        self._slow = np.array(slow)
+        self.ntr = len(self._baz)
 
-        self.ntr = len(self.baz)
+        self._dn = np.full(self.ntr, dn)
+        self._de = np.full(self.ntr, de)
 
-        self.dn = np.full(self.ntr, dn)
-        self.de = np.full(self.ntr, de)
+        self.rays = [*zip(self._baz, self._slow, self._dn, self._de)]
 
-        self.maxtr = maxtr
+        self._set_fattributes()
+
+    def __getitem__(self, iray):
+        if isinstance(iray, tuple):
+            # geometry[0, "baz"]
+            iprop = self.properties[iray[1]]
+            return self.rays[iray[0]][iprop]
+        else:
+            try:
+                # geometry["baz"]
+                iprop = self.properties[iray]
+                return [tup[iprop] for tup in self.rays]
+            except KeyError:
+                # geometry[0]
+                return self.rays[iray]
+
+    def __setitem__(self, iray, value):
+
+        if not isinstance(value, tuple) or len(value) != 4:
+            msg = "Can only set tuple(baz, slow, dn, de)"
+            raise TypeError(msg)
+        self.rays[iray] = value
+
+        self._baz[iray] = value[0]
+        self._slow[iray] = value[1]
+        self._geom[iray] = (value[0], value[1])
+        self._dn[iray] = value[2]
+        self._de[iray] = value[3]
+
         self._set_fattributes()
 
     def __len__(self):
@@ -1042,35 +1079,36 @@ class Geometry(object):
 
         third = deepcopy(self)
 
-        third.baz = np.append(self.baz, other.baz)
-        third.slow = np.append(self.slow, other.slow)
-        third.dn = np.append(self.dn, other.dn)
-        third.de = np.append(self.de, other.de)
-        third.geom = np.append(self.geom, other.geom)
+        third._baz = np.append(self._baz, other._baz)
+        third._slow = np.append(self._slow, other._slow)
+        third._dn = np.append(self._dn, other._dn)
+        third._de = np.append(self._de, other._de)
+        third._geom = np.append(self._geom, other._geom)
         third.ntr += other.ntr
+        third.rays += other.rays
         third._set_fattributes()
 
         return third
 
     def __eq__(self, other):
         return (
-            all(np.equal(self.baz, other.baz))
-            and all(np.equal(self.slow, other.slow))
-            and all(np.equal(self.dn, other.dn))
-            and all(np.equal(self.de, other.de))
+            all(np.equal(self._baz, other._baz))
+            and all(np.equal(self._slow, other._slow))
+            and all(np.equal(self._dn, other._dn))
+            and all(np.equal(self._de, other._de))
         )
 
     def __str__(self):
         out = "#Back-azimuth, Slowness, N-offset, E-offset\n"
         form = "{: 13.2f} {: 9.4f} {:9.2f} {:9.2f}\n"
-        for bb, ss, xx, yy in zip(self.baz, self.slow, self.dn, self.de):
+        for bb, ss, xx, yy in zip(self._baz, self._slow, self._dn, self._de):
             out += form.format(bb, ss, xx, yy)
         return out.strip("\n")
 
     def _fstr(self):
         out = "#Back-azimuth, Slowness, N-offset, E-offset\n"
         form = "{: 13.2f} {: 9.1e} {:9.2f} {:9.2f}\n"
-        for bb, ss, xx, yy in zip(self.baz, self.slow, self.dn, self.de):
+        for bb, ss, xx, yy in zip(self._baz, self._slow, self._dn, self._de):
             out += form.format(bb, ss*1e-3, xx, yy)
         return out.strip("\n")
 
@@ -1083,10 +1121,10 @@ class Geometry(object):
             )
             raise IndexError(msg)
         tail = np.zeros(self.maxtr - self.ntr)
-        self.fbaz = np.asfortranarray(np.append(self.baz, tail) * np.pi / 180)
-        self.fslow = np.asfortranarray(np.append(self.slow, tail) * 1e-3)
-        self.fdn = np.asfortranarray(np.append(self.dn, tail))
-        self.fde = np.asfortranarray(np.append(self.de, tail))
+        self.fbaz = np.asfortranarray(np.append(self._baz, tail) * np.pi / 180)
+        self.fslow = np.asfortranarray(np.append(self._slow, tail) * 1e-3)
+        self.fdn = np.asfortranarray(np.append(self._dn, tail))
+        self.fde = np.asfortranarray(np.append(self._de, tail))
         self.parameters = [self.fbaz, self.fslow, self.fdn, self.fde, self.ntr]
 
     def save(self, fname="sample.geom"):
@@ -1122,8 +1160,8 @@ class Geometry(object):
         fig, ax = plt.subplots(subplot_kw={"projection": "polar"})
         ax.set_theta_zero_location("N")
         ax.set_theta_direction("clockwise")
-        ax.scatter(self.baz * np.pi / 180, self.slow, s=200, color="black", zorder=10)
-        for n, (b, s) in enumerate(zip(self.baz, self.slow)):
+        ax.scatter(self._baz * np.pi / 180, self._slow, s=200, color="black", zorder=10)
+        for n, (b, s) in enumerate(zip(self._baz, self._slow)):
             t = "{:d}".format(n)
             b *= np.pi / 180
             ax.text(b, s, t, color="white", ha="center", va="center", zorder=12)
@@ -1513,6 +1551,8 @@ class Result(object):
             msg += "\nNo geometry stored."
 
         return msg
+
+    
 
     def calculate_rfs(self):
         """
