@@ -1494,7 +1494,8 @@ class Result(object):
     """
     Result of a PyRaysum wavefield simulation. 3-component synthetic seismograms
     are strored as a list of streams in the stream attribute. Includes methods
-    to calculate receiver functions, filter and plot the results.
+    to calculate receiver functions, filter and plot the results. See
+    :func:`run()` for examples.
 
     Parameters:
         model (:class:`~pyraysum.prs.Model`):
@@ -1807,16 +1808,23 @@ def run(model, geometry, rc, mode="full", rf=False):
     >>> from pyraysum import prs, Model, Geometry, Control
     >>> # Define two-layer model with isotropic crust over isotropic half-space
     >>> model = Model([30000., 0], [2800., 3300.], [6000., 8000.], [3600., 4500.])
-    >>> geom = Geometry(0., 0.06) # baz = 0 deg; slow = 0.06 x/km
+    >>> geom = Geometry(0., 0.06) # baz = 0 deg; slow = 0.06 s/km
     >>> rc = Control(npts=1500, dt=0.025)
-    >>> seismogram = prs.run(model, geom, rc)
-    >>> type(seismogram.streams[0])
+    >>> result = prs.run(model, geom, rc, rf=True)
+    >>> type(result.streams[0])
     <class 'obspy.core.stream.Stream'>
-    >>> print(seismogram.streams[0])
+    >>> type(result.rfs[0])
+    <class 'obspy.core.stream.Stream'>
+    >>> seis, rf = result[0]
+    >>> print(seis)
     3 Trace(s) in Stream:
     ...SYR | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples
     ...SYT | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples
     ...SYZ | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples
+    >>> print(rf)
+    2 Trace(s) in Stream:
+    ...RFR | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples
+    ...RFT | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples
     """
 
     if rf and rc.rot == 0:
