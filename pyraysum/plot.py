@@ -79,7 +79,7 @@ def stack_all(stream, pws=False):
 
 
 def rf_wiggles(rflist, btyp='baz', wvtype='P', pws=False, tmin=-5., tmax=20,
-               scale=None, pcolor='red', ncolor='blue', save=False,
+               scale=None, pcolor='red', ncolor='blue', save=False, axs=None,
                ftitle='Figure_rf_wiggle',
                fmt='png', plot_kwargs={'linewidth': 0.1, 'color': 'black'},
                figure_kwargs={}):
@@ -104,6 +104,14 @@ def rf_wiggles(rflist, btyp='baz', wvtype='P', pws=False, tmin=-5., tmax=20,
             Amplitude scaling factor
         save (bool):
             Whether or not to save the figure
+        axs (4*tuple):
+            matplotlib axes to place the subplots.
+            
+                * axs[0]: radial stack
+                * axs[1]: radial section
+                * axs[2]: transverse stack
+                * axs[3]: transverse section
+
         pcolor (str):
             Color to fill positive wiggles
         ncolor (str):
@@ -142,14 +150,18 @@ def rf_wiggles(rflist, btyp='baz', wvtype='P', pws=False, tmin=-5., tmax=20,
     time = str1[0].stats.taxis
 
     # Initialize figure
-    fig = plt.figure(**figure_kwargs)
-    plt.clf()
+    if not axs:
+        fig = plt.figure(**figure_kwargs)
+        plt.clf()
 
-    # Get more control on subplots
-    ax1 = fig.add_axes([0.1, 0.825, 0.3, 0.05])
-    ax2 = fig.add_axes([0.1, 0.1, 0.3, 0.7])
-    ax3 = fig.add_axes([0.45, 0.825, 0.3, 0.05])
-    ax4 = fig.add_axes([0.45, 0.1, 0.3, 0.7])
+        # Get more control on subplots
+        ax1 = fig.add_axes([0.1, 0.825, 0.3, 0.05])
+        ax2 = fig.add_axes([0.1, 0.1, 0.3, 0.7])
+        ax3 = fig.add_axes([0.45, 0.825, 0.3, 0.05])
+        ax4 = fig.add_axes([0.45, 0.1, 0.3, 0.7])
+    else:
+        ax1, ax2, ax3, ax4 = axs
+        fig = ax1.get_figure()
 
     # Plot stack of all traces from str1 on top left
     ax1.fill_between(time, 0., tr1.data, where=tr1.data+1e-6 <= 0.,
@@ -252,7 +264,7 @@ def rf_wiggles(rflist, btyp='baz', wvtype='P', pws=False, tmin=-5., tmax=20,
 
 
 def stream_wiggles(streamlist, btyp='baz', wvtype='P', tmin=-5., tmax=20.,
-                   scale=None, pcolor='red', ncolor='blue', save=False, ftitle='Figure_pw_wiggles',
+                   scale=None, pcolor='red', ncolor='blue', save=False, axs=None, ftitle='Figure_pw_wiggles',
                    fmt='png', plot_kwargs={'linewidth': 0.1, 'color': 'black'},
                    figure_kwargs={}):
     """
@@ -278,6 +290,13 @@ def stream_wiggles(streamlist, btyp='baz', wvtype='P', tmin=-5., tmax=20.,
             Color to fill negative wiggles
         save (bool):
             Whether or not to save the figure
+        axs (3*tuple):
+            matplotlib axes to place the subplots.
+            
+                * axs[0]: P or R section
+                * axs[1]: V or T section
+                * axs[2]: H or Z section
+
         ftitle (str):
             Filename of figure to be saved (without format suffix, see fmt)
         fmt (str):
@@ -307,15 +326,19 @@ def stream_wiggles(streamlist, btyp='baz', wvtype='P', tmin=-5., tmax=20.,
     time = str1[0].stats.taxis
 
     # Initialize figure
-    fig = plt.figure(**figure_kwargs)
-    plt.clf()
+    if not axs:
+        fig = plt.figure(**figure_kwargs)
+        plt.clf()
 
-    # Get more control on subplots
-    ax1 = fig.add_axes([0.1, 0.1, 0.25, 0.83])
-    ax2 = fig.add_axes([0.4, 0.1, 0.25, 0.83])
-    ax3 = fig.add_axes([0.7, 0.1, 0.25, 0.83])
+        # Get more control on subplots
+        ax1 = fig.add_axes([0.1, 0.1, 0.25, 0.83])
+        ax2 = fig.add_axes([0.4, 0.1, 0.25, 0.83])
+        ax3 = fig.add_axes([0.7, 0.1, 0.25, 0.83])
+        axes = [ax1, ax2, ax3]
+    else:
+        axes = axs
+        fig = ax1.get_figure()
 
-    axes = [ax1, ax2, ax3]
     streams = [str1, str2, str3]
 
     for ax, st in zip(axes, streams):
@@ -379,10 +402,10 @@ def stream_wiggles(streamlist, btyp='baz', wvtype='P', tmin=-5., tmax=20.,
         ax.grid(ls=':')
 
     # Remove labels on axes 2 and 3
-    ax2.set_ylabel('')
-    ax3.set_ylabel('')
-    ax2.set_yticklabels(())
-    ax3.set_yticklabels(())
+    axes[1].set_ylabel('')
+    axes[2].set_ylabel('')
+    axes[1].set_yticklabels(())
+    axes[2].set_yticklabels(())
 
     if save:
         plt.savefig(ftitle+'.'+fmt, bbox_inches='tight', format=fmt)
