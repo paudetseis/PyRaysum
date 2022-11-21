@@ -440,6 +440,10 @@ class Model(object):
         self._set_fattributes()
         self._set_layers()
 
+    def copy(self):
+        """Return a copy of the model"""
+        return deepcopy(self)
+
     def change(self, command, verbose=True):
         """
         Change layer properties using a command string.
@@ -721,7 +725,9 @@ class Model(object):
         self.plot_interfaces(zmax=zmax, ax=ax3)
 
         # Tighten the plot and show it
-        plt.tight_layout()
+        # TODO: tight layout does not work with colorbar.
+        # Do this manually.
+        #plt.tight_layout()
         plt.show()
 
     def plot_profile(self, zmax=75.0, ax=None):
@@ -815,6 +821,8 @@ class Model(object):
             fig = plt.figure(figsize=(2, 5))
             ax = fig.add_subplot(111)
             show = True
+        else:
+            fig = ax.get_figure()
 
         # Define color palette
         norm = plt.Normalize()
@@ -835,6 +843,12 @@ class Model(object):
         ax.set_ylim(0.0, zmax)
         ax.set_xticks(())
         ax.invert_yaxis()
+        pos = ax.get_position()
+        
+        ax2 = fig.add_axes([pos.x0, pos.y0-0.02, pos.width, 0.015])
+
+        cmap = plt.cm.ScalarMappable(norm=norm, cmap="GnBu")
+        plt.colorbar(cmap, cax=ax2, orientation="horizontal", label="$V_S$ (m/s)")
 
         if show:
             ax.set_ylabel("Depth (km)")
@@ -1134,6 +1148,10 @@ class Geometry(object):
         self.fdn = np.asfortranarray(np.append(self._dn, tail))
         self.fde = np.asfortranarray(np.append(self._de, tail))
         self.parameters = [self.fbaz, self.fslow, self.fdn, self.fde, self.ntr]
+
+    def copy(self):
+        """Return a copy of the geometry"""
+        return deepcopy(self)
 
     def save(self, fname="sample.geom"):
         """
