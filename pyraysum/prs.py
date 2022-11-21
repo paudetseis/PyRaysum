@@ -250,8 +250,12 @@ class Model(object):
             # model[0, "thickn"]
             return self.layers[ilay[0]][ilay[1]]
         except TypeError:
-            # model[0]
-            return self.layers[ilay]
+            try:
+                # model[0]
+                return self.layers[ilay]
+            except TypeError:
+                # model["thickn"]
+                return np.array([lay[ilay] for lay in self.layers])
 
     def __setitem__(self, layatt, value):
 
@@ -284,7 +288,7 @@ class Model(object):
                 self.__dict__["_flag"][lay] = 0
             if att == "ani" and val == 0:
                 self.__dict__["_flag"][lay] = 1
-                
+
             if att == "vpvs":
                 self._update(change="vs")
             else:
@@ -514,6 +518,7 @@ class Model(object):
             "pl": "plunge",
             "plunge": "plunge",
         }
+        _ATT = {key: "_" + val for key, val in zip(**ATT)}
 
         changed = []
         for com in command.split(";"):
@@ -550,15 +555,16 @@ class Model(object):
                 change = "vp"
 
             attribute = ATT[att]
+            _attribute = _ATT[att]
 
             # Apply
             if sign == "=":
-                self.__dict__[attribute][lay] = val
+                self.__dict__[_attribute][lay] = val
                 sign = ""  # to print nicely below
             elif sign == "+":
-                self.__dict__[attribute][lay] += val
+                self.__dict__[_attribute][lay] += val
             elif sign == "-":
-                self.__dict__[attribute][lay] -= val
+                self.__dict__[_attribute][lay] -= val
 
             # Set isotropy flag iff layer is isotropic
             self._flag[lay] = 1
@@ -566,7 +572,7 @@ class Model(object):
                 self._flag[lay] = 0
 
             self._update(change=change)
-            changed.append((attribute, lay, self.__dict__[attribute][lay]))
+            changed.append((attribute, lay, self.__dict__[_attribute][lay]))
 
             if verbose:
                 msg = "Changed: {:}[{:d}] {:}= {:}".format(attribute, lay, sign, val)
@@ -584,7 +590,7 @@ class Model(object):
                 Index of the layer to split
         """
 
-        for att in self.properties:
+        for att in self._properties:
             self.__dict__[att] = np.insert(self.__dict__[att], n, self.__dict__[att][n])
 
         self._thickn[n] /= 2
@@ -602,7 +608,7 @@ class Model(object):
                 Index of the layer to remove
         """
 
-        for att in self.properties:
+        for att in self._properties:
             self.__dict__[att] = np.delete(self.__dict__[att], n)
 
         self.nlay -= 1
@@ -727,7 +733,7 @@ class Model(object):
         # Tighten the plot and show it
         # TODO: tight layout does not work with colorbar.
         # Do this manually.
-        #plt.tight_layout()
+        # plt.tight_layout()
         plt.show()
 
     def plot_profile(self, zmax=75.0, ax=None):
@@ -844,8 +850,8 @@ class Model(object):
         ax.set_xticks(())
         ax.invert_yaxis()
         pos = ax.get_position()
-        
-        ax2 = fig.add_axes([pos.x0, pos.y0-0.02, pos.width, 0.015])
+
+        ax2 = fig.add_axes([pos.x0, pos.y0 - 0.02, pos.width, 0.015])
 
         cmap = plt.cm.ScalarMappable(norm=norm, cmap="GnBu")
         plt.colorbar(cmap, cax=ax2, orientation="horizontal", label="$V_S$ (m/s)")
@@ -1570,8 +1576,8 @@ class Result(object):
         else:
             msg += "\nNo subsurface model stored\n"
         if self.geometry:
-            baz = self.geometry.baz
-            slow = self.geometry.slow
+            baz = self.geometry._baz
+            slow = self.geometry._slow
             msg += "\nBack-azimuth and slowness range is:\n"
             msg += "{:f} - {:f}° and {:f} - {:f}s/km".format(
                 min(baz), max(baz), min(slow), max(slow)
@@ -1587,7 +1593,7 @@ class Result(object):
 
         if iray in istreams:
             return self.streams
-        
+
         elif iray in irfs:
             return self.rfs
 
