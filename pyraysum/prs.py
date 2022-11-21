@@ -1582,13 +1582,27 @@ class Result(object):
         return msg
 
     def __getitem__(self, iray):
-        stream = self.streams[iray]
-        try:
-            rf = self.rfs[iray]
-        except IndexError:
-            rf = Stream()
+        istreams = ["stream", "streams", "seis", "seismogram", "seismograms"]
+        irfs = ["rf", "rfs"]
 
-        return stream, rf
+        if iray in istreams:
+            return self.streams
+        
+        elif iray in irfs:
+            return self.rfs
+
+        elif isinstance(iray, int):
+            stream = self.streams[iray]
+            try:
+                rf = self.rfs[iray]
+            except IndexError:
+                rf = Stream()
+            return stream, rf
+
+        else:
+            msg = "Can only return integer ray index or key in: "
+            msg += ", ".join(istreams, irfs)
+            raise ValueError(msg)
 
     def __len__(self):
         return len(self.streams)

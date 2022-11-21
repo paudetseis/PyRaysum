@@ -141,6 +141,9 @@ def test_single_event():
     assert len(result[0][0]) == 3  # 3-components
     assert len(result[0][1]) == 0  # No RFs
     assert len(result) == 1
+    assert len(result["seis"]) == 1
+    assert len(result["streams"]) == 1
+    assert len(result["seismograms"]) == 1
 
 def test_rfs():
 
@@ -173,6 +176,8 @@ def test_rfs():
 
     assert isinstance(streamlist2[0][1], Stream)
     assert len(streamlist2[0][1]) == 2
+    assert len(streamlist2["rfs"]) == len(geom)
+    assert len(streamlist2["rf"]) == len(geom)
 
 def test_bailout():
     """
