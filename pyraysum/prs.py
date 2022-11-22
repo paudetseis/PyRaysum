@@ -518,7 +518,7 @@ class Model(object):
             "pl": "plunge",
             "plunge": "plunge",
         }
-        _ATT = {key: "_" + val for key, val in zip(**ATT)}
+        _ATT = {key: "_" + val for key, val in zip(ATT.keys(), ATT.values())}
 
         changed = []
         for com in command.split(";"):
