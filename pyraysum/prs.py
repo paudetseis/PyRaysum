@@ -1283,26 +1283,7 @@ class Control(object):
         maxsamp=100000,
     ):
 
-        if verbose not in [0, 1, "0", "1"]:
-            msg = "verbose must be 0 or 1, not: " + str(verbose)
-            raise ValueError(msg)
-
-        if wvtype not in ["P", "SV", "SH"]:
-            msg = "wvtype must be 'P', 'SV', or 'SH', not: " + str(wvtype)
-            raise ValueError(msg)
-
-        if mults not in [0, 1, 2, 3, "0", "1", "2", "3"]:
-            msg = "mults must be 0, 1, 2, or 3, not: " + str(mults)
-            raise ValueError(msg)
-
-        if align not in [0, 1, 2, 3, "0", "1", "2", "3"]:
-            msg = "align must be 0, 1, 2, or 3, not: " + str(align)
-            raise ValueError(msg)
-
-        if rot not in [0, 1, 2, "0", "1", "2"]:
-            msg = "rot must be 0, 1, or 2, not: " + str(rot)
-            raise ValueError(msg)
-
+        self.parameters = [0] * 17  # Allocate for setters
         self.verbose = int(verbose)
         self.wvtype = wvtype
         self.mults = int(mults)
@@ -1315,8 +1296,7 @@ class Control(object):
         else:
             self.shift = float(shift)
 
-        self.iphase = _iphase[self.wvtype]
-
+        self._iphase = _iphase[self.wvtype]
         self._numph = np.int32(0)
         self._maxseg = maxseg
         self._maxph = maxph
@@ -1327,6 +1307,95 @@ class Control(object):
         )
         self._nseg = np.asfortranarray(np.zeros(maxph), dtype=np.int32)
         self.update()
+
+    @property
+    def verbose(self):
+        return self._verbose
+
+    @verbose.setter
+    def verbose(self, value):
+        if value not in [0, 1, "0", "1"]:
+            msg = "verbose must be 0 or 1, not: " + str(value)
+            raise ValueError(msg)
+        self._verbose = int(value)
+        self.parameters[7] = self._verbose
+
+    @property
+    def wvtype(self):
+        return self._wvtype
+
+    @wvtype.setter
+    def wvtype(self, value):
+        if value not in ["P", "SV", "SH"]:
+            msg = "wvtype must be 'P', 'SV', or 'SH', not: " + str(value)
+            raise ValueError(msg)
+        self._wvtype = value
+        self._iphase = _iphase[self.wvtype]
+        self.parameters[0] = self._iphase
+
+    @property
+    def mults(self):
+        return self._mults
+
+    @mults.setter
+    def mults(self, value):
+        if value not in [0, 1, 2, 3, "0", "1", "2", "3"]:
+            msg = "mults must be 0, 1, 2, or 3, not: " + str(value)
+            raise ValueError(msg)
+
+        self._mults = int(value)
+        self.parameters[1] = self._iphase
+
+    @property
+    def npts(self):
+        return self._npts
+
+    @npts.setter
+    def npts(self, value):
+        self._npts = int(value)
+        self.parameters[2] = self._npts
+
+    @property
+    def dt(self):
+        return self._dt
+
+    @dt.setter
+    def dt(self, value):
+        self._dt = int(value)
+        self.parameters[3] = self._dt
+
+    @property
+    def align(self):
+        return self._align
+
+    @align.setter
+    def align(self, value):
+        if value not in [0, 1, 2, 3, "0", "1", "2", "3"]:
+            msg = "align must be 0, 1, 2, or 3, not: " + str(value)
+            raise ValueError(msg)
+        self._align = int(value)
+        self.parameters[4] = self._align
+
+    @property
+    def rot(self):
+        return self._rot
+
+    @rot.setter
+    def rot(self, value):
+        if value not in [0, 1, 2, "0", "1", "2"]:
+            msg = "rot must be 0, 1, or 2, not: " + str(value)
+            raise ValueError(msg)
+        self._rot = int(value)
+        self.parameters[5] = self._rot
+
+    @property
+    def shift(self):
+        return self._shift
+
+    @shift.setter
+    def shift(self, value):
+        self._shift = float(value)
+        self.parameters[6] = self._shift
 
     def __str__(self):
         out = "Run control parameters:\n\n"
@@ -1476,7 +1545,7 @@ class Control(object):
         """
 
         self.parameters = [
-            self.iphase,
+            self._iphase,
             self.mults,
             self.npts,
             self.dt,
