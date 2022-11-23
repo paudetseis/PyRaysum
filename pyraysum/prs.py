@@ -1344,7 +1344,7 @@ class Control(object):
             raise ValueError(msg)
 
         self._mults = int(value)
-        self.parameters[1] = self._iphase
+        self.parameters[1] = self.mults
 
     @property
     def npts(self):
@@ -1361,7 +1361,7 @@ class Control(object):
 
     @dt.setter
     def dt(self, value):
-        self._dt = int(value)
+        self._dt = float(value)
         self.parameters[3] = self._dt
 
     @property
@@ -1386,7 +1386,7 @@ class Control(object):
             msg = "rot must be 0, 1, or 2, not: " + str(value)
             raise ValueError(msg)
         self._rot = int(value)
-        self.parameters[5] = self._rot
+        self.parameters[6] = self._rot
 
     @property
     def shift(self):
@@ -1395,7 +1395,7 @@ class Control(object):
     @shift.setter
     def shift(self, value):
         self._shift = float(value)
-        self.parameters[6] = self._shift
+        self.parameters[5] = self._shift
 
     def __str__(self):
         out = "Run control parameters:\n\n"
