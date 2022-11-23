@@ -57,11 +57,10 @@ all layers can be given as floats.
 
 .. parsed-literal::
 
-    # thickn     rho      vp      vs  flag aniso   trend plunge strike   dip
-     20000.0  2800.0  6400.0  3657.1    1    0.0     0.0    0.0   90.0   0.0
-      5000.0  2800.0  5800.0  3333.3    1    0.0     0.0    0.0   90.0  20.0
-         0.0  2800.0  7800.0  4482.8    1    0.0     0.0    0.0   90.0  20.0
-    
+    #  thickn     rho      vp      vs  flag aniso   trend plunge strike   dip
+      20000.0  2800.0  6400.0  3657.1    1    0.0     0.0    0.0   90.0   0.0
+       5000.0  2800.0  5800.0  3333.3    1    0.0     0.0    0.0   90.0  20.0
+          0.0  2800.0  7800.0  4482.8    1    0.0     0.0    0.0   90.0  20.0
 
 
 Now we specify the run-control parameters. Here we use the argument
@@ -83,7 +82,7 @@ internally.
 
 .. code:: ipython3
 
-    seismogram = prs.run(model, geom, rc)
+    result = prs.run(model, geom, rc)
 
 The function returns a ``Result`` object whose attributes are the
 ``Model``, ``Geometry`` of incoming rays, a list of ``Streams`` as well
@@ -91,14 +90,14 @@ as all run-time arguments that are used by Raysum:
 
 .. code:: ipython3
 
-    seismogram.__dict__.keys()
+    result.__dict__.keys()
 
 
 
 
 .. parsed-literal::
 
-    dict_keys(['model', 'geom', 'streams', 'rc'])
+    dict_keys(['model', 'geometry', 'streams', 'rc', 'rfs'])
 
 
 
@@ -107,7 +106,7 @@ functions.
 
 .. code:: ipython3
 
-    seismogram.calculate_rfs()
+    result.calculate_rfs()
 
 The receiver functions are stored as an additional attribute of the
 streamlist object, which is itself a list of ``Streams`` containing the
@@ -115,14 +114,14 @@ radial and transverse component RFs:
 
 .. code:: ipython3
 
-    seismogram.__dict__.keys()
+    result.__dict__.keys()
 
 
 
 
 .. parsed-literal::
 
-    dict_keys(['model', 'geom', 'streams', 'rc', 'rfs'])
+    dict_keys(['model', 'geometry', 'streams', 'rc', 'rfs'])
 
 
 
@@ -131,8 +130,8 @@ work on the receiver functions only.
 
 .. code:: ipython3
 
-    seismogram.filter('rfs', 'lowpass', freq=1., zerophase=True, corners=2)
-    seismogram.plot('rfs', tmin=-0.5, tmax=8.)
+    result.filter('rfs', 'lowpass', freq=1., zerophase=True, corners=2)
+    result.plot('rfs', tmin=-0.5, tmax=8.)
 
 
 
@@ -180,11 +179,10 @@ indicator below.
 
 .. parsed-literal::
 
-    # thickn     rho      vp      vs  flag aniso   trend plunge strike   dip
-     20000.0  2800.0  6400.0  3657.1    1    0.0     0.0    0.0   90.0   0.0
-      5000.0  2800.0  6200.0  3542.9    0  -20.0   180.0   45.0   90.0   0.0
-         0.0  2800.0  7800.0  4482.8    1    0.0     0.0    0.0   90.0   0.0
-    
+    #  thickn     rho      vp      vs  flag aniso   trend plunge strike   dip
+      20000.0  2800.0  6400.0  3657.1    1    0.0     0.0    0.0   90.0   0.0
+       5000.0  2800.0  6200.0  3542.9    0  -20.0   180.0   45.0   90.0   0.0
+          0.0  2800.0  7800.0  4482.8    1    0.0     0.0    0.0   90.0   0.0
 
 
 Instead of two dipping interfaces, the model now has a thin anisotropic
@@ -193,10 +191,10 @@ and use the ``rf`` argument to process the receiver functions as well.
 
 .. code:: ipython3
 
-    seismogram = prs.run(model, geom, rc, rf=True)
+    result = prs.run(model, geom, rc, rf=True)
     
-    seismogram.filter('rfs', 'lowpass', freq=1., zerophase=True, corners=2)
-    seismogram.plot('rfs', tmin=-0.5, tmax=8.)
+    result.filter('rfs', 'lowpass', freq=1., zerophase=True, corners=2)
+    result.plot('rfs', tmin=-0.5, tmax=8.)
 
 
 
@@ -207,14 +205,71 @@ Understanding Fast and Slow S-Waves
 -----------------------------------
 
 To understand the different phases displayed, we can look at, e.g., the
-receiver function at back-azimuth 150°. We look at how the individual
-phases are called and when they arrive.
+receiver function at back-azimuth 150°. With a back-azimuthal spacing of
+10°, the ray-index is 15. Let look into ``Geometry``:
 
 .. code:: ipython3
 
-    print(seismogram.streams[15][0].stats.phase_descriptors)
-    print(seismogram.streams[15][0].stats.phase_times)
-    _ = seismogram.streams[15][0].plot()
+    geom[15]
+
+
+
+
+.. parsed-literal::
+
+    (150.0, 0.06, 0, 0)
+
+
+
+Yes, the first value of the tuple is the back-azimuth, which is 150°.
+The same index points into ``Result``:
+
+.. code:: ipython3
+
+    print(result[15])
+
+
+.. parsed-literal::
+
+    (<obspy.core.stream.Stream object at 0x7f596a0616a0>, <obspy.core.stream.Stream object at 0x7f596a038700>)
+
+
+The first element of the tuple are the synthetic seismograms, the second
+the receiver function:
+
+.. code:: ipython3
+
+    print(result[15][0])
+
+
+.. parsed-literal::
+
+    3 Trace(s) in Stream:
+    ...SYR | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:14.987500Z | 80.0 Hz, 1200 samples
+    ...SYT | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:14.987500Z | 80.0 Hz, 1200 samples
+    ...SYZ | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:14.987500Z | 80.0 Hz, 1200 samples
+
+
+.. code:: ipython3
+
+    print(result[15][1])
+
+
+.. parsed-literal::
+
+    2 Trace(s) in Stream:
+    ...RFR | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:14.987500Z | 80.0 Hz, 1200 samples
+    ...RFT | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:14.987500Z | 80.0 Hz, 1200 samples
+
+
+We now look at how the individual phases are called and when they
+arrive.
+
+.. code:: ipython3
+
+    print(result[15][0][0].stats.phase_descriptors)
+    print(result[15][0][0].stats.phase_times)
+    _ = result[15][0][0].plot()
 
 
 .. parsed-literal::
@@ -225,7 +280,7 @@ phases are called and when they arrive.
 
 
 
-.. image:: output_23_1.png
+.. image:: output_30_1.png
 
 
 The commands above tell us that the negative wiggle arriving at 2.5
@@ -243,10 +298,10 @@ amplitude, while the P-to-S2 conversion has a larger, positive one.
 
 .. code:: ipython3
 
-    print(seismogram.streams[15][1].stats.phase_descriptors)
-    print(seismogram.streams[15][1].stats.phase_times)
+    print(result[15][0][1].stats.phase_descriptors)
+    print(result[15][0][1].stats.phase_times)
     
-    _ = seismogram.streams[15][1].plot()
+    _ = result[15][0][1].plot()
 
 
 .. parsed-literal::
@@ -256,7 +311,7 @@ amplitude, while the P-to-S2 conversion has a larger, positive one.
 
 
 
-.. image:: output_25_1.png
+.. image:: output_32_1.png
 
 
 Validation against Telewavesim Data
@@ -293,7 +348,7 @@ plot.
 
 
 
-.. image:: output_28_0.png
+.. image:: output_35_0.png
 
 
 We’ll again filter both seismograms, as Telewavesim data does not
@@ -304,7 +359,7 @@ provide a good infinite frequency approximation.
     # Set frequency corners in Hz
     fmin = 1./10. 
     fmax = 10
-    prsd = seismogram.streams[15]
+    prsd = result.streams[15]
     prsd.trim(endtime = prsd[0].stats.starttime+5)
     
     # Demean and filter all data
@@ -397,14 +452,14 @@ And run it
 
 
 
-.. image:: output_36_0.png
+.. image:: output_43_0.png
 
 
 We see that the Waveforms of *Pyraysum* (red) and *Teleweavesim* (gray)
 match pretty well. The *Telewavsim* data has some additional energy at
 about 0.9 seconds, which is a reflection from the top of the anisotropic
 layer. This reflections has explicitly not been computed
-(``Control.mults = 0``), but this could be done using ``Control.set_phaselist()``.
+(``RC.mults = 0``), but this could be done using ``RC.set_phaselist()``.
 
 Conclusion
 ----------

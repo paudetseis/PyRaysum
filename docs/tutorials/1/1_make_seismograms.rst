@@ -177,9 +177,9 @@ We again use the incident P-wave geometry of the Philippines earthquake:
 
     baz = 90
     slow = 0.06
-    geom = prs.Geometry(baz=[baz], slow=[slow])
+    geom = prs.Geometry(baz=baz, slow=slow)
 
-In the run control (Control) parameters, we specify that we would like to: 1)
+In the run control (RC) parameters, we specify that we would like to: 1)
 generate data in a seismometer coordinate system (east-north-up;
 ``rot=0``), 2) include all free surface reflections (``mults=2``); 3)
 and use a sampling rate of 100 Hz (``dt=1/100``) with 2500 samples
@@ -190,7 +190,7 @@ points *toward* the source.
 .. code:: ipython3
 
     # Set `run` parameters
-    rc = prs.Control(
+    ctrl = prs.Control(
         verbose=False,
         rot=0,
         mults=2,
@@ -200,26 +200,46 @@ points *toward* the source.
     )
     
     # Run Raysum and get seismograms
-    seismogram = prs.run(model, geom, rc)
+    result = prs.run(model, geom, ctrl)
     
-    # Extract first set of seismograms (element `0` in `streams`)
-    prsd = seismogram.streams[0]
-    
-    # Make simple plot
-    print(prsd)
-    _ = prsd.plot()
+    # Extract first (and only) ray from the result (ray index [0])
+    seis, rfs = result[0]
+    print(seis)
 
 
 .. parsed-literal::
 
     3 Trace(s) in Stream:
-    .prs..Z | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:24.990000Z | 100.0 Hz, 2500 samples
-    .prs..N | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:24.990000Z | 100.0 Hz, 2500 samples
-    .prs..E | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:24.990000Z | 100.0 Hz, 2500 samples
+    ...SYZ | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:24.990000Z | 100.0 Hz, 2500 samples
+    ...SYN | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:24.990000Z | 100.0 Hz, 2500 samples
+    ...SYE | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:24.990000Z | 100.0 Hz, 2500 samples
+
+
+These are the synthetic seismograms. Once we calculate receiver
+functions, they will be strored in the second return value. Right now,
+this is an empty ``Stream``:
+
+.. code:: ipython3
+
+    print(rfs)
+
+
+.. parsed-literal::
+
+    0 Trace(s) in Stream:
+    
+
+
+Let’s continue working with the seismograms and make a quick plot.
+
+.. code:: ipython3
+
+    prsd = result[0][0]
+    _ = prsd.plot()
 
 
 
-.. image:: output_13_1.png
+.. image:: output_17_0.png
 
 
 We will now pre-process all data equally. We will filter them, and align
@@ -339,7 +359,7 @@ Comparison with real data
 
 
 
-.. image:: output_19_0.png
+.. image:: output_23_0.png
 
 
 The comparison with the real data shows that some complexity of the
@@ -351,7 +371,7 @@ long phase descriptors consist of layer numbers and phase letters.
    layer **1** as an **upgoing P**-wave, layer **0** as an **upgoing
    P**-wave, gets reflected, travels through layer **0** as a
    **downgoing S**-wave, gets again reflected and finally travels
-   through layer **0** as an **upgoing S**-wave”. The timing and
+   through layer **0** as an **upgoing S**-wave". The timing and
    amplitude of such reverberations will be used in example 3 to invert
    for subsurface properties instead of assuming them, as we did here.
 
@@ -365,7 +385,7 @@ Comparison with synthetic data
 
 
 
-.. image:: output_22_0.png
+.. image:: output_26_0.png
 
 
 The comparison with synthetic data from Telewavesim shows a good match
@@ -377,17 +397,17 @@ Computing equivalent phases
 
 The amplitude of the *PpS* phase is apparently overestimated on the E
 component and underestimated on the Z component. This is the case,
-because the Control parameter ``mults=2`` only computes first-order
+because the RC parameter ``mults=2`` only computes first-order
 multiples, i.e. reflections of the direct *P* wave. Reflections from
 *PS* are missing, most notably *PSpP*. To address this problem, we will
-next use the ``Control.set_phaselist()`` method to explicitly name the phases
-we wish to compute. The method implicitly sets ``mults=3``.
-``Result`` has a dedicated method ``descriptors()`` to list unique
-phases present in the synthetic waveforms.
+next use the ``RC.set_phaselist()`` method to explicitly name the phases
+we wish to compute. The method implicitly sets ``mults=3``. ``Result``
+has a dedicated method ``descriptors()`` to list unique phases present
+in the synthetic waveforms.
 
 .. code:: ipython3
 
-    phl = seismogram.descriptors()
+    phl = result.descriptors()
     eqp = prs.equivalent_phases(phl)
     print("Phases computed with mult=2:")
     print(phl)
@@ -402,7 +422,7 @@ phases present in the synthetic waveforms.
     ['1P0P', '1P0P0p0P', '1P0P0p0S', '1P0P0s0S', '1P0S']
     
     Dynamically equivalent phases:
-    ['1P0S0s0P', '1P0P0s0P', '1P0S0p0P', '1P0S0p0S']
+    ['1P0P0s0P', '1P0S0p0P', '1P0S0p0S', '1P0S0s0P']
 
 
 We will now set a phaselist that includes these phases using the
@@ -410,17 +430,16 @@ We will now set a phaselist that includes these phases using the
 
 .. code:: ipython3
 
-    rc.set_phaselist(phl, equivalent=True)
+    ctrl.set_phaselist(phl, equivalent=True)
 
 And run *PyRaysum* and the post processing again:
 
 .. code:: ipython3
 
     # Run Raysum and get seismograms
-    seismogram = prs.run(model, geom, rc)
+    result = prs.run(model, geom, ctrl)
     
-    # Extract first set of seismograms (element `0` in `streams`)
-    prsd = seismogram.streams[0]
+    prsd = result[0][0]
     prsd.filter("bandpass", freqmin=fmin, freqmax=fmax, zerophase=True)
     
     jmax = np.argmax(abs(prsd[0].data))  # maximum vertical amplitude
@@ -439,7 +458,7 @@ And run *PyRaysum* and the post processing again:
 
 
 
-.. image:: output_29_0.png
+.. image:: output_33_0.png
 
 
 The amplitudes of the reflected phases are now better matched. To
@@ -449,7 +468,7 @@ look them up in the metadata of the synthetic seismic trace:
 .. code:: ipython3
 
     print("Name, Time, Amplitude")
-    f = "{:4s}  {:>4.1f}    {:>7.0f}"
+    f = "{:4s}  {:>4.1f}    {:>7.3f}"
     stats = prsd[0].stats
     for t, a, n in sorted(zip(stats.phase_times, stats.phase_amplitudes, stats.phase_names)):
         print(f.format(n, t, a))
@@ -458,15 +477,15 @@ look them up in the metadata of the synthetic seismic trace:
 .. parsed-literal::
 
     Name, Time, Amplitude
-    P      4.5      74495
-    PS     8.9      -2628
-    PpP   13.5     -10550
-    PsP   17.9      -6219
-    PpS   17.9      -2792
-    PSpP  17.9        829
-    PSsP  22.4       -966
-    PSpS  22.4        219
-    PsS   22.4       2648
+    P      4.5      1.830
+    PS     8.9     -0.065
+    PpP   13.5     -0.259
+    PsP   17.9     -0.153
+    PpS   17.9     -0.069
+    PSpP  17.9      0.020
+    PSsP  22.4     -0.024
+    PSpS  22.4      0.005
+    PsS   22.4      0.065
 
 
 Conclusion
