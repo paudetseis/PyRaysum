@@ -1,4 +1,4 @@
-# Copyright 2020 Pascal Audet
+# Copyright 2022 Wasja Bloch, Pascal Audet
 
 # This file is part of PyRaysum.
 
