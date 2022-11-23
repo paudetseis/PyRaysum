@@ -2,7 +2,6 @@
 
 def test_imports():
     import obspy
-    import pandas
     import numpy
     import matplotlib
     import pyraysum

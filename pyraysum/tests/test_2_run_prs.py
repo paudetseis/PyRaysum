@@ -183,14 +183,18 @@ def test_bailout():
     """
     The given model produces the 'WARNING in evec_check'. Make sure phases are bailed out
     """
+    from pkg_resources import resource_filename
 
-    modf = "evec_warn_model.txt"
-    try:
-        mod = prs.read_model(modf)
-    except OSError:
-        # VSCode starts tests from root directory
-        modf = "pyraysum/tests/" + modf
-        mod = prs.read_model(modf)
+    modf = resource_filename('pyraysum',
+                               'tests/evec_warn_model.txt')
+    mod = prs.read_model(modf)
+    # modf = "evec_warn_model.txt"
+    # try:
+    #     mod = prs.read_model(modf)
+    # except OSError:
+    #     # VSCode starts tests from root directory
+    #     modf = "pyraysum/tests/" + modf
+    #     mod = prs.read_model(modf)
         
     rc = Control(rot=2)
 
