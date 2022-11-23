@@ -1,4 +1,4 @@
-# Copyright 2020 Pascal Audet
+# Copyright 2022 Wasja Bloch, Pascal Audet
 
 # This file is part of PyRaysum.
 
@@ -21,23 +21,62 @@
 # SOFTWARE.
 
 import re
+import numpy as np
+import re
 from datetime import datetime
 import numpy as np
-from scipy import signal
 import matplotlib.pyplot as plt
-from obspy import Trace, Stream, UTCDateTime
+from obspy import Stream
 from numpy.fft import fft, ifft, fftshift
-from pyraysum import plot
+from copy import deepcopy
 import fraysum
 
+from . import plot
+from .frs import read_arrivals, read_traces, _phnames
+
+_align = {0: "None", 1: "P", 2: "SV", 3: "SH"}
+_rot = {0: "ZNE", 1: "RTZ", 2: "PVH"}
 _iphase = {"P": 1, "SV": 2, "SH": 3}
-_phnames = {1: "P", 2: "S", 3: "T", 4: "p", 5: "s", 6: "t"}
-_phids = {_phnames[k]: k for k in _phnames}  # inverse dictionary
+_phids = {_phnames[k]: k for k in _phnames}  # inverse dictionary, imported in core
+_modhint = (
+    "################################################\n"
+    "#\n"
+    "#   Model file to use with `PyRaysum` for \n"
+    "#   modeling teleseismic body wave propagation \n"
+    "#   through dippin anisotropic media.\n"
+    "#\n"
+    "#   Lines starting with '#' are ignored. Each \n"
+    "#   line corresponds to a unique layer. The \n"
+    "#   bottom layer is assumed to be a half-space\n"
+    "#   (Thickness is irrelevant).\n"
+    "#\n"
+    "#   Format:\n"
+    "#       Column  Contents\n"
+    "#          0    Thickness (km)\n"
+    "#          1    Density (kg/m^3)\n"
+    "#          2    Layer P-wave velocity (km/s)\n"
+    "#          3    Layer S-wave velocity (km/s)\n"
+    "#          4    Layer flag \n"
+    "#                   1: isotropic\n"
+    "#                   0: transverse isotropy\n"
+    "#          5    % Transverse anisotropy (if Layer flag is set to 0)\n"
+    "#                   0: isotropic\n"
+    "#                   +: fast symmetry axis\n"
+    "#                   -: slow symmetry axis\n"
+    "#          6    Trend of symmetry axis (degrees)\n"
+    "#          7    Plunge of symmetry axis (degrees)\n"
+    "#		    8	 Interface strike (degrees)\n"
+    "#		    9	 Interface dip (degrees)\n"
+    "#\n"
+    "################################################\n"
+)
 
 
 class Model(object):
-    """
-    Model of the subsurface seismic velocity structure
+    """Model of the subsurface seismic velocity structure.
+
+    .. note::
+       This object holds the infromation of the .mod file in classic Raysum
 
     Parameters:
         thickn (array_like):
@@ -66,6 +105,9 @@ class Model(object):
           Defaults to 1.73. Ignored if :const:`vs` is set.
         maxlay (int):
           Maximum number of layers defined in params.h
+
+    Warning:
+        When setting `vpvs`, `vs` is adjusted to satisfy vs = vp / vpvs.
 
     The following attributes are set upon initialization and when executing
     :meth:`update()`. `f` prefixes indicate attributes used for interaction with
@@ -96,6 +138,43 @@ class Model(object):
           azimuth of interface in RHR (radians)
         fdip
           dip of interface in RHR (radians)
+
+    Example
+    -------
+        >>> from pyraysum import Model
+        >>> model = Model([10000, 0], [3000, 4500], [6000, 8000], [3500, 4600])
+        >>> print(model)
+        #  thickn     rho      vp      vs  flag aniso   trend plunge strike   dip
+          10000.0  3000.0  6000.0  3500.0    1    0.0     0.0    0.0    0.0   0.0
+              0.0  4500.0  8000.0  4600.0    1    0.0     0.0    0.0    0.0   0.0
+        >>> model[0]["thickn"]
+        10000.0
+        >>> model[1, "vp"]
+        8000.0
+        >>> model[1, "vp"] = 7400.
+        >>> model[1, "vp"]
+        7400.0
+        >>> model[1] = {"vs": 4200., "rho": 4000.}
+        >>> model[1]["vs"]
+        4200.0
+        >>> model[1, "rho"]
+        4000.0
+        >>> model[1] = {"thickn": 5000, "vp": 8000., "vpvs": 2.}
+        >>> model[1]["vs"]
+        4000.0
+        >>> model += [5000, 3600, 8000, 4000]  # thickn, rho, vp, vs
+        >>> print(model)
+        #  thickn     rho      vp      vs  flag aniso   trend plunge strike   dip
+          10000.0  3000.0  6000.0  3500.0    1    0.0     0.0    0.0    0.0   0.0
+           5000.0  4000.0  8000.0  4000.0    1    0.0     0.0    0.0    0.0   0.0
+           5000.0  3600.0  8000.0  4000.0    1    0.0     0.0    0.0    0.0   0.0
+        >>> model += {"thickn": 0, "rho": 3800, "vp": 8500., "dip": 20, "strike": 90}
+        >>> print(model)
+        #  thickn     rho      vp      vs  flag aniso   trend plunge strike   dip
+          10000.0  3000.0  6000.0  3500.0    1    0.0     0.0    0.0    0.0   0.0
+           5000.0  4000.0  8000.0  4000.0    1    0.0     0.0    0.0    0.0   0.0
+           5000.0  3600.0  8000.0  4000.0    1    0.0     0.0    0.0    0.0   0.0
+              0.0  3800.0  8500.0  4913.3    1    0.0     0.0    0.0   90.0  20.0
     """
 
     def __init__(
@@ -121,32 +200,34 @@ class Model(object):
             else:
                 return np.array([0.0] * self.nlay)
 
-        self.nlay = len(thickn)
-        self.thickn = np.array(thickn)
-        self.rho = _get_val(rho)
-        self.vp = _get_val(vp)
+        try:
+            self.nlay = len(thickn)
+        except TypeError:
+            self.nlay = 1
+
+        self._thickn = _get_val(thickn)
+        self._rho = _get_val(rho)
+        self._vp = _get_val(vp)
 
         if vs is None:
-            self.vpvs = _get_val(vpvs)
-            self.vs = self.vp / self.vpvs
+            self._vpvs = _get_val(vpvs)
+            self._vs = self._vp / self._vpvs
         else:
-            self.vs = np.array(vs)
-            self.vpvs = self.vp / self.vs
+            self._vs = _get_val(vs)
+            self._vpvs = self._vp / self._vs
 
-        self.flag = np.array(
+        self._flag = np.array(
             [flag] * self.nlay if isinstance(flag, int) else list(flag)
         )
-        self.ani = _get_val(ani)
-        self.trend = _get_val(trend)
-        self.plunge = _get_val(plunge)
-        self.strike = _get_val(strike)
-        self.dip = _get_val(dip)
+        self._ani = _get_val(ani)
+        self._trend = _get_val(trend)
+        self._plunge = _get_val(plunge)
+        self._strike = _get_val(strike)
+        self._dip = _get_val(dip)
 
         self.maxlay = maxlay
 
-        self._set_fattributes()
-
-        self._useratts = [
+        self.properties = [
             "thickn",
             "rho",
             "vp",
@@ -159,45 +240,142 @@ class Model(object):
             "strike",
             "dip",
         ]
+        self._properties = ["_" + prop for prop in self.properties]
+
+        self._set_fattributes()
+        self._set_layers()
+
+    def __getitem__(self, ilay):
+        try:
+            # model[0, "thickn"]
+            return self.layers[ilay[0]][ilay[1]]
+        except TypeError:
+            try:
+                # model[0]
+                return self.layers[ilay]
+            except TypeError:
+                # model["thickn"]
+                return np.array([lay[ilay] for lay in self.layers])
+
+    def __setitem__(self, layatt, value):
+
+        lays = []
+        atts = []
+        vals = []
+        try:
+            # model[0] = {"plunge": 10} syntax
+            # layatt is layer and value is {"att": value}
+            atts = value.keys()
+            for att in atts:
+                vals.append(value[att])
+            lays = [layatt] * len(vals)
+        except AttributeError:
+            # model[0, "plunge"] = 10 syntax
+            # layatt[0] is layer, layatt[1] is attribute, value is value
+            lays = [layatt[0]]
+            atts = [layatt[1]]
+            vals = [value]
+
+        for lay, att, val in zip(lays, atts, vals):
+            if att not in self.properties:
+                msg = f"Unknown attribute: '{att}'. Must be one of: "
+                msg += ", ".join(self.properties)
+                raise ValueError(msg)
+
+            self.__dict__["_" + att][lay] = val
+
+            if att == "ani" and val != 0:
+                self.__dict__["_flag"][lay] = 0
+            if att == "ani" and val == 0:
+                self.__dict__["_flag"][lay] = 1
+
+            if att == "vpvs":
+                self._update(change="vs")
+            else:
+                self._update()
 
     def __len__(self):
         return self.nlay
 
     def __str__(self):
-        buf = "# thickn     rho      vp      vs  flag aniso   trend "
+        buf = "#  thickn     rho      vp      vs  flag aniso   trend "
         buf += "plunge strike   dip\n"
 
-        f = "{: 8.1f} {: 7.1f} {: 7.1f} {: 7.1f} {: 4.0f} {: 6.1f} {: 7.1f} "
+        f = "{: 9.1f} {: 7.1f} {: 7.1f} {: 7.1f} {: 4.0f} {: 6.1f} {: 7.1f} "
         f += "{: 6.1f} {: 6.1f} {: 5.1f}\n"
 
         for th, vp, vs, r, fl, a, tr, p, s, d in zip(
-            self.thickn,
-            self.vp,
-            self.vs,
-            self.rho,
-            self.flag,
-            self.ani,
-            self.trend,
-            self.plunge,
-            self.strike,
-            self.dip,
+            self._thickn,
+            self._vp,
+            self._vs,
+            self._rho,
+            self._flag,
+            self._ani,
+            self._trend,
+            self._plunge,
+            self._strike,
+            self._dip,
         ):
             buf += f.format(th, r, vp, vs, fl, a, tr, p, s, d)
 
-        return buf
+        return buf.strip("\n")
+
+    def __add__(self, other):
+        if not isinstance(other, Model):
+            try:
+                other = Model(**other)
+            except TypeError:
+                other = Model(*other)
+            except Exception:
+                msg = "Can only add Model, or valid dict or list to Model."
+                raise TypeError(msg)
+
+        third = deepcopy(self)
+
+        for att in third._properties:
+            third.__dict__[att] = np.append(self.__dict__[att], other.__dict__[att])
+
+        third.nlay += other.nlay
+        third._set_fattributes()
+        third._set_layers()
+        return third
+
+    def __eq__(self, other):
+        issame = [
+            slay[att] == olay[att]
+            for slay, olay in zip(self.layers, other.layers)
+            for att in self.properties
+        ]
+        return all(issame)
+
+    def _set_layers(self):
+        self.layers = [
+            {
+                prop: self.__dict__[_prop][lay]
+                for prop, _prop in zip(self.properties, self._properties)
+            }
+            for lay in range(self.nlay)
+        ]
 
     def _set_fattributes(self):
+        if self.nlay > self.maxlay:
+            msg = f"The object is larger (nlay={self.nlay}) than the memory allocated "
+            msg += f"at compile time (maxlay={self.maxlay}). "
+            msg += (
+                f"Increase maxlay in params.h and when constucting this Model object."
+            )
+            raise IndexError(msg)
         tail = np.zeros(self.maxlay - self.nlay)
-        self.fthickn = np.asfortranarray(np.append(self.thickn, tail))
-        self.frho = np.asfortranarray(np.append(self.rho, tail))
-        self.fvp = np.asfortranarray(np.append(self.vp, tail))
-        self.fvs = np.asfortranarray(np.append(self.vs, tail))
-        self.fflag = np.asfortranarray(np.append(self.flag, tail))
-        self.fani = np.asfortranarray(np.append(self.ani, tail))
-        self.ftrend = np.asfortranarray(np.append(self.trend, tail) * np.pi / 180)
-        self.fplunge = np.asfortranarray(np.append(self.plunge, tail) * np.pi / 180)
-        self.fstrike = np.asfortranarray(np.append(self.strike, tail) * np.pi / 180)
-        self.fdip = np.asfortranarray(np.append(self.dip, tail) * np.pi / 180)
+        self.fthickn = np.asfortranarray(np.append(self._thickn, tail))
+        self.frho = np.asfortranarray(np.append(self._rho, tail))
+        self.fvp = np.asfortranarray(np.append(self._vp, tail))
+        self.fvs = np.asfortranarray(np.append(self._vs, tail))
+        self.fflag = np.asfortranarray(np.append(self._flag, tail))
+        self.fani = np.asfortranarray(np.append(self._ani, tail))
+        self.ftrend = np.asfortranarray(np.append(self._trend, tail) * np.pi / 180)
+        self.fplunge = np.asfortranarray(np.append(self._plunge, tail) * np.pi / 180)
+        self.fstrike = np.asfortranarray(np.append(self._strike, tail) * np.pi / 180)
+        self.fdip = np.asfortranarray(np.append(self._dip, tail) * np.pi / 180)
         self.parameters = [
             self.fthickn,
             self.frho,
@@ -212,9 +390,33 @@ class Model(object):
             self.nlay,
         ]
 
-    def update(self, change="vpvs"):
+    def _v12str(self):
+        """Raysum version 1.2 .mod file convention"""
+        buf = "#  thickn     rho      vp      vs  flag p-aniso  s-aniso   trend "
+        buf += "plunge strike   dip\n"
+
+        f = "{: 9.1f} {: 7.1f} {: 7.1f} {: 7.1f} {: 4.0f} {: 8.1f} {: 8.1f} {: 7.1f} "
+        f += "{: 6.1f} {: 6.1f} {: 5.1f}\n"
+
+        for th, vp, vs, r, fl, a, tr, p, s, d in zip(
+            self._thickn,
+            self._vp,
+            self._vs,
+            self._rho,
+            self._flag,
+            self._ani,
+            self._trend,
+            self._plunge,
+            self._strike,
+            self._dip,
+        ):
+            buf += f.format(th, r, vp, vs, fl, a, a, tr, p, s, d)
+
+        return buf.strip("\n")
+
+    def _update(self, change="vpvs"):
         """
-        Update all attributes after one of them was changed by the user.
+        Update all attributes after one of them was changed.
 
         Parameters:
             change (str):
@@ -230,16 +432,21 @@ class Model(object):
         """
 
         if change == "vp":
-            self.vp = self.vs * self.vpvs
+            self._vp = self._vs * self._vpvs
         elif change == "vs":
-            self.vs = self.vp / self.vpvs
+            self._vs = self._vp / self._vpvs
         elif change == "vpvs":
-            self.vpvs = self.vp / self.vs
+            self._vpvs = self._vp / self._vs
         else:
             msg = "Unknown value for keyword: " + change
             raise ValueError(msg)
 
         self._set_fattributes()
+        self._set_layers()
+
+    def copy(self):
+        """Return a copy of the model"""
+        return deepcopy(self)
 
     def change(self, command, verbose=True):
         """
@@ -311,6 +518,7 @@ class Model(object):
             "pl": "plunge",
             "plunge": "plunge",
         }
+        _ATT = {key: "_" + val for key, val in zip(ATT.keys(), ATT.values())}
 
         changed = []
         for com in command.split(";"):
@@ -347,23 +555,24 @@ class Model(object):
                 change = "vp"
 
             attribute = ATT[att]
+            _attribute = _ATT[att]
 
             # Apply
             if sign == "=":
-                self.__dict__[attribute][lay] = val
+                self.__dict__[_attribute][lay] = val
                 sign = ""  # to print nicely below
             elif sign == "+":
-                self.__dict__[attribute][lay] += val
+                self.__dict__[_attribute][lay] += val
             elif sign == "-":
-                self.__dict__[attribute][lay] -= val
+                self.__dict__[_attribute][lay] -= val
 
             # Set isotropy flag iff layer is isotropic
-            self.flag[lay] = 1
-            if self.ani[lay] != 0:
-                self.flag[lay] = 0
+            self._flag[lay] = 1
+            if self._ani[lay] != 0:
+                self._flag[lay] = 0
 
-            self.update(change=change)
-            changed.append((attribute, lay, self.__dict__[attribute][lay]))
+            self._update(change=change)
+            changed.append((attribute, lay, self.__dict__[_attribute][lay]))
 
             if verbose:
                 msg = "Changed: {:}[{:d}] {:}= {:}".format(attribute, lay, sign, val)
@@ -381,14 +590,14 @@ class Model(object):
                 Index of the layer to split
         """
 
-        for att in self._useratts:
+        for att in self._properties:
             self.__dict__[att] = np.insert(self.__dict__[att], n, self.__dict__[att][n])
 
-        self.thickn[n] /= 2
-        self.thickn[n + 1] /= 2
+        self._thickn[n] /= 2
+        self._thickn[n + 1] /= 2
         self.nlay += 1
 
-        self.update()
+        self._update()
 
     def remove_layer(self, n):
         """
@@ -399,11 +608,11 @@ class Model(object):
                 Index of the layer to remove
         """
 
-        for att in self._useratts:
+        for att in self._properties:
             self.__dict__[att] = np.delete(self.__dict__[att], n)
 
         self.nlay -= 1
-        self.update()
+        self._update()
 
     def average_layers(self, top, bottom):
         """
@@ -424,26 +633,26 @@ class Model(object):
         if bottom <= top:
             raise IndexError("bottom must be larger than top.")
 
-        if not all(self.flag[top:bottom]):
+        if not all(self._flag[top:bottom]):
             raise ValueError("Can only combine isotropic layers")
 
-        if not all(self.dip[top:bottom][0] == self.dip[top:bottom]):
+        if not all(self._dip[top:bottom][0] == self._dip[top:bottom]):
             raise ValueError("All layers must have the same dip")
 
-        if not all(self.strike[top:bottom][0] == self.strike[top:bottom]):
+        if not all(self._strike[top:bottom][0] == self._strike[top:bottom]):
             raise ValueError("All layers must have the same strike")
 
-        thickn = sum(self.thickn[top:bottom])
-        weights = self.thickn[top:bottom] / thickn
+        thickn = sum(self._thickn[top:bottom])
+        weights = self._thickn[top:bottom] / thickn
 
         layer = {
             "thickn": thickn,
-            "vp": sum(self.vp[top:bottom] * weights),
-            "vs": sum(self.vs[top:bottom] * weights),
-            "rho": sum(self.rho[top:bottom] * weights),
+            "vp": sum(self._vp[top:bottom] * weights),
+            "vs": sum(self._vs[top:bottom] * weights),
+            "rho": sum(self._rho[top:bottom] * weights),
         }
 
-        for att in self._useratts:
+        for att in self.properties:
             try:
                 self.__dict__[att][top] = layer[att]
             except KeyError:
@@ -451,22 +660,23 @@ class Model(object):
             self.__dict__[att] = np.delete(self.__dict__[att], range(top + 1, bottom))
 
         self.nlay -= bottom - top - 1
-        self.update()
+        self._update()
 
-    def save(self, fname="sample.mod", comment=""):
+    def save(self, fname="sample.mod", comment="", hint=False, version="prs"):
         """
         Alias for :class:`write()`
         """
-        self.write(fname=fname, comment=comment)
+        self.write(fname=fname, comment=comment, hint=hint, version=version)
 
-    def write(self, fname="sample.mod", comment=""):
+    def write(self, fname="sample.mod", comment="", hint=False, version="prs"):
         """
         Write seismic velocity model to disk as Raysum ASCII model file
 
         Args:
             fname (str): Name of the output file (including extension)
             comment (str): String to write into file header
-
+            hint (bool): Include usage comment to model file
+            version ("prs" or "1.2"): Use PyRaysum or Raysum1.2 file format
         """
 
         if not comment.startswith("#"):
@@ -480,8 +690,19 @@ class Model(object):
 
         buf = "# Raysum velocity model created with PyRaysum\n"
         buf += "# on: {:}\n".format(datetime.now().isoformat(" ", "seconds"))
+
+        if hint:
+            buf += _modhint
+
         buf += comment
-        buf += self.__str__()
+
+        if version == "prs":
+            buf += self.__str__()
+        elif version == "1.2":
+            buf += self._v12str()
+        else:
+            msg = f"Unknown version: {version}"
+            raise ValueError(msg)
 
         with open(fname, "w") as fil:
             fil.write(buf)
@@ -510,7 +731,9 @@ class Model(object):
         self.plot_interfaces(zmax=zmax, ax=ax3)
 
         # Tighten the plot and show it
-        plt.tight_layout()
+        # TODO: tight layout does not work with colorbar.
+        # Do this manually.
+        # plt.tight_layout()
         plt.show()
 
     def plot_profile(self, zmax=75.0, ax=None):
@@ -532,17 +755,17 @@ class Model(object):
         show = False
 
         # Find depths of all interfaces in km
-        thickn = self.thickn.copy()
+        thickn = self._thickn.copy()
         if thickn[-1] == 0.0:
             thickn[-1] = 50000.0
         depths = np.concatenate(([0.0], np.cumsum(thickn))) / 1000.0
 
         # Get corner coordinates of staircase representation of model
         depth = np.array(list(zip(depths[:-1], depths[1:]))).flatten()
-        vs = np.array(list(zip(self.vs, self.vs))).flatten()
-        vp = np.array(list(zip(self.vp, self.vp))).flatten()
-        rho = np.array(list(zip(self.rho, self.rho))).flatten()
-        ani = np.array(list(zip(self.ani, self.ani))).flatten()
+        vs = np.array(list(zip(self._vs, self._vs))).flatten()
+        vp = np.array(list(zip(self._vp, self._vp))).flatten()
+        rho = np.array(list(zip(self._rho, self._rho))).flatten()
+        ani = np.array(list(zip(self._ani, self._ani))).flatten()
 
         # Generate new plot if an Axis is not passed
         if ax is None:
@@ -556,7 +779,7 @@ class Model(object):
         ax.plot(rho, depth, color="C2", label=r"Density (kg m$^{-3}$)")
 
         # If there is anisotropy, show variability
-        if np.any([flag == 0 for flag in self.flag]):
+        if np.any([flag == 0 for flag in self._flag]):
             ax.plot(vs * (1.0 - ani / 100.0), depth, "--", color="C0")
             ax.plot(vs * (1.0 + ani / 100.0), depth, "--", color="C0")
             ax.plot(vp * (1.0 - ani / 100.0), depth, "--", color="C1")
@@ -594,7 +817,7 @@ class Model(object):
         show = False
 
         # Find depths of all interfaces
-        thickn = self.thickn.copy()
+        thickn = self._thickn.copy()
         if thickn[-1] == 0.0:
             thickn[-1] = 50000.0
         depths = np.concatenate(([0.0], np.cumsum(thickn))) / 1000.0
@@ -604,16 +827,18 @@ class Model(object):
             fig = plt.figure(figsize=(2, 5))
             ax = fig.add_subplot(111)
             show = True
+        else:
+            fig = ax.get_figure()
 
         # Define color palette
         norm = plt.Normalize()
-        colors = plt.cm.GnBu(norm(self.vs))
+        colors = plt.cm.GnBu(norm(self._vs))
 
         # Cycle through layers
         for i in range(len(depths) - 1):
 
             # If anisotropic, add texture - still broken hatch
-            if not self.flag[i] == 1:
+            if not self._flag[i] == 1:
                 cax = ax.axhspan(depths[i], depths[i + 1], color=colors[i])
                 cax.set_hatch("o")
             # Else isotropic
@@ -624,6 +849,12 @@ class Model(object):
         ax.set_ylim(0.0, zmax)
         ax.set_xticks(())
         ax.invert_yaxis()
+        pos = ax.get_position()
+
+        ax2 = fig.add_axes([pos.x0, pos.y0 - 0.02, pos.width, 0.015])
+
+        cmap = plt.cm.ScalarMappable(norm=norm, cmap="GnBu")
+        plt.colorbar(cmap, cax=ax2, orientation="horizontal", label="$V_S$ (m/s)")
 
         if show:
             ax.set_ylabel("Depth (km)")
@@ -657,7 +888,7 @@ class Model(object):
         show = False
 
         # Find depths of all interfaces
-        depths = np.concatenate(([0.0], np.cumsum(self.thickn))) / 1000.0
+        depths = np.concatenate(([0.0], np.cumsum(self._thickn))) / 1000.0
         maxdep = depths[-1] + 50
         xs = np.array([-maxdep / 2, maxdep / 2])
 
@@ -670,12 +901,12 @@ class Model(object):
         ax.scatter(0, -0.6, 60, marker="v", c="black")
         # Cycle through layers
         for i, depth in enumerate(depths[:-1]):
-            dzdx = np.sin(self.dip[i] * np.pi / 180)
+            dzdx = np.sin(self._dip[i] * np.pi / 180)
             zs = depth + xs * dzdx
             ax.plot(xs, zs, color="black")
-            dipdir = (self.strike[i] + 90) % 360
+            dipdir = (self._strike[i] + 90) % 360
 
-            if i == 0 or self.strike[i] != self.strike[i - 1]:
+            if i == 0 or self._strike[i] != self._strike[i - 1]:
                 ax.text(
                     xs[-1], zs[-1], ">{:.0f}°".format(dipdir), ha="left", va="center"
                 )
@@ -685,13 +916,13 @@ class Model(object):
 
             for n, inf in enumerate(info):
                 if inf == "vp":
-                    msg += "$V_P={:.1f}$km/s".format(self.vp[i] / 1000)
+                    msg += "$V_P={:.1f}$km/s".format(self._vp[i] / 1000)
                 elif inf == "vs":
-                    msg += "$V_S={:.1f}$km/s".format(self.vs[i] / 1000)
+                    msg += "$V_S={:.1f}$km/s".format(self._vs[i] / 1000)
                 elif inf == "vpvs":
-                    msg += "$V_P/V_S={:.2f}$".format(self.vpvs[i])
+                    msg += "$V_P/V_S={:.2f}$".format(self._vpvs[i])
                 elif inf == "rho":
-                    msg += "$\\rho={:.1f}$kg/m$^3$".format(self.rho[i] / 1000)
+                    msg += "$\\rho={:.1f}$kg/m$^3$".format(self._rho[i] / 1000)
                 else:
                     err = "Unknown argument to 'info': " + inf
                     raise ValueError(err)
@@ -702,19 +933,19 @@ class Model(object):
                 0,
                 depth + 1,
                 msg,
-                rotation=-self.dip[i],
+                rotation=-self._dip[i],
                 rotation_mode="anchor",
                 ha="center",
                 va="top",
             )
 
-            if self.flag[i] == 0:
-                aninfo = "-{:.0f}%-{:.0f}°".format(self.ani[i], self.trend[i])
+            if self._flag[i] == 0:
+                aninfo = "-{:.0f}%-{:.0f}°".format(self._ani[i], self._trend[i])
                 ax.text(
                     xs[-1],
-                    zs[-1] + self.thickn[i] / 2000,
+                    zs[-1] + self._thickn[i] / 2000,
                     aninfo,
-                    rotation=-self.plunge[i],
+                    rotation=-self._plunge[i],
                     ha="left",
                     va="center",
                 )
@@ -737,24 +968,31 @@ class Model(object):
 
 
 class Geometry(object):
-    """
-    Recording geometry of rays and events at the seismic station. 
+    """Ray geometry of seismic events and station configuration.
+
     One set of synthetic traces will be computed for each array element.
+
+    .. note::
+       This object holds the infromation of the .geom file in classic Raysum
 
     Parameters:
         baz (float or array_like):
           Ray back-azimuths (deg)
         slow (float or array_like):
           Ray slownesses (s/km)
-        dn (array_like):
+        dn (float):
           North-offset of the seismic station (m)
-        de (array_like):
+        de (float):
           East-offset of the seismic station (m)
         maxtr (int):
           Maximum number of traces defined in params.h
 
-    The following attributes are set upon initialization. `f` prefixes indicate 
-    attributes used for interaction with `fraysum.run_bare()` and 
+    .. hint::
+       If :attr:`baz` and :attr:`slow` do not have a different length, one ray will
+       be computed for each *combination* of :attr:`baz` and :attr:`slow` (See examples)
+
+    The following attributes are set upon initialization. `f` prefixes indicate
+    attributes used for interaction with `fraysum.run_bare()` and
     `fraysum.run_full()`.
 
         ntr (int):
@@ -770,9 +1008,37 @@ class Geometry(object):
           North-offset of the seismic station (m)
         fde (np.ndarray):
           East-offset of the seismic station (m)
+
+    Example
+    -------
+        >>> from pyraysum import Geometry
+        >>> geom = Geometry(60, 0.06)
+        >>> print(geom)
+        #Back-azimuth, Slowness, N-offset, E-offset
+                60.00    0.0600      0.00      0.00
+        >>> geom += [[90, 120], 0.04]
+        >>> print(geom)
+        #Back-azimuth, Slowness, N-offset, E-offset
+                60.00    0.0600      0.00      0.00
+                90.00    0.0400      0.00      0.00
+               120.00    0.0400      0.00      0.00
+        >>> geom = Geometry(range(0, 360, 90), [0.04, 0.08], 10, 35)
+        >>> print(geom)
+        #Back-azimuth, Slowness, N-offset, E-offset
+                 0.00    0.0400     10.00     35.00
+                90.00    0.0400     10.00     35.00
+               180.00    0.0400     10.00     35.00
+               270.00    0.0400     10.00     35.00
+                 0.00    0.0800     10.00     35.00
+                90.00    0.0800     10.00     35.00
+               180.00    0.0800     10.00     35.00
+               270.00    0.0800     10.00     35.00
     """
 
-    def __init__(self, baz, slow, dn=[0], de=[0], maxtr=500):
+    def __init__(self, baz, slow, dn=0, de=0, maxtr=500):
+
+        self.maxtr = maxtr
+        self.properties = {"baz": 0, "slow": 1, "dn": 2, "de": 3}
 
         if type(baz) == int or type(baz) == float:
             baz = [baz]
@@ -781,41 +1047,117 @@ class Geometry(object):
             slow = [slow]
 
         if len(baz) != len(slow):
-            self.geom = [(bb, ss) for ss in slow for bb in baz]
+            self._geom = [(bb, ss) for ss in slow for bb in baz]
         else:
-            self.geom = [(bb, ss) for bb, ss in zip(baz, slow)]
+            self._geom = [(bb, ss) for bb, ss in zip(baz, slow)]
 
-        baz, slow = zip(*self.geom)
-        self.baz = np.array(baz)
-        self.slow = np.array(slow)
+        baz, slow = zip(*self._geom)
+        self._baz = np.array(baz)
+        self._slow = np.array(slow)
+        self.ntr = len(self._baz)
 
-        self.ntr = len(self.baz)
+        self._dn = np.full(self.ntr, dn)
+        self._de = np.full(self.ntr, de)
 
-        self.dn = np.array(dn)
-        self.de = np.array(de)
+        self.rays = [*zip(self._baz, self._slow, self._dn, self._de)]
 
-        if len(self.dn) != self.ntr:
-            self.dn = np.full(self.ntr, self.dn[0])
+        self._set_fattributes()
 
-        if len(self.de) != self.ntr:
-            self.de = np.full(self.ntr, self.de[0])
+    def __getitem__(self, iray):
+        if isinstance(iray, tuple):
+            # geometry[0, "baz"]
+            iprop = self.properties[iray[1]]
+            return self.rays[iray[0]][iprop]
+        else:
+            try:
+                # geometry["baz"]
+                iprop = self.properties[iray]
+                return [tup[iprop] for tup in self.rays]
+            except KeyError:
+                # geometry[0]
+                return self.rays[iray]
 
-        tail = np.zeros(maxtr - self.ntr)
-        self.fbaz = np.asfortranarray(np.append(self.baz, tail) * np.pi / 180)
-        self.fslow = np.asfortranarray(np.append(self.slow, tail) * 1e-3)
-        self.fdn = np.asfortranarray(np.append(self.dn, tail))
-        self.fde = np.asfortranarray(np.append(self.de, tail))
-        self.parameters = [self.fbaz, self.fslow, self.fdn, self.fde, self.ntr]
+    def __setitem__(self, iray, value):
+
+        if not isinstance(value, tuple) or len(value) != 4:
+            msg = "Can only set tuple(baz, slow, dn, de)"
+            raise TypeError(msg)
+        self.rays[iray] = value
+
+        self._baz[iray] = value[0]
+        self._slow[iray] = value[1]
+        self._geom[iray] = (value[0], value[1])
+        self._dn[iray] = value[2]
+        self._de[iray] = value[3]
+
+        self._set_fattributes()
 
     def __len__(self):
         return self.ntr
 
+    def __add__(self, other):
+        if not isinstance(other, Geometry):
+            try:
+                other = Geometry(**other)
+            except TypeError:
+                other = Geometry(*other)
+            except Exception:
+                msg = "Can only add Geometry, or valid dict or list to Geometry."
+                raise TypeError(msg)
+
+        third = deepcopy(self)
+
+        third._baz = np.append(self._baz, other._baz)
+        third._slow = np.append(self._slow, other._slow)
+        third._dn = np.append(self._dn, other._dn)
+        third._de = np.append(self._de, other._de)
+        third._geom = np.append(self._geom, other._geom)
+        third.ntr += other.ntr
+        third.rays += other.rays
+        third._set_fattributes()
+
+        return third
+
+    def __eq__(self, other):
+        return (
+            all(np.equal(self._baz, other._baz))
+            and all(np.equal(self._slow, other._slow))
+            and all(np.equal(self._dn, other._dn))
+            and all(np.equal(self._de, other._de))
+        )
+
     def __str__(self):
-        out = ""
-        form = "{: 7.2f} {: 8.4f} {:7.2f} {:7.2f}\n"
-        for bb, ss, xx, yy in zip(self.baz, self.slow, self.dn, self.de):
+        out = "#Back-azimuth, Slowness, N-offset, E-offset\n"
+        form = "{: 13.2f} {: 9.4f} {:9.2f} {:9.2f}\n"
+        for bb, ss, xx, yy in zip(self._baz, self._slow, self._dn, self._de):
             out += form.format(bb, ss, xx, yy)
-        return out
+        return out.strip("\n")
+
+    def _fstr(self):
+        out = "#Back-azimuth, Slowness, N-offset, E-offset\n"
+        form = "{: 13.2f} {: 9.1e} {:9.2f} {:9.2f}\n"
+        for bb, ss, xx, yy in zip(self._baz, self._slow, self._dn, self._de):
+            out += form.format(bb, ss * 1e-3, xx, yy)
+        return out.strip("\n")
+
+    def _set_fattributes(self):
+        if self.ntr > self.maxtr:
+            msg = f"The object is larger (ntr={self.ntr}) than the memory allocated "
+            msg += f"at compile time (maxtr={self.maxtr}). "
+            msg += (
+                f"Increase maxtr in params.h and when constucting this Geometry object."
+            )
+            raise IndexError(msg)
+        tail = np.zeros(self.maxtr - self.ntr)
+        self.fbaz = np.asfortranarray(np.append(self._baz, tail) * np.pi / 180)
+        self.fslow = np.asfortranarray(np.append(self._slow, tail) * 1e-3)
+        self.fdn = np.asfortranarray(np.append(self._dn, tail))
+        self.fde = np.asfortranarray(np.append(self._de, tail))
+        self.parameters = [self.fbaz, self.fslow, self.fdn, self.fde, self.ntr]
+
+    def copy(self):
+        """Return a copy of the geometry"""
+        return deepcopy(self)
 
     def save(self, fname="sample.geom"):
         """
@@ -833,7 +1175,7 @@ class Geometry(object):
         """
 
         with open(fname, "w") as f:
-            f.write(self.__str__())
+            f.write(self._fstr())
 
         print("Geometry written to: " + fname)
 
@@ -850,8 +1192,8 @@ class Geometry(object):
         fig, ax = plt.subplots(subplot_kw={"projection": "polar"})
         ax.set_theta_zero_location("N")
         ax.set_theta_direction("clockwise")
-        ax.scatter(self.baz * np.pi / 180, self.slow, s=200, color="black", zorder=10)
-        for n, (b, s) in enumerate(zip(self.baz, self.slow)):
+        ax.scatter(self._baz * np.pi / 180, self._slow, s=200, color="black", zorder=10)
+        for n, (b, s) in enumerate(zip(self._baz, self._slow)):
             t = "{:d}".format(n)
             b *= np.pi / 180
             ax.text(b, s, t, color="white", ha="center", va="center", zorder=12)
@@ -863,7 +1205,7 @@ class Geometry(object):
         return ax
 
 
-class RC(object):
+class Control(object):
     """
     Run Control parameters for :meth:`prs.run()`.
 
@@ -876,7 +1218,7 @@ class RC(object):
                 * 0: no multiple
                 * 1: First interface multiples only
                 * 2: all first-order multiples (once reflected from the surface)
-                * 3: supply phases to be computed via meth:`RC.set_phaselist()`
+                * 3: supply phases to be computed via meth:`Control.set_phaselist()`
 
         npts (int):
             Number of samples in time series
@@ -941,26 +1283,7 @@ class RC(object):
         maxsamp=100000,
     ):
 
-        if verbose not in [0, 1, "0", "1"]:
-            msg = "verbose must be 0 or 1, not: " + str(verbose)
-            raise ValueError(msg)
-
-        if wvtype not in ["P", "SV", "SH"]:
-            msg = "wvtype must be 'P', 'SV', or 'SH', not: " + str(wvtype)
-            raise ValueError(msg)
-
-        if mults not in [0, 1, 2, 3, "0", "1", "2", "3"]:
-            msg = "mults must be 0, 1, 2, or 3, not: " + str(mults)
-            raise ValueError(msg)
-
-        if align not in [0, 1, 2, 3, "0", "1", "2", "3"]:
-            msg = "align must be 0, 1, 2, or 3, not: " + str(align)
-            raise ValueError(msg)
-
-        if rot not in [0, 1, 2, "0", "1", "2"]:
-            msg = "rot must be 0, 1, or 2, not: " + str(rot)
-            raise ValueError(msg)
-
+        self.parameters = [0] * 17  # Allocate for setters
         self.verbose = int(verbose)
         self.wvtype = wvtype
         self.mults = int(mults)
@@ -973,8 +1296,7 @@ class RC(object):
         else:
             self.shift = float(shift)
 
-        self.iphase = _iphase[self.wvtype]
-
+        self._iphase = _iphase[self.wvtype]
         self._numph = np.int32(0)
         self._maxseg = maxseg
         self._maxph = maxph
@@ -986,7 +1308,116 @@ class RC(object):
         self._nseg = np.asfortranarray(np.zeros(maxph), dtype=np.int32)
         self.update()
 
+    @property
+    def verbose(self):
+        return self._verbose
+
+    @verbose.setter
+    def verbose(self, value):
+        if value not in [0, 1, "0", "1"]:
+            msg = "verbose must be 0 or 1, not: " + str(value)
+            raise ValueError(msg)
+        self._verbose = int(value)
+        self.parameters[7] = self._verbose
+
+    @property
+    def wvtype(self):
+        return self._wvtype
+
+    @wvtype.setter
+    def wvtype(self, value):
+        if value not in ["P", "SV", "SH"]:
+            msg = "wvtype must be 'P', 'SV', or 'SH', not: " + str(value)
+            raise ValueError(msg)
+        self._wvtype = value
+        self._iphase = _iphase[self.wvtype]
+        self.parameters[0] = self._iphase
+
+    @property
+    def mults(self):
+        return self._mults
+
+    @mults.setter
+    def mults(self, value):
+        if value not in [0, 1, 2, 3, "0", "1", "2", "3"]:
+            msg = "mults must be 0, 1, 2, or 3, not: " + str(value)
+            raise ValueError(msg)
+
+        self._mults = int(value)
+        self.parameters[1] = self.mults
+
+    @property
+    def npts(self):
+        return self._npts
+
+    @npts.setter
+    def npts(self, value):
+        self._npts = int(value)
+        self.parameters[2] = self._npts
+
+    @property
+    def dt(self):
+        return self._dt
+
+    @dt.setter
+    def dt(self, value):
+        self._dt = float(value)
+        self.parameters[3] = self._dt
+
+    @property
+    def align(self):
+        return self._align
+
+    @align.setter
+    def align(self, value):
+        if value not in [0, 1, 2, 3, "0", "1", "2", "3"]:
+            msg = "align must be 0, 1, 2, or 3, not: " + str(value)
+            raise ValueError(msg)
+        self._align = int(value)
+        self.parameters[4] = self._align
+
+    @property
+    def rot(self):
+        return self._rot
+
+    @rot.setter
+    def rot(self, value):
+        if value not in [0, 1, 2, "0", "1", "2"]:
+            msg = "rot must be 0, 1, or 2, not: " + str(value)
+            raise ValueError(msg)
+        self._rot = int(value)
+        self.parameters[6] = self._rot
+
+    @property
+    def shift(self):
+        return self._shift
+
+    @shift.setter
+    def shift(self, value):
+        self._shift = float(value)
+        self.parameters[5] = self._shift
+
     def __str__(self):
+        out = "Run control parameters:\n\n"
+        out += "Verbosity: "
+        out += "{:}\n".format(self.verbose)
+        out += "Incoming wave type: "
+        out += "{:}\n".format(self.wvtype)
+        out += "Multiples: "
+        out += "{:}\n".format(self.mults)
+        out += "Number of samples per trace: "
+        out += "{:}\n".format(self.npts)
+        out += "Sample rate (seconds): "
+        out += "{:}\n".format(self.dt)
+        out += "Alignment: "
+        out += "{:}\n".format(_align[self.align])
+        out += "Shift of traces (seconds): "
+        out += "{:}\n".format(self.shift)
+        out += "Rotation to output: "
+        out += "{:}".format(_rot[self.rot])
+        return out
+
+    def _prs_str(self):
         out = "# Verbosity\n"
         out += "{:}\n".format(int(self.verbose))
         out += "# Phase name\n"
@@ -997,6 +1428,23 @@ class RC(object):
         out += "{:}\n".format(self.npts)
         out += "# Sample rate (seconds)\n"
         out += "{:}\n".format(self.dt)
+        out += "# Alignment: 0 is none, 1 aligns on P, 2 on SV, 3 on SH\n"
+        out += "{:}\n".format(self.align)
+        out += "# Shift of traces (seconds)\n"
+        out += "{:}\n".format(self.shift)
+        out += "# Rotation to output: 0 is ENZ, 1 is RTZ, 2 is PVH\n"
+        out += "{:}\n".format(self.rot)
+        return out
+
+    def _v12_str(self):
+        out = "# Multiples: 0 for none, 1 for Moho, 2 all first-order\n"
+        out += "{:}\n".format(self.mults)
+        out += "# Number of samples per trace\n"
+        out += "{:}\n".format(self.npts)
+        out += "# Sample rate (seconds)\n"
+        out += "{:}\n".format(self.dt)
+        out += "# Gaussian pulse width (seconds)\n"
+        out += "1.\n"
         out += "# Alignment: 0 is none, 1 aligns on P, 2 on SV, 3 on SH\n"
         out += "{:}\n".format(self.align)
         out += "# Shift of traces (seconds)\n"
@@ -1035,7 +1483,7 @@ class RC(object):
             IndexError: If resulting phaselist is longer than :const:`maxph`.
 
         Hint:
-            In a two layer model (index `0` is the topmost subsurface layer, index `1` 
+            In a two layer model (index `0` is the topmost subsurface layer, index `1`
             is the underlying half-space) the :const:`descriptors` compute the phases:
 
             * ``['1P0P']``: direct P-wave
@@ -1078,7 +1526,7 @@ class RC(object):
 
         Args:
             mults (int):
-                Set :attr:`RC.mults` to this value.
+                Set :attr:`Control.mults` to this value.
         """
 
         if mults > 2:
@@ -1097,7 +1545,7 @@ class RC(object):
         """
 
         self.parameters = [
-            self.iphase,
+            self._iphase,
             self.mults,
             self.npts,
             self.dt,
@@ -1110,45 +1558,56 @@ class RC(object):
             self._phaselist,
         ]
 
-    def save(self, fname="raysum-param"):
+    def save(self, fname="raysum-param", version="prs"):
         """
-        Alias for :class:`~pyraysum.prs.RC.write()`
+        Alias for :class:`~pyraysum.prs.Control.write()`
         """
 
-        self.write(fname=fname)
+        self.write(fname=fname, version=version)
 
-    def write(self, fname="raysum-param"):
+    def write(self, fname="raysum-param", version="prs"):
         """
         Write parameter file to disk
 
         Args:
             fname: (str)
                 Name of file
+            version: ("prs" or "1.2")
+                Pyraysum or Raysum v1.2 compatible
         """
 
+        if version == "prs":
+            buf = self._prs_str()
+        elif version == "1.2":
+            buf = self._v12_str()
+        else:
+            msg = f"Unknown version: {version}"
+            raise ValueError(msg)
+
         with open(fname, "w") as f:
-            f.write(self.__str__())
+            f.write(buf)
 
 
-class Seismogram(object):
+class Result(object):
     """
-    List of streams of 3-component synthetic seismograms produced by Raysum.
-    Includes methods to calculate receiver functions, filter and plot the
-    streams.
+    Result of a PyRaysum wavefield simulation. 3-component synthetic seismograms
+    are strored as a list of streams in the stream attribute. Includes methods
+    to calculate receiver functions, filter and plot the results. See
+    :func:`run()` for examples.
 
     Parameters:
         model (:class:`~pyraysum.prs.Model`):
             Subsurface velocity model
-        geom (:class:`~pyraysum.prs.Geometry`):
+        geometry (:class:`~pyraysum.prs.Geometry`):
             Recording geometry
-        rc (:class:`~pyraysum.prs.RC`):
+        rc (:class:`~pyraysum.prs.Control`):
             Run-control parameters
         streams (List):
             List of :class:`~obspy.core.Stream` objects.
 
     If created with :const:`mode='full'` in :meth:`run()`, the :attr:`stats` attribute
-    of each :class:`~obspy.core.Trace` in each :class:`~obspy.core.Stream` holds the
-    additional attributes:
+    of each :class:`~obspy.core.Trace` in each :class:`~obspy.core.Stream` in
+    :attr:`Result.streams` holds the additional attributes:
 
         phase_times
             Arrival times of seismic phases
@@ -1165,20 +1624,71 @@ class Seismogram(object):
 
     """
 
-    def __init__(self, model=None, geom=None, rc=None, streams=None):
+    def __init__(self, model=None, geometry=None, rc=[], streams=[]):
 
         self.model = model
-        self.geom = geom
+        self.geometry = geometry
         self.streams = streams
         self.rc = rc
+        self.rfs = []
+
+    def __str__(self):
+        msg = "Result contains:\n"
+        msg += "{:d} synthetic {:}-seismogram(s)\n".format(
+            len(self.streams), _rot[self.rc.rot]
+        )
+        msg += "{:d} synthetic receiver function(s)\n".format(len(self.rfs))
+        if self.model:
+            msg += "\nFrom subsurface model:\n"
+            msg += self.model.__str__()
+            msg += "\n"
+        else:
+            msg += "\nNo subsurface model stored\n"
+        if self.geometry:
+            baz = self.geometry._baz
+            slow = self.geometry._slow
+            msg += "\nBack-azimuth and slowness range is:\n"
+            msg += "{:f} - {:f}° and {:f} - {:f}s/km".format(
+                min(baz), max(baz), min(slow), max(slow)
+            )
+        else:
+            msg += "\nNo geometry stored."
+
+        return msg
+
+    def __getitem__(self, iray):
+        istreams = ["stream", "streams", "seis", "seismogram", "seismograms"]
+        irfs = ["rf", "rfs"]
+
+        if iray in istreams:
+            return self.streams
+
+        elif iray in irfs:
+            return self.rfs
+
+        elif isinstance(iray, int):
+            stream = self.streams[iray]
+            try:
+                rf = self.rfs[iray]
+            except IndexError:
+                rf = Stream()
+            return stream, rf
+
+        else:
+            msg = "Can only return integer ray index or key in: "
+            msg += ", ".join(istreams, irfs)
+            raise ValueError(msg)
+
+    def __len__(self):
+        return len(self.streams)
 
     def calculate_rfs(self):
         """
-        Generate receiver functions from spectral division of displacement traces. 
+        Generate receiver functions from spectral division of displacement traces.
         Will be stored in :attr:`rflist`.
 
         Raises:
-            ValueError: In case :class:`RC` parameters a unsuitable.
+            ValueError: In case :class:`Control` parameters a unsuitable.
         """
 
         if self.rc.rot == 0:
@@ -1238,7 +1748,7 @@ class Seismogram(object):
 
         self.rfs = rflist
 
-        return 
+        return
 
     def descriptors(self):
         """
@@ -1251,10 +1761,10 @@ class Seismogram(object):
 
         Example
         -------
-        >>> from pyraysum import Model, RC, Geometry, run
+        >>> from pyraysum import Model, Control, Geometry, run
         >>> model = Model([30000., 0], [2800., 3300.], [6000., 8000.], [3600., 4500.])
         >>> geom = Geometry(0., 0.06)
-        >>> rc = RC(mults=1)
+        >>> rc = Control(mults=0)
         >>> seismogram = run(model, geom, rc)
         >>> seismogram.descriptors()
         ['1P0P', '1P0S']
@@ -1289,12 +1799,12 @@ class Seismogram(object):
         for itr, stream in enumerate(self.streams):
             arr = np.vstack((stream[0].data, stream[1].data, stream[2].data)).T
             buf += "#-------------------\n"
-            buf += "# Trace number {:5d}\n".format(itr+1)  # Fortran indexing
+            buf += "# Trace number {:5d}\n".format(itr + 1)  # Fortran indexing
             buf += "#-------------------\n"
             buf += (
                 np.array2string(
                     arr,
-                    threshold=3*arr.shape[0] + 1,
+                    threshold=3 * arr.shape[0] + 1,
                     formatter={"float": lambda i: "{:15.7e}".format(i)},
                 )
                 .replace("[", " ")
@@ -1308,7 +1818,7 @@ class Seismogram(object):
     def plot(self, typ, **kwargs):
         """
         Plot the displacement seismograms and/or receiver functions stored in
-        :class:`~pyraysum.prs.Seismogram` streams.
+        :class:`~pyraysum.prs.Result` streams.
 
         Parameters:
             typ (str):
@@ -1319,9 +1829,9 @@ class Seismogram(object):
                 Are passed to the underlying :meth:`~pyraysum.plot.stream_wiggles` or
                 :meth:`~pyraysum.plot.rf_wiggles`
         Hint:
-            If :class:`Seismogram` contains only one event (i.e., single :attr:`baz` and
+            If :class:`Result` contains only one event (i.e., single :attr:`baz` and
             :attr:`slow` values), it is more appropriate to plot the waveforms using the
-            default :meth:`Stream.plot()` method on :attr:`Seismogram.streams[0]`.
+            default :meth:`Stream.plot()` method on :attr:`Result.streams[0]`.
 
 
         """
@@ -1341,7 +1851,7 @@ class Seismogram(object):
         """
 
         Filters the displacement seismograms and/or receiver functions stored
-        in :class:`~pyraysum.prs.Seismogram` streams.
+        in :class:`~pyraysum.prs.Result` streams.
 
         Parameters:
             typ (str):
@@ -1349,10 +1859,10 @@ class Seismogram(object):
                 :const:`'rfs'`, or :const:`'all'` for the displacement seismograms,
                 receiver functions, or both
             ftype (str):
-                Type of filter to use in 
+                Type of filter to use in
                 `obspy.Trace.filter <https://tinyurl.com/45dkyvwy>`_
             **kwargs:
-                Keyword arguments passed to 
+                Keyword arguments passed to
                 `obspy.Trace.filter <https://tinyurl.com/45dkyvwy>`_
 
         """
@@ -1385,7 +1895,7 @@ class Seismogram(object):
 
 def run(model, geometry, rc, mode="full", rf=False):
     """
-    Run a wave-field simulation. This function calls the compiled :mod:`fraysum` 
+    Run a wave-field simulation. This function calls the compiled :mod:`fraysum`
     binaries.
 
     Parameters:
@@ -1393,7 +1903,7 @@ def run(model, geometry, rc, mode="full", rf=False):
             Subsurface velocity model
         geometry (:class:`~pyraysum.prs.Geometry`):
             Recording geometry
-        rc (:class:`~pyraysum.prs.RC`):
+        rc (:class:`~pyraysum.prs.Control`):
             Run-control parameters
         mode (str):
             * :const:`'full'`: Compute seismograms, phase arrivals and descriptors (slower)
@@ -1402,24 +1912,31 @@ def run(model, geometry, rc, mode="full", rf=False):
             Whether or not to calculate receiver functions
 
     Returns:
-        :class:`~pyraysum.prs.Seismogram`:
+        :class:`~pyraysum.prs.Result`:
             Synthetic seimograms
 
     Example
     -------
-    >>> from pyraysum import prs, Model, Geometry, RC
+    >>> from pyraysum import prs, Model, Geometry, Control
     >>> # Define two-layer model with isotropic crust over isotropic half-space
     >>> model = Model([30000., 0], [2800., 3300.], [6000., 8000.], [3600., 4500.])
-    >>> geom = Geometry(0., 0.06) # baz = 0 deg; slow = 0.06 x/km
-    >>> rc = RC(npts=1500, dt=0.025)
-    >>> seismogram = prs.run(model, geom, rc)
-    >>> type(seismogram.streams[0])
+    >>> geom = Geometry(0., 0.06) # baz = 0 deg; slow = 0.06 s/km
+    >>> rc = Control(npts=1500, dt=0.025)
+    >>> result = prs.run(model, geom, rc, rf=True)
+    >>> type(result.streams[0])
     <class 'obspy.core.stream.Stream'>
-    >>> print(seismogram.streams[0])
+    >>> type(result.rfs[0])
+    <class 'obspy.core.stream.Stream'>
+    >>> seis, rf = result[0]
+    >>> print(seis)
     3 Trace(s) in Stream:
-    .prs..BHN | 2020-11-30T21:04:43.890339Z - 2020-11-30T21:05:21.365339Z | 40.0 Hz, 1500 samples
-    .prs..BHE | 2020-11-30T21:04:43.891418Z - 2020-11-30T21:05:21.366418Z | 40.0 Hz, 1500 samples
-    .prs..BHZ | 2020-11-30T21:04:43.891692Z - 2020-11-30T21:05:21.366692Z | 40.0 Hz, 1500 samples
+    ...SYR | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples
+    ...SYT | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples
+    ...SYZ | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples
+    >>> print(rf)
+    2 Trace(s) in Stream:
+    ...RFR | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples
+    ...RFT | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:37.475000Z | 40.0 Hz, 1500 samples
     """
 
     if rf and rc.rot == 0:
@@ -1451,8 +1968,8 @@ def run(model, geometry, rc, mode="full", rf=False):
     # Read all traces and store them into a list of :class:`~obspy.core.Stream`
     streams = read_traces(traces, rc, geometry, arrivals=arrivals)
 
-    # Store everything into Seismogram object
-    seismogram = Seismogram(model=model, geom=geometry.geom, rc=rc, streams=streams)
+    # Store everything into Result object
+    seismogram = Result(model=model, geometry=geometry, rc=rc, streams=streams)
 
     if rf:
         seismogram.calculate_rfs()
@@ -1460,7 +1977,7 @@ def run(model, geometry, rc, mode="full", rf=False):
     return seismogram
 
 
-def read_model(modfile, encoding=None):
+def read_model(modfile, encoding=None, version="prs"):
     """
     Reads model parameters from file
 
@@ -1470,6 +1987,10 @@ def read_model(modfile, encoding=None):
     """
 
     vals = np.genfromtxt(modfile, encoding=encoding).T
+    if version == "1.2":
+        # ignore s-anisotropy
+        vals = np.vstack((vals[:6], vals[7:]))
+
     return Model(*vals)
 
 
@@ -1483,6 +2004,7 @@ def read_geometry(geomfile, encoding=None):
     """
 
     vals = np.genfromtxt(geomfile, dtype=None, encoding=encoding)
+    vals[:, 1] *= 1e3
 
     try:
         geom = Geometry(*zip(*vals))
@@ -1492,25 +2014,32 @@ def read_geometry(geomfile, encoding=None):
     return geom
 
 
-def read_rc(paramfile):
+def read_control(paramfile, version="prs"):
     """
     Read Raysum run control parameters from file.
 
     Returns:
-        :class:`~pyraysum.prs.RC`:
+        :class:`~pyraysum.prs.Control`:
             Run control parameters
     """
 
     with open(paramfile, "r") as f:
         lines = f.readlines()
 
-    values = []
+    buf = []
     for line in lines:
         line = line.strip()
         if line.startswith("#"):
             continue
-        values.append(line)
-    return RC(*values)
+        buf.append(line)
+
+    if version == "prs":
+        return Control(*buf)
+    elif version == "1.2":
+        rc = Control(
+            mults=buf[0], npts=buf[1], dt=buf[2], align=buf[4], shift=buf[5], rot=buf[6]
+        )
+        return rc
 
 
 def equivalent_phases(descriptors, kinematic=False):
@@ -1520,7 +2049,7 @@ def equivalent_phases(descriptors, kinematic=False):
 
     Parameters:
         descriptors (list of strings):
-            Phase descriptors as in :meth:`RC.set_phaselist`
+            Phase descriptors as in :meth:`Control.set_phaselist`
 
         kinematic (boolean):
             If True, restrict to kinematically equivalent phases, i.e. those that have
@@ -1611,344 +2140,4 @@ def equivalent_phases(descriptors, kinematic=False):
 
                     ndscrs.append(ndscr)
 
-    return list(set(ndscrs))
-
-
-def read_traces(traces, rc, geometry, arrivals=None):
-    """
-    Create a :class:`Seismogram` from the array produced by :meth:`fraysum.run_bare()`
-    and :meth:`fraysum.run_full`.
-
-    Parameters:
-        rc (:class:`RC`):
-            Run-control parameters
-        geometry (:class:`Geometry`):
-            Geometry parameters
-        arrivals (list):
-            Output of :meth:`read_arrivals`. List of arrival times, amplitudes, and
-            names
-
-    Returns:
-        :class:`~pyraysum.prs.Seismogram`:
-            List of Stream objects
-    """
-
-    npts = rc.npts
-    dt = rc.dt
-    rot = rc.rot
-    shift = rc.shift
-    ntr = geometry.ntr
-    geom = geometry.geom
-
-    # Crop unused overhang of oversized fortran arrays
-    trs = [
-        traces[0, :npts, :ntr].reshape(npts * ntr, order="F"),
-        traces[1, :npts, :ntr].reshape(npts * ntr, order="F"),
-        traces[2, :npts, :ntr].reshape(npts * ntr, order="F"),
-    ]
-
-    itr = np.array([npts * [tr] for tr in range(ntr)]).reshape(npts * ntr)
-
-    # Component names
-    if rot == 0:
-        # Rotate to seismometer convention
-        component = ["N", "E", "Z"]
-        order = [2, 0, 1]
-    elif rot == 1:
-        component = ["R", "T", "Z"]
-        order = [0, 1, 2]
-    elif rot == 2:
-        component = ["P", "V", "H"]
-        order = [0, 1, 2]
-    else:
-        raise (ValueError('Invalid value for "rot": Must be 0, 1, 2'))
-
-    taxis = np.arange(npts) * dt - shift
-
-    streams = []
-
-    for iitr in range(ntr):
-
-        # Split by trace ID
-        istr = itr == iitr
-
-        # Store into trace by component with stats information
-        stream = Stream()
-        for ic in order:
-            stats = {
-                "baz": geom[iitr][0],
-                "slow": geom[iitr][1],
-                "station": "prs",
-                "network": "",
-                "starttime": UTCDateTime(0),
-                "delta": dt,
-                "channel": component[ic],
-                "taxis": taxis,
-            }
-
-            if arrivals:
-                stats.update(
-                    {
-                        "phase_times": arrivals[iitr][ic][0],
-                        "phase_amplitudes": arrivals[iitr][ic][1],
-                        "phase_descriptors": arrivals[iitr][ic][2],
-                        "phase_names": arrivals[iitr][ic][3],
-                        "conversion_names": arrivals[iitr][ic][4],
-                    }
-                )
-
-            if rot == 0 and component[ic] != "Z":
-                # Raysum has z down, change here to z up
-                tr = Trace(data=-trs[ic][istr], header=stats)
-                tr.stats.phase_amplitudes *= -1
-            else:
-                tr = Trace(data=trs[ic][istr], header=stats)
-
-            stream.append(tr)
-
-        # Store into Stream object and append to list
-        streams.append(stream)
-
-    return streams
-
-
-def read_arrivals(ttimes, amplitudes, phaselist, geometry):
-    """
-    Convert the :const:`phaselist`, :const:`amplitude` and :const:`traveltime` output of
-    :meth:`fraysum.run_full()` to lists of phase arrival times, amplitudes, long phase
-    descriptors, short phase names, and conversion names.
-
-    Parameters:
-        ttimes (np.array):
-            Travel time array ...
-        amplitudes (np.array):
-            Amplitude array ...
-        phaselist (np.array):
-            Phase identifier array returned by :func:`fraysum.run_full`
-        geometry (:class:`prs.Geometry`):
-            Ray geometry
-
-    Returns:
-        list:
-            3-component phase arrival lists, where indices translate to:
-
-            * :const:`0`: phase arrival times
-            * :const:`1`: phase amplitudes
-            * :const:`2`: (long) phase descriptors, e.g. "1P0S"
-            * :const:`3`: (short) phase names, e.g. "PS"
-            * :const:`4`: (intermediate) conversion names, e.g. "P1S"
-    """
-
-    dscrs = []
-    phnms = []
-    convs = []
-    for iph in range(len(phaselist[0, 0, :])):
-        dscr = ""
-        phnm = ""
-        conv = ""
-
-        for iseg in range(len(phaselist[:, 0, 0])):
-            if phaselist[iseg, 0, iph] == 0:
-                # No more reflections / conversions
-                dscrs.append(dscr)
-                phnms.append(phnm)
-                convs.append(conv)
-                break
-
-            phid = phaselist[iseg, 1, iph]
-            layn = phaselist[iseg, 0, iph] - 1  # Python indexing
-
-            phn = _phnames[phid]
-            dscr += str(layn) + phn
-
-            if phn.isupper():
-                # Upward-conversion at top of layer below
-                con = str(layn + 1) + phn
-            else:
-                con = str(layn) + phn
-
-            # Omit not-converted segment from phase name and conversions
-            try:
-                if phnm[-1] == phn:
-                    phn = ""
-                    con = ""
-            except IndexError:
-                con = ""
-
-            # Always prefix incoming wavetype to conversions
-            if iseg == 0:
-                con = phn
-
-            phnm += phn
-            conv += con
-
-        if phaselist[0, 0, iph + 1] == 0:
-            break
-
-    nphs = len(dscrs)
-
-    dscrs = np.array(dscrs)
-    phnms = np.array(phnms)
-    convs = np.array(convs)
-
-    tanss = []
-    for itr in range(geometry.ntr):
-        tans = []
-        for comp in range(len(amplitudes[:, 0, 0])):
-            amps = amplitudes[comp, :nphs, itr]
-            ia = abs(amps) > 1e-6  # Dismiss 0 amplitude arrivals
-            tans.append(
-                np.array(
-                    [ttimes[:nphs, itr][ia], amps[ia], dscrs[ia], phnms[ia], convs[ia]],
-                    dtype=object,
-                )
-            )
-        tanss.append(tans)
-
-    return tanss
-
-
-def rfarray(geometry, rc):
-    """
-    Initialize array for `NumPy`-based post processing
-
-    Parameters:
-        geometry (:class:`prs.Geometry`):
-            Recording geometry
-        rc (:class:`prs.RC`):
-            Run-control parameters
-
-    Returns:
-        :const:`numpy.zeros((geometry.ntr, 2, rc.npts))`:
-            Array in shape to be used by :meth:`filterd_rf_array` and
-            :meth:`filtered_array`.
-    """
-    return np.zeros((geometry.ntr, 2, rc.npts))
-
-
-cached_coefficients = {}
-
-
-def _get_cached_bandpass_coefs(order, corners):
-    # from pyrocko.Trace.filter
-    ck = (order, tuple(corners))
-    if ck not in cached_coefficients:
-        cached_coefficients[ck] = signal.butter(order, corners, btype="band")
-
-    return cached_coefficients[ck]
-
-
-def filtered_rf_array(traces, rfarray, ntr, npts, dt, fmin, fmax):
-    """
-    Fast, `NumPy`-based, receiver function computation and filtering of
-    :meth:`fraysum.run_bare()` output
-
-    Roughly equivalent to subsequent calls to :func:`read_traces()`,
-    :meth:`Seismogram.calculate_rfs()` and :meth:`Seismogram.filter()`, stripped down
-    for computational efficiency, for use in inversion/probabilistic approaches.
-
-    Parameters:
-        traces (np.ndarray):
-            Output of :meth:`fraysum.run_bare()`
-        rfarray (np.ndarray):
-            Initialized array of shape (ntr, 2, npts) to store output (See:
-            :func:`rfarray()`)
-        ntr (int):
-            Number of traces (:attr:`Geometry.ntr`)
-        npts (int):
-            Number of points per trace (:attr:`RC.npts`)
-        dt (float):
-            Sampling interval (:attr:`RC.dt`)
-        fmin (float):
-            Lower bandpass frequency corner (Hz)
-        fmax (float):
-            Upper bandpass frequency corner (Hz)
-
-    Returns:
-        None:
-            Output is written to :const:`rfarray`
-
-    Warning:
-        Assumes PVH alignment (ray-polarization), i.e. :attr:`RC.rot=2`.
-    """
-
-    order = 2
-
-    def _bandpass(arr):
-        # from pyrocko.Trace.filter
-        (b, a) = _get_cached_bandpass_coefs(order, (2 * dt * fmin, 2 * dt * fmax))
-        arr -= np.mean(arr)
-        firstpass = signal.lfilter(b, a, arr)
-        return signal.lfilter(b, a, firstpass[::-1])[::-1]
-
-    # Crop unused overhang of oversized fortran arrays and transpose to
-    # [traces[components[samples]]] order
-    data = np.array(
-        [traces[0, :npts, :ntr], traces[1, :npts, :ntr], traces[2, :npts, :ntr]]
-    ).transpose(2, 0, 1)
-
-    for n, trace in enumerate(data):
-        ft_ztr = fft(trace[0])  # P or R or N
-        ft_rfr = fft(trace[1])  # V or T or E
-        ft_rft = fft(trace[2])  # H or Z or Z
-
-        # assuming PVH:
-        rfarray[n, 0, :] = _bandpass(fftshift(np.real(ifft(np.divide(ft_rfr, ft_ztr)))))
-        rfarray[n, 1, :] = _bandpass(fftshift(np.real(ifft(np.divide(ft_rft, ft_ztr)))))
-
-
-def filtered_array(traces, rfarray, ntr, npts, dt, fmin, fmax):
-    """
-    Fast, `NumPy`-based filtering of :meth:`fraysum.run_bare()` output
-
-    Roughly equivalent to subsequent calls to :func:`read_traces()`, and
-    :meth:`Seismogram.filter()`, stripped down for computational efficiency, 
-    for use in inversion/probabilistic approaches.
-
-    Parameters:
-        traces (np.ndarray):
-            Output of :meth:`fraysum.run_bare()`
-        rfarray (np.ndarray):
-            Initialized array of shape (ntr, 2, npts) to store output (See:
-            :func:`rfarray()`)
-        ntr (int):
-            Number of traces (:attr:`Geometry.ntr`)
-        npts (int):
-            Number of points per trace (:attr:`RC.npts`)
-        dt (float):
-            Sampling intervall (:attr:`RC.dt`)
-        fmin (float):
-            Lower bandpass frequency corner (Hz)
-        fmax (float):
-            Upper bandpass frequency corner (Hz)
-
-    Returns:
-        None:
-            Output is written to :const:`rfarray`
-
-    Warning:
-        Assumes PVH alignment (ray-polarization), i.e. :attr:`RC.rot=2`.
-    """
-
-    npts2 = npts // 2
-    rem = npts % 2
-
-    order = 2
-
-    def _bandpass(arr):
-        # from pyrocko.Trace.filter
-        (b, a) = _get_cached_bandpass_coefs(order, (2 * dt * fmin, 2 * dt * fmax))
-        arr -= np.mean(arr)
-        firstpass = signal.lfilter(b, a, arr)
-        return signal.lfilter(b, a, firstpass[::-1])[::-1]
-
-    # Crop unused overhang of oversized fortran arrays and transpose to
-    # [traces[components[samples]]] order
-    data = np.array(
-        [traces[0, :npts, :ntr], traces[1, :npts, :ntr], traces[2, :npts, :ntr]]
-    ).transpose(2, 0, 1)
-
-    for n, trace in enumerate(data):
-        # assuming PVH:
-        rfarray[n, 0, npts2:] = _bandpass(trace[1][: npts2 + rem])  # SV
-        rfarray[n, 1, npts2:] = _bandpass(trace[2][: npts2 + rem])  # SH
+    return sorted(list(set(ndscrs)))

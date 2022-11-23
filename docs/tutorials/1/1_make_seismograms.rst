@@ -16,7 +16,7 @@ comparison plot.
    `here <https://paudetseis.github.io/PyRaysum/init.html#usage>`__, and
    execute the notebook from the Examples/notebooks/ directory.
 
-.. code:: ipython3
+.. code:: python
 
     import obspy
     from obspy.clients.fdsn import Client
@@ -34,7 +34,7 @@ seismically transparent (i.e., homogeneous) cratonic crust. The
 earthquake arrives due east (back-azimuth equal to 90°), so that the
 east component in the seismogram is in the radial direction.
 
-.. code:: ipython3
+.. code:: python
 
     # Use the `IRIS` client
     client = Client("IRIS")
@@ -77,7 +77,7 @@ few seconds later, the surface reflected pP wave arrives. Around 11:45,
 the S waves arrive. They are here shown only for orientation. We will
 only be interested in the short time interval between P and pP.
 
-.. code:: ipython3
+.. code:: python
 
     # Set start (t1) and end (t2) times of P-wave window
     t1 = t0 + 8*60. + 20.
@@ -114,7 +114,7 @@ data with ``pyraysum``. The incident teleseismic P wave is characterized
 by 90 degree back-azimuth and 0.06 s/km slowness. Note that we are here
 only looking at a much shorter time interval, i.e. 35 seconds of data.
 
-.. code:: ipython3
+.. code:: python
 
     # Load telewavesim data
     twt, twn, twe, twz = np.loadtxt("../data/telewavesim_baz090-slow006.dat", unpack=True)
@@ -154,7 +154,7 @@ al (2000), which suggests a 32 km thick cratonic crust with P- and
 S-wave velocities of 6.55 and 3.50 km/s, repectively. In ``pyraysum``,
 we define:
 
-.. code:: ipython3
+.. code:: python
 
     # Make a pyraysum model
     thickn = [32000, 0]
@@ -173,11 +173,11 @@ we define:
 
 We again use the incident P-wave geometry of the Philippines earthquake:
 
-.. code:: ipython3
+.. code:: python
 
     baz = 90
     slow = 0.06
-    geom = prs.Geometry(baz=[baz], slow=[slow])
+    geom = prs.Geometry(baz=baz, slow=slow)
 
 In the run control (RC) parameters, we specify that we would like to: 1)
 generate data in a seismometer coordinate system (east-north-up;
@@ -187,10 +187,10 @@ and use a sampling rate of 100 Hz (``dt=1/100``) with 2500 samples
 not be shifted or aligned (``align=0``). Note that the unit amplitude
 points *toward* the source.
 
-.. code:: ipython3
+.. code:: python
 
     # Set `run` parameters
-    rc = prs.RC(
+    ctrl = prs.Control(
         verbose=False,
         rot=0,
         mults=2,
@@ -200,33 +200,53 @@ points *toward* the source.
     )
     
     # Run Raysum and get seismograms
-    seismogram = prs.run(model, geom, rc)
+    result = prs.run(model, geom, ctrl)
     
-    # Extract first set of seismograms (element `0` in `streams`)
-    prsd = seismogram.streams[0]
-    
-    # Make simple plot
-    print(prsd)
-    _ = prsd.plot()
+    # Extract first (and only) ray from the result (ray index [0])
+    seis, rfs = result[0]
+    print(seis)
 
 
 .. parsed-literal::
 
     3 Trace(s) in Stream:
-    .prs..Z | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:24.990000Z | 100.0 Hz, 2500 samples
-    .prs..N | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:24.990000Z | 100.0 Hz, 2500 samples
-    .prs..E | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:24.990000Z | 100.0 Hz, 2500 samples
+    ...SYZ | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:24.990000Z | 100.0 Hz, 2500 samples
+    ...SYN | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:24.990000Z | 100.0 Hz, 2500 samples
+    ...SYE | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:24.990000Z | 100.0 Hz, 2500 samples
+
+
+These are the synthetic seismograms. Once we calculate receiver
+functions, they will be strored in the second return value. Right now,
+this is an empty ``Stream``:
+
+.. code:: python
+
+    print(rfs)
+
+
+.. parsed-literal::
+
+    0 Trace(s) in Stream:
+    
+
+
+Let’s continue working with the seismograms and make a quick plot.
+
+.. code:: python
+
+    prsd = result[0][0]
+    _ = prsd.plot()
 
 
 
-.. image:: output_13_1.png
+.. image:: output_17_0.png
 
 
 We will now pre-process all data equally. We will filter them, and align
 and normalize them to the maximum amplitude on the vertical component of
 the measured seismogram.
 
-.. code:: ipython3
+.. code:: python
 
     # Set frequency corners in Hz
     fmin = 1./20. 
@@ -265,7 +285,7 @@ infrastructure of ``obspy.Trace`` is used to store phase names, arrival
 times and amplitudes. These are used here to better interpret the
 seismograms.
 
-.. code:: ipython3
+.. code:: python
 
     def plot(data, model):
         
@@ -332,14 +352,14 @@ seismograms.
 Comparison with real data
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. code:: ipython3
+.. code:: python
 
     fig = plot(hybd, prsd)
     _ = fig.suptitle("Comparison between Pyraysum and seismogram recored at G.HYB")
 
 
 
-.. image:: output_19_0.png
+.. image:: output_23_0.png
 
 
 The comparison with the real data shows that some complexity of the
@@ -351,21 +371,21 @@ long phase descriptors consist of layer numbers and phase letters.
    layer **1** as an **upgoing P**-wave, layer **0** as an **upgoing
    P**-wave, gets reflected, travels through layer **0** as a
    **downgoing S**-wave, gets again reflected and finally travels
-   through layer **0** as an **upgoing S**-wave”. The timing and
+   through layer **0** as an **upgoing S**-wave". The timing and
    amplitude of such reverberations will be used in example 3 to invert
    for subsurface properties instead of assuming them, as we did here.
 
 Comparison with synthetic data
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. code:: ipython3
+.. code:: python
 
     fig = plot(twsd, prsd)
     _ = fig.suptitle("Comparison between PyRaysum and Telewavesim synthetics")
 
 
 
-.. image:: output_22_0.png
+.. image:: output_26_0.png
 
 
 The comparison with synthetic data from Telewavesim shows a good match
@@ -381,13 +401,13 @@ because the RC parameter ``mults=2`` only computes first-order
 multiples, i.e. reflections of the direct *P* wave. Reflections from
 *PS* are missing, most notably *PSpP*. To address this problem, we will
 next use the ``RC.set_phaselist()`` method to explicitly name the phases
-we wish to compute. The method implicitly sets ``mults=3``.
-``Seismogram`` has a dedicated method ``descriptors()`` to list unique
-phases present in the synthetic waveforms.
+we wish to compute. The method implicitly sets ``mults=3``. ``Result``
+has a dedicated method ``descriptors()`` to list unique phases present
+in the synthetic waveforms.
 
-.. code:: ipython3
+.. code:: python
 
-    phl = seismogram.descriptors()
+    phl = result.descriptors()
     eqp = prs.equivalent_phases(phl)
     print("Phases computed with mult=2:")
     print(phl)
@@ -402,25 +422,24 @@ phases present in the synthetic waveforms.
     ['1P0P', '1P0P0p0P', '1P0P0p0S', '1P0P0s0S', '1P0S']
     
     Dynamically equivalent phases:
-    ['1P0S0s0P', '1P0P0s0P', '1P0S0p0P', '1P0S0p0S']
+    ['1P0P0s0P', '1P0S0p0P', '1P0S0p0S', '1P0S0s0P']
 
 
 We will now set a phaselist that includes these phases using the
 ``equivalent`` option of ``set_phaselist``.
 
-.. code:: ipython3
+.. code:: python
 
-    rc.set_phaselist(phl, equivalent=True)
+    ctrl.set_phaselist(phl, equivalent=True)
 
 And run *PyRaysum* and the post processing again:
 
-.. code:: ipython3
+.. code:: python
 
     # Run Raysum and get seismograms
-    seismogram = prs.run(model, geom, rc)
+    result = prs.run(model, geom, ctrl)
     
-    # Extract first set of seismograms (element `0` in `streams`)
-    prsd = seismogram.streams[0]
+    prsd = result[0][0]
     prsd.filter("bandpass", freqmin=fmin, freqmax=fmax, zerophase=True)
     
     jmax = np.argmax(abs(prsd[0].data))  # maximum vertical amplitude
@@ -439,17 +458,17 @@ And run *PyRaysum* and the post processing again:
 
 
 
-.. image:: output_29_0.png
+.. image:: output_33_0.png
 
 
 The amplitudes of the reflected phases are now better matched. To
 explore the actual amplitude contributions of the equivalent phases, we
 look them up in the metadata of the synthetic seismic trace:
 
-.. code:: ipython3
+.. code:: python
 
     print("Name, Time, Amplitude")
-    f = "{:4s}  {:>4.1f}    {:>7.0f}"
+    f = "{:4s}  {:>4.1f}    {:>7.3f}"
     stats = prsd[0].stats
     for t, a, n in sorted(zip(stats.phase_times, stats.phase_amplitudes, stats.phase_names)):
         print(f.format(n, t, a))
@@ -458,15 +477,15 @@ look them up in the metadata of the synthetic seismic trace:
 .. parsed-literal::
 
     Name, Time, Amplitude
-    P      4.5      74495
-    PS     8.9      -2628
-    PpP   13.5     -10550
-    PsP   17.9      -6219
-    PpS   17.9      -2792
-    PSpP  17.9        829
-    PSsP  22.4       -966
-    PSpS  22.4        219
-    PsS   22.4       2648
+    P      4.5      1.830
+    PS     8.9     -0.065
+    PpP   13.5     -0.259
+    PsP   17.9     -0.153
+    PpS   17.9     -0.069
+    PSpP  17.9      0.020
+    PSsP  22.4     -0.024
+    PSpS  22.4      0.005
+    PsS   22.4      0.065
 
 
 Conclusion

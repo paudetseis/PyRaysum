@@ -1,5 +1,7 @@
-from pyraysum import prs, Model, Geometry, RC
-from fraysum import run_full, run_bare
+from pyraysum import Geometry, Control, run
+from pyraysum import prs, frs
+from fraysum import run_bare
+from obspy import Stream
 import numpy as np
 import pytest
 import matplotlib.pyplot as mp
@@ -19,14 +21,14 @@ def test_Porter2011():
     # Read first model with dipping lower crustal layer
     model = mod.test_read_model_dip()
     geom = Geometry(baz, slow)
-    rc = RC(rot=1, mults=0)
+    rc = Control(rot=1, mults=0)
 
     print('model', model.__dict__)
     print('geom', geom.__dict__)
     print('running run()')
     # Run Raysum with most default values and `rot=1` and `mults=0`
     # to reproduce the results of Porter et al., 2011
-    streamlist = prs.run(model, geom, rc)
+    streamlist = run(model, geom, rc)
 
     # Calculate receiver functions
     streamlist.calculate_rfs()
@@ -41,7 +43,7 @@ def test_Porter2011():
     # Now load a different model and repeat (lower crustal anisotropic layer)
     model = mod.test_read_model_aniso()
 
-    streamlist = prs.run(model, geom, rc)
+    streamlist = run(model, geom, rc)
     streamlist.calculate_rfs()
     streamlist.filter('all', 'lowpass', freq=1., zerophase=True, corners=2)
     streamlist.plot('all', tmin=-0.5, tmax=8.)
@@ -54,18 +56,22 @@ def test_frs():
     # Read first model with dipping lower crustal layer
     model = mod.test_read_model_dip()
     geom = Geometry(baz, slow)
-    rc = RC(rot=1, mults=0)
+    rc = Control(rot=1, mults=0)
 
     # Run Raysum with most default values and `rot=1` and `mults=0`
     # to reproduce the results of Porter et al., 2011
-    fstreamlist = prs.run(model, geom, rc)
+    fstreamlist = run(model, geom, rc)
 
     # Now load a different model and repeat (lower crustal anisotropic layer)
     model = mod.test_read_model_aniso()
 
-    fstreamlist = prs.run(model, geom, rc)
+    fstreamlist = run(model, geom, rc)
+    assert len(fstreamlist[0][0]) == 3  # 3-components
+    assert len(fstreamlist[0][1]) == 0  # No RFs
+    assert len(fstreamlist) == len(geom)
 
     fstreamlist.calculate_rfs()
+    assert len(fstreamlist[0][1]) == 2  # No RFs
 
 
 def test_filtered_rf_array():
@@ -86,7 +92,7 @@ def test_filtered_rf_array():
     # Read first model with dipping lower crustal layer
     model = mod.test_read_model_dip()
     geom = Geometry(baz, slow)
-    rc = RC(dt=dt, rot=rot, mults=mults, align=align, wvtype=wvtype, verbose=verbose,
+    rc = Control(dt=dt, rot=rot, mults=mults, align=align, wvtype=wvtype, verbose=verbose,
             npts=npts)
 
     rfarray = np.zeros((geom.ntr, 2, npts))
@@ -95,7 +101,7 @@ def test_filtered_rf_array():
     # print(timeit('_run()', number=50, globals=globals()))
     # >> 21.00839215517044
     def _run():
-        streams = prs.run(model, geom, rc)
+        streams = run(model, geom, rc)
         streams.calculate_rfs()
         streams.filter('rfs', 'bandpass', freqmin=fmin, freqmax=fmax,
                        zerophase=True, corners=2)
@@ -108,13 +114,13 @@ def test_filtered_rf_array():
         ph_traces = run_bare(
             *model.parameters, *geom.parameters, *rc.parameters)
 
-        prs.filtered_rf_array(ph_traces, rfarray, geom.ntr, rc.npts, rc.dt, fmin, fmax)
+        frs.filtered_rf_array(ph_traces, rfarray, geom.ntr, rc.npts, rc.dt, fmin, fmax)
 
     streams = _run()
 
     _run_bare()
 
-    fig, ax = mp.subplots(len(geom.geom), 2, tight_layout=True)
+    fig, ax = mp.subplots(len(geom._geom), 2, tight_layout=True)
     for l, (stream, array)  in enumerate(zip(streams.rfs, rfarray)):
         for r, (scomp, acomp) in enumerate(zip(stream, array)):
             ax[l, r].plot(scomp.data)
@@ -128,34 +134,79 @@ def test_single_event():
     model = mod.test_def_model()
     geom = Geometry(baz=0, slow=0.06)
     for wvtype in ['P', 'SV', 'SH']:
-        rc = RC(npts=1500, dt=0.025, rot=2, wvtype=wvtype)
-        streamlist = prs.run(model, geom, rc)
+        rc = Control(npts=1500, dt=0.025, rot=2, wvtype=wvtype)
+        result = run(model, geom, rc)
+
+    assert isinstance(result[0][0], Stream)
+    assert len(result[0][0]) == 3  # 3-components
+    assert len(result[0][1]) == 0  # No RFs
+    assert len(result) == 1
+    assert len(result["seis"]) == 1
+    assert len(result["streams"]) == 1
+    assert len(result["seismograms"]) == 1
 
 def test_rfs():
 
     model = mod.test_def_model()
-    rc = RC(npts=1500, dt=0.025, rot=0)
+    rc = Control(npts=1500, dt=0.025, rot=0)
     geom = Geometry(slow=0.06, baz=0.)
 
     # test 1
     with pytest.raises(ValueError):
-        assert prs.run(model, geom, rc, rf=True)
+        assert run(model, geom, rc, rf=True)
 
     rc.rot = 1
-    streamlist1 = prs.run(model, geom, rc, rf=True)
+    streamlist1 = run(model, geom, rc, rf=True)
 
     rc.rot = 2
-    streamlist1 = prs.run(model, geom, rc, rf=True)
+    streamlist1 = run(model, geom, rc, rf=True)
     streamlist1.filter('rfs', 'lowpass', freq=1., corners=2, zerophase=True)
     streamlist1.filter('streams', 'lowpass', freq=1., corners=2, zerophase=True)
 
     # test 2
     rc.rot = 0
-    streamlist2 = prs.run(model, geom, rc)
+    streamlist2 = run(model, geom, rc)
     with pytest.raises(ValueError):
         assert streamlist2.calculate_rfs()
 
     rc.rot = 1
-    streamlist2 = prs.run(model, geom, rc)
+    streamlist2 = run(model, geom, rc)
     rflist = streamlist2.calculate_rfs()
     [rf.filter('lowpass', freq=1., corners=2, zerophase=True) for rf in streamlist2.rfs]
+
+    assert isinstance(streamlist2[0][1], Stream)
+    assert len(streamlist2[0][1]) == 2
+    assert len(streamlist2["rfs"]) == len(geom)
+    assert len(streamlist2["rf"]) == len(geom)
+
+def test_bailout():
+    """
+    The given model produces the 'WARNING in evec_check'. Make sure phases are bailed out
+    """
+    from pkg_resources import resource_filename
+
+    modf = resource_filename('pyraysum',
+                               'tests/evec_warn_model.txt')
+    mod = prs.read_model(modf)
+    # modf = "evec_warn_model.txt"
+    # try:
+    #     mod = prs.read_model(modf)
+    # except OSError:
+    #     # VSCode starts tests from root directory
+    #     modf = "pyraysum/tests/" + modf
+    #     mod = prs.read_model(modf)
+        
+    rc = Control(rot=2)
+
+    geom1 = Geometry(7.5, 0.045)
+
+    seis = run(mod, geom1, rc)
+
+    amps = seis.streams[0][1].stats.phase_amplitudes
+
+    assert all(abs(amps) < 2.5)
+
+    geom2 = Geometry(135, 0.06)
+    seis = run(mod, geom2, rc)
+
+    assert all(abs(amps) < 2.5)

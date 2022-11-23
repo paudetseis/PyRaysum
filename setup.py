@@ -14,7 +14,7 @@ ext = Extension(name='fraysum',
                            'pyraysum/src/readwrite.f',
                            'pyraysum/src/seis-spread.f',
                            'pyraysum/src/trace.f'],
-                extra_compile_args=['-O3'])
+                extra_compile_args=['-Ofast'])
 
 def find_version(*paths):
     fname = os.path.join(os.path.dirname(__file__), *paths)

@@ -14,6 +14,14 @@ build
 dist
 
 _build
+_images
+_sources
+_static
+*.html
+objects.inv
+searchindex.js
+.buildinfo
+
 sample.*
 raysum-params
 empty
