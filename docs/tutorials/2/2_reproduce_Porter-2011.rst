@@ -8,7 +8,7 @@ anisotropic layer. These example reproduce the results of Figure 3 in
 
 Start by importing the necessary packages:
 
-.. code:: ipython3
+.. code:: python
 
     from pyraysum import prs, Geometry, Model, Control
     import numpy as np
@@ -19,7 +19,7 @@ Dipping Layers
 First we define the arrays of slowness and back-azimuth values of the
 incident ``P`` wave to use as input in the simulation
 
-.. code:: ipython3
+.. code:: python
 
     baz = np.arange(0., 360., 10.)
     slow = 0.06
@@ -37,7 +37,7 @@ of Figure 3 in `Porter et al. (2011) <#references>`__. Note that
 which is what we do here. Also note that values that are constant for
 all layers can be given as floats.
 
-.. code:: ipython3
+.. code:: python
 
     thickn = [20000, 5000, 0]
     rho = 2800
@@ -73,14 +73,14 @@ dealing with multiples. This is required to reproduce the published
 examples, although it is good practice to keep all first-order multiples
 to properly simulate all possible phase arrivals.
 
-.. code:: ipython3
+.. code:: python
 
     rc = Control(rot=1, mults=0, verbose=False, npts=1200, dt=0.0125)
 
 Finally, let’s run the simulation. All book-keeping is handled
 internally.
 
-.. code:: ipython3
+.. code:: python
 
     result = prs.run(model, geom, rc)
 
@@ -88,7 +88,7 @@ The function returns a ``Result`` object whose attributes are the
 ``Model``, ``Geometry`` of incoming rays, a list of ``Streams`` as well
 as all run-time arguments that are used by Raysum:
 
-.. code:: ipython3
+.. code:: python
 
     result.__dict__.keys()
 
@@ -104,7 +104,7 @@ as all run-time arguments that are used by Raysum:
 We can then use the method ``calculate_rfs()`` to calculate receiver
 functions.
 
-.. code:: ipython3
+.. code:: python
 
     result.calculate_rfs()
 
@@ -112,7 +112,7 @@ The receiver functions are stored as an additional attribute of the
 streamlist object, which is itself a list of ``Streams`` containing the
 radial and transverse component RFs:
 
-.. code:: ipython3
+.. code:: python
 
     result.__dict__.keys()
 
@@ -128,7 +128,7 @@ radial and transverse component RFs:
 We can now filter and plot the results - we specify the key ``'rfs'`` to
 work on the receiver functions only.
 
-.. code:: ipython3
+.. code:: python
 
     result.filter('rfs', 'lowpass', freq=1., zerophase=True, corners=2)
     result.plot('rfs', tmin=-0.5, tmax=8.)
@@ -155,7 +155,7 @@ constant :math:`V_P/V_S` ratio, we must explicitly change ``vpvs`` by
 changing ``vs``. This is achieved using the ``'pss'`` attribute
 indicator below.
 
-.. code:: ipython3
+.. code:: python
 
     model.change('d1=0; d2=0; vp1=6.2; pss1=1.75; a1=-20; tr1=180; pl1=45;')
     model.plot()
@@ -189,7 +189,7 @@ Instead of two dipping interfaces, the model now has a thin anisotropic
 layer at the base of the crust. We again compute synthetic seismograms
 and use the ``rf`` argument to process the receiver functions as well.
 
-.. code:: ipython3
+.. code:: python
 
     result = prs.run(model, geom, rc, rf=True)
     
@@ -208,7 +208,7 @@ To understand the different phases displayed, we can look at, e.g., the
 receiver function at back-azimuth 150°. With a back-azimuthal spacing of
 10°, the ray-index is 15. Let look into ``Geometry``:
 
-.. code:: ipython3
+.. code:: python
 
     geom[15]
 
@@ -224,7 +224,7 @@ receiver function at back-azimuth 150°. With a back-azimuthal spacing of
 Yes, the first value of the tuple is the back-azimuth, which is 150°.
 The same index points into ``Result``:
 
-.. code:: ipython3
+.. code:: python
 
     print(result[15])
 
@@ -237,7 +237,7 @@ The same index points into ``Result``:
 The first element of the tuple are the synthetic seismograms, the second
 the receiver function:
 
-.. code:: ipython3
+.. code:: python
 
     print(result[15][0])
 
@@ -250,7 +250,7 @@ the receiver function:
     ...SYZ | 1970-01-01T00:00:00.000000Z - 1970-01-01T00:00:14.987500Z | 80.0 Hz, 1200 samples
 
 
-.. code:: ipython3
+.. code:: python
 
     print(result[15][1])
 
@@ -265,7 +265,7 @@ the receiver function:
 We now look at how the individual phases are called and when they
 arrive.
 
-.. code:: ipython3
+.. code:: python
 
     print(result[15][0][0].stats.phase_descriptors)
     print(result[15][0][0].stats.phase_times)
@@ -296,7 +296,7 @@ in the topmost layer 0, but at different speeds.
 On the transverse component, the P-to-S1 conversion has a negative
 amplitude, while the P-to-S2 conversion has a larger, positive one.
 
-.. code:: ipython3
+.. code:: python
 
     print(result[15][0][1].stats.phase_descriptors)
     print(result[15][0][1].stats.phase_times)
@@ -323,12 +323,12 @@ with independently obtained results from *Telewavesim*. We’ll need
 store them in a *Stream* object, and *Matplotlib* to make the comparison
 plot.
 
-.. code:: ipython3
+.. code:: python
 
     import obspy
     import matplotlib.pyplot as mp
 
-.. code:: ipython3
+.. code:: python
 
     # Load telewavesim data
     time, twr, twt, twz = np.loadtxt("../data/telewavesim_aniso_baz150-slow006.dat", unpack=True)
@@ -354,7 +354,7 @@ plot.
 We’ll again filter both seismograms, as Telewavesim data does not
 provide a good infinite frequency approximation.
 
-.. code:: ipython3
+.. code:: python
 
     # Set frequency corners in Hz
     fmin = 1./10. 
@@ -371,7 +371,7 @@ provide a good infinite frequency approximation.
 We also need to align the two different datasets to the direct *P*-wave
 and scale them to its amplitude on the vertical component.
 
-.. code:: ipython3
+.. code:: python
 
     # Index of the maximum amplitude on the vertical component of the data
     imax = np.argmax(abs(prsd[2].data))
@@ -388,7 +388,7 @@ and scale them to its amplitude on the vertical component.
 For a good comparison, we use the plot function from the previous
 example:
 
-.. code:: ipython3
+.. code:: python
 
     def plot(data, model):
         
@@ -446,7 +446,7 @@ example:
 
 And run it
 
-.. code:: ipython3
+.. code:: python
 
     _ = plot(twsd, prsd)
 

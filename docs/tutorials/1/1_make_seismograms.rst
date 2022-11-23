@@ -16,7 +16,7 @@ comparison plot.
    `here <https://paudetseis.github.io/PyRaysum/init.html#usage>`__, and
    execute the notebook from the Examples/notebooks/ directory.
 
-.. code:: ipython3
+.. code:: python
 
     import obspy
     from obspy.clients.fdsn import Client
@@ -34,7 +34,7 @@ seismically transparent (i.e., homogeneous) cratonic crust. The
 earthquake arrives due east (back-azimuth equal to 90°), so that the
 east component in the seismogram is in the radial direction.
 
-.. code:: ipython3
+.. code:: python
 
     # Use the `IRIS` client
     client = Client("IRIS")
@@ -77,7 +77,7 @@ few seconds later, the surface reflected pP wave arrives. Around 11:45,
 the S waves arrive. They are here shown only for orientation. We will
 only be interested in the short time interval between P and pP.
 
-.. code:: ipython3
+.. code:: python
 
     # Set start (t1) and end (t2) times of P-wave window
     t1 = t0 + 8*60. + 20.
@@ -114,7 +114,7 @@ data with ``pyraysum``. The incident teleseismic P wave is characterized
 by 90 degree back-azimuth and 0.06 s/km slowness. Note that we are here
 only looking at a much shorter time interval, i.e. 35 seconds of data.
 
-.. code:: ipython3
+.. code:: python
 
     # Load telewavesim data
     twt, twn, twe, twz = np.loadtxt("../data/telewavesim_baz090-slow006.dat", unpack=True)
@@ -154,7 +154,7 @@ al (2000), which suggests a 32 km thick cratonic crust with P- and
 S-wave velocities of 6.55 and 3.50 km/s, repectively. In ``pyraysum``,
 we define:
 
-.. code:: ipython3
+.. code:: python
 
     # Make a pyraysum model
     thickn = [32000, 0]
@@ -173,7 +173,7 @@ we define:
 
 We again use the incident P-wave geometry of the Philippines earthquake:
 
-.. code:: ipython3
+.. code:: python
 
     baz = 90
     slow = 0.06
@@ -187,7 +187,7 @@ and use a sampling rate of 100 Hz (``dt=1/100``) with 2500 samples
 not be shifted or aligned (``align=0``). Note that the unit amplitude
 points *toward* the source.
 
-.. code:: ipython3
+.. code:: python
 
     # Set `run` parameters
     ctrl = prs.Control(
@@ -219,7 +219,7 @@ These are the synthetic seismograms. Once we calculate receiver
 functions, they will be strored in the second return value. Right now,
 this is an empty ``Stream``:
 
-.. code:: ipython3
+.. code:: python
 
     print(rfs)
 
@@ -232,7 +232,7 @@ this is an empty ``Stream``:
 
 Let’s continue working with the seismograms and make a quick plot.
 
-.. code:: ipython3
+.. code:: python
 
     prsd = result[0][0]
     _ = prsd.plot()
@@ -246,7 +246,7 @@ We will now pre-process all data equally. We will filter them, and align
 and normalize them to the maximum amplitude on the vertical component of
 the measured seismogram.
 
-.. code:: ipython3
+.. code:: python
 
     # Set frequency corners in Hz
     fmin = 1./20. 
@@ -285,7 +285,7 @@ infrastructure of ``obspy.Trace`` is used to store phase names, arrival
 times and amplitudes. These are used here to better interpret the
 seismograms.
 
-.. code:: ipython3
+.. code:: python
 
     def plot(data, model):
         
@@ -352,7 +352,7 @@ seismograms.
 Comparison with real data
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. code:: ipython3
+.. code:: python
 
     fig = plot(hybd, prsd)
     _ = fig.suptitle("Comparison between Pyraysum and seismogram recored at G.HYB")
@@ -378,7 +378,7 @@ long phase descriptors consist of layer numbers and phase letters.
 Comparison with synthetic data
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. code:: ipython3
+.. code:: python
 
     fig = plot(twsd, prsd)
     _ = fig.suptitle("Comparison between PyRaysum and Telewavesim synthetics")
@@ -405,7 +405,7 @@ we wish to compute. The method implicitly sets ``mults=3``. ``Result``
 has a dedicated method ``descriptors()`` to list unique phases present
 in the synthetic waveforms.
 
-.. code:: ipython3
+.. code:: python
 
     phl = result.descriptors()
     eqp = prs.equivalent_phases(phl)
@@ -428,13 +428,13 @@ in the synthetic waveforms.
 We will now set a phaselist that includes these phases using the
 ``equivalent`` option of ``set_phaselist``.
 
-.. code:: ipython3
+.. code:: python
 
     ctrl.set_phaselist(phl, equivalent=True)
 
 And run *PyRaysum* and the post processing again:
 
-.. code:: ipython3
+.. code:: python
 
     # Run Raysum and get seismograms
     result = prs.run(model, geom, ctrl)
@@ -465,7 +465,7 @@ The amplitudes of the reflected phases are now better matched. To
 explore the actual amplitude contributions of the equivalent phases, we
 look them up in the metadata of the synthetic seismic trace:
 
-.. code:: ipython3
+.. code:: python
 
     print("Name, Time, Amplitude")
     f = "{:4s}  {:>4.1f}    {:>7.3f}"

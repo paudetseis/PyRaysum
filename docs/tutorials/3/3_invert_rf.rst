@@ -15,7 +15,7 @@ and spectral division that is required to create receiver functions from
 the synthetic seismograms is carried out using ``numpy`` array methods.
 finally, we will plot the results with ``matplotlib``.
 
-.. code:: ipython3
+.. code:: python
 
     from pyraysum import prs, frs
     from fraysum import run_bare
@@ -38,7 +38,7 @@ are provided. ``filtered_rf_array`` divides the SV- and SH-spectra by
 the P-spectra (i.e., computes a receiver function) and filters the data,
 whereas ``filtered_array`` returns the filtered SV and SH data.
 
-.. code:: ipython3
+.. code:: python
 
     def predictRF(model, geometry, rc, freqs, rfarray, ist, rf=True):
     
@@ -90,7 +90,7 @@ between the predicted and observed receiver functions (``pred`` and
 ``obs``, respectively) as 1. minus the cross correlation coefficient. A
 status message is printed so the user can follow the inversion process.
 
-.. code:: ipython3
+.. code:: python
 
     def misfit(theta, model, geometry, rc, freqs, rfarray, ist, obs):
     
@@ -112,13 +112,13 @@ status message is printed so the user can follow the inversion process.
     
         return cost
 
-Plotting Function for Data vs. Model Prediction
+Plotting Function for Data vs. Model Prediction
 -----------------------------------------------
 
 This plot function allows us to compare the observed and predicted data
 vectors:
 
-.. code:: ipython3
+.. code:: python
 
     def plot(obs, pred):
         fig, ax = mp.subplots(nrows=1, ncols=1)
@@ -150,7 +150,7 @@ time window should span the interval between 0 and 25 seconds after the
 arrival of the direct P-wave. Data should be bandpassed filtered between
 periods of 20 and 2 seconds.
 
-.. code:: ipython3
+.. code:: python
 
     if __name__ == "__main__":
         baz = 90
@@ -173,7 +173,7 @@ it can be reused for post-processing of the synthetic receiver
 functions. The windowed receiver function are concatenated to yield the
 data vector.
 
-.. code:: ipython3
+.. code:: python
 
         # Load saved stream
         time, rfr, rft = np.loadtxt("../data/rf_hyb.dat", unpack=True)
@@ -185,9 +185,9 @@ Setup of Starting Model and Run Control Parameters
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 We set up the starting subsurface velocity model using Saul et
-al. (2000), as well as the recording geometry.
+al. (2000), as well as the recording geometry.
 
-.. code:: ipython3
+.. code:: python
 
         thickn = [30000, 0]
         rho = [2800, 3600]
@@ -208,7 +208,7 @@ be computed. This is the recommended option for all time-sensitive
 applications, as ``mults=2`` computes many multiples, many of which
 might not be used at all.
 
-.. code:: ipython3
+.. code:: python
 
         rc = prs.Control(
             verbose=False,
@@ -250,7 +250,7 @@ to the phaselist. The ``equivalent=True`` keyword implicitly adds such
    seismogram, where they become part of the denominator of spectral
    division when computing the receiver function.)
 
-.. code:: ipython3
+.. code:: python
 
         rc.set_phaselist(["1P0P", "1P0S", "1P0P0p0P", "1P0P0p0S", "1P0P0s0P"], equivalent=True)
 
@@ -261,7 +261,7 @@ Swift post processing of the synthetic receiver function is done on the
 ``rfarray`` using numpy array methods, which is initialized here. It has
 shape ``(geometry.ntr, 2, rc.npts)``.
 
-.. code:: ipython3
+.. code:: python
 
         rfarray = frs.make_array(geometry, rc)
 
@@ -273,7 +273,7 @@ changes if you set ``rf=False``, in which case no spectral division is
 performed and the model prediction is the synthetic seismogram. This
 expedites the computation, but is less exact.
 
-.. code:: ipython3
+.. code:: python
 
         predicted = predictRF(model, geometry, rc, freqs, rfarray, ist, rf=True)
         plot(observed, predicted)
@@ -297,10 +297,10 @@ Inverse Modeling with Scipy’s Optimize Module
 We now define the search bounds for dual annealing. This definition
 prescribes that the first element of the model vector is the *thickness
 of layer 0* and is searched in an interval of
-$:raw-latex:`\pm`\ :math:`5000 m, and its second element is the *`\ V_P/V_S$
-ratio of layer 0*, searched in an interval of $:raw-latex:`\pm`$0.1.
+:math:`\pm 5000` m, and its second element is the :math:`V_P/V_S`
+ratio of layer 0*, searched in an interval of :math:`\pm` 0.1.
 
-.. code:: ipython3
+.. code:: python
 
         bounds = [
             (model[0, "thickn"] - 5000, model[0, "thickn"] + 5000),
@@ -314,7 +314,7 @@ The call is in principle interchangeable with other `global search
 methods from the optimization
 module <https://docs.scipy.org/doc/scipy/reference/optimize.html#global-optimization>`__.
 
-.. code:: ipython3
+.. code:: python
 
         result = spo.dual_annealing(
             misfit,
@@ -422,7 +422,7 @@ Results
 
 Let’s have a look at the result
 
-.. code:: ipython3
+.. code:: python
 
         print(result)
 
@@ -442,7 +442,7 @@ Let’s have a look at the result
 
 And assign it to the model
 
-.. code:: ipython3
+.. code:: python
 
         model[0, "thickn"] = result.x[0]
         model[0, "vpvs"] = result.x[1]
@@ -468,7 +468,7 @@ the solution.
 
 Finally, we can look at how well the optimized model predicts the data.
 
-.. code:: ipython3
+.. code:: python
 
         predicted = predictRF(model, geometry, rc, freqs, rfarray, ist)
         plot(observed, predicted)

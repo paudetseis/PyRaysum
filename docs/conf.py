@@ -18,8 +18,8 @@
 # -- Project information -----------------------------------------------------
 
 project = 'pyraysum'
-copyright = '2020, Pascal Audet'
-author = 'Andrew Frederiksen, Pascal Audet'
+copyright = '2022, Wasja Bloch, Pascal Audet'
+author = 'Andrew Frederiksen, Wasja Bloch, Pascal Audet'
 
 # The full version, including alpha/beta/rc tags
 from pyraysum import __version__ as release

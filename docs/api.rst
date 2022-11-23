@@ -28,7 +28,7 @@ Geometry
    :members:
 
 Control
---
+-------
 
 .. autoclass:: pyraysum.prs.Control
    :members:
@@ -48,6 +48,12 @@ Module :mod:`prs`
 .. automodule:: pyraysum.prs
    :members:
    :exclude-members: Model, Geometry, Control, Result
+
+Module :mod:`frs`
+-----------------
+
+.. automodule:: pyraysum.frs
+   :members:
 
 Module :mod:`plot`
 ------------------
