@@ -2,8 +2,8 @@
    :align: center
 
 Synthetic seismograms are computed from three classes: :class:`Model`,
-:class:`Geometry`, and :class:`RC` using :func:`prs.run`, and are stored in
-an instance of class :class:`Seismogram`.
+:class:`Geometry`, and :class:`Control` using :func:`prs.run`, and are stored in
+an instance of class :class:`Result`.
 
 Classes
 =======
@@ -12,8 +12,8 @@ Classes
 
 - :class:`~pyraysum.prs.Model`
 - :class:`~pyraysum.prs.Geometry`
-- :class:`~pyraysum.prs.Seismogram`
-- :class:`~pyraysum.prs.RC`
+- :class:`~pyraysum.prs.Result`
+- :class:`~pyraysum.prs.Control`
 
 Model
 -----
@@ -27,16 +27,16 @@ Geometry
 .. autoclass:: pyraysum.prs.Geometry
    :members:
 
-RC
---
+Control
+-------
 
-.. autoclass:: pyraysum.prs.RC
+.. autoclass:: pyraysum.prs.Control
    :members:
 
-Seismogram
+Result
 ----------
 
-.. autoclass:: pyraysum.prs.Seismogram
+.. autoclass:: pyraysum.prs.Result
    :members:
 
 Modules
@@ -47,7 +47,13 @@ Module :mod:`prs`
 
 .. automodule:: pyraysum.prs
    :members:
-   :exclude-members: Model, Geometry, RC, Seismogram
+   :exclude-members: Model, Geometry, Control, Result
+
+Module :mod:`frs`
+-----------------
+
+.. automodule:: pyraysum.frs
+   :members:
 
 Module :mod:`plot`
 ------------------
@@ -84,17 +90,17 @@ These are the the access points to the low-level fortran routines.
     :param sta_dx: :attr:`Geometry.fdn`
     :param sta_dy: :attr:`Geometry.fde`
     :param ntr: :attr:`Geometry.ntr`
-    :param iphase: :attr:`RC.wvtype`
-    :param mults: :attr:`RC.mults`
-    :param nsamp: :attr:`RC.nsamp`
-    :param dt: :attr:`RC.dt`
-    :param align: :attr:`RC.align`
-    :param shift: :attr:`RC.shift`
-    :param out_rot: :attr:`RC.rot`
-    :param verb: :attr:`RC.verbose`
-    :param nsegin: :attr:`RC._nseg`
-    :param numphin: :attr:`RC._numph`
-    :param phaselistin: :attr:`RC.phaselist`
+    :param iphase: :attr:`Control.wvtype`
+    :param mults: :attr:`Control.mults`
+    :param nsamp: :attr:`Control.nsamp`
+    :param dt: :attr:`Control.dt`
+    :param align: :attr:`Control.align`
+    :param shift: :attr:`Control.shift`
+    :param out_rot: :attr:`Control.rot`
+    :param verb: :attr:`Control.verbose`
+    :param nsegin: :attr:`Control._nseg`
+    :param numphin: :attr:`Control._numph`
+    :param phaselistin: :attr:`Control.phaselist`
 
     :returns: tr_ph
     :rtype: rank-3 array('f') with bounds (3, `maxsamp`, `maxtr`)
@@ -120,17 +126,17 @@ These are the the access points to the low-level fortran routines.
     :param sta_dx: :attr:`Geometry.fdn`
     :param sta_dy: :attr:`Geometry.fde`
     :param ntr: :attr:`Geometry.ntr`
-    :param iphase: :attr:`RC.wvtype`
-    :param mults: :attr:`RC.mults`
-    :param nsamp: :attr:`RC.nsamp`
-    :param dt: :attr:`RC.dt`
-    :param align: :attr:`RC.align`
-    :param shift: :attr:`RC.shift`
-    :param out_rot: :attr:`RC.rot`
-    :param verb: :attr:`RC.verbose`
-    :param nsegin: :attr:`RC._nseg`
-    :param numphin: :attr:`RC._numph`
-    :param phaselistin: :attr:`RC.phaselist`
+    :param iphase: :attr:`Control.wvtype`
+    :param mults: :attr:`Control.mults`
+    :param nsamp: :attr:`Control.nsamp`
+    :param dt: :attr:`Control.dt`
+    :param align: :attr:`Control.align`
+    :param shift: :attr:`Control.shift`
+    :param out_rot: :attr:`Control.rot`
+    :param verb: :attr:`Control.verbose`
+    :param nsegin: :attr:`Control._nseg`
+    :param numphin: :attr:`Control._numph`
+    :param phaselistin: :attr:`Control.phaselist`
 
     :returns: tr_ph
     :rtype: rank-3 array('f') with bounds (3, `maxsamp`, `maxtr`):

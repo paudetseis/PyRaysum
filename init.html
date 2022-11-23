@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Licence &mdash; pyraysum 0.2.0 documentation</title>
+  <title>Licence &mdash; pyraysum 0.3.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -16,6 +16,7 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -123,8 +124,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Licence</li>
+      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">Licence</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/init.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -139,7 +140,7 @@
 </figure>
 <section id="licence">
 <h1>Licence<a class="headerlink" href="#licence" title="Permalink to this heading"></a></h1>
-<p>Copyright 2020 Pascal Audet</p>
+<p>Copyright 2022 Wasja Bloch, Pascal Audet</p>
 <p>Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the “Software”), to deal
 in the Software without restriction, including without limitation the rights
@@ -435,14 +436,14 @@ be created separately using the <code class="docutils literal notranslate"><span
 <section id="modeling-a-single-event">
 <h3>Modeling a single event<a class="headerlink" href="#modeling-a-single-event" title="Permalink to this heading"></a></h3>
 <p>Here we model P waveforms from a single event, characterized by a back-azimuth of 30 degrees and slowness of 0.05 s/km. Let’s examine the synthetic waveforms that would be recorded in a Z-N-E coordinate system (<code class="docutils literal notranslate"><span class="pre">rot=0</span></code>) from the P-wave propagating through a simple homogeneous crust over a mantle half-space:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyraysum</span> <span class="kn">import</span> <span class="n">prs</span><span class="p">,</span> <span class="n">Model</span><span class="p">,</span> <span class="n">Geometry</span><span class="p">,</span> <span class="n">RC</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyraysum</span> <span class="kn">import</span> <span class="n">prs</span><span class="p">,</span> <span class="n">Model</span><span class="p">,</span> <span class="n">Geometry</span><span class="p">,</span> <span class="n">Control</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Define model with isotropic crust over isotropic half-space mantle</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">([</span><span class="mf">30000.</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mf">2800.</span><span class="p">,</span> <span class="mf">3300.</span><span class="p">],</span> <span class="p">[</span><span class="mf">6000.</span><span class="p">,</span> <span class="mf">8000.</span><span class="p">],</span> <span class="p">[</span><span class="mf">3600.</span><span class="p">,</span> <span class="mf">4500.</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Define the ray geometry for one event</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">geom</span> <span class="o">=</span> <span class="n">Geometry</span><span class="p">(</span><span class="mf">30.</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span> <span class="c1"># baz = 30 deg; slow = 0.05 s/km</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Define the run-control parameters</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># sampling of 0.025 s; 1500 samples; with multiples; in Z-N-E coordinate system</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">rc</span> <span class="o">=</span> <span class="n">RC</span><span class="p">(</span><span class="n">dt</span><span class="o">=</span><span class="mf">0.025</span><span class="p">,</span> <span class="n">npts</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span> <span class="n">mults</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">rot</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rc</span> <span class="o">=</span> <span class="n">Control</span><span class="p">(</span><span class="n">dt</span><span class="o">=</span><span class="mf">0.025</span><span class="p">,</span> <span class="n">npts</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span> <span class="n">mults</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">rot</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Run Raysum for this setup</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">streamlist</span> <span class="o">=</span> <span class="n">prs</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">geom</span><span class="p">,</span> <span class="n">rc</span><span class="p">)</span>
 </pre></div>
@@ -520,11 +521,11 @@ Here we calculate receiver functions for a single event. Other examples that des
 function calculation for multiple events are included in the accompanying Jupyter notebook
 tutorials.</p>
 <p>Let’s first setup a simulation for a simple 2-layer model:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyraysum</span> <span class="kn">import</span> <span class="n">prs</span><span class="p">,</span> <span class="n">Model</span><span class="p">,</span> <span class="n">Geometry</span><span class="p">,</span> <span class="n">RC</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyraysum</span> <span class="kn">import</span> <span class="n">prs</span><span class="p">,</span> <span class="n">Model</span><span class="p">,</span> <span class="n">Geometry</span><span class="p">,</span> <span class="n">Control</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Define model with isotropic crust over isotropic half-space mantle</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">([</span><span class="mf">30000.</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mf">2800.</span><span class="p">,</span> <span class="mf">3300.</span><span class="p">],</span> <span class="p">[</span><span class="mf">6000.</span><span class="p">,</span> <span class="mf">8000.</span><span class="p">],</span> <span class="p">[</span><span class="mf">3600.</span><span class="p">,</span> <span class="mf">4500.</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">geom</span> <span class="o">=</span> <span class="n">Geometry</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.06</span><span class="p">)</span> <span class="c1"># baz = 0 deg; slow = 0.06 s/km</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">rc</span> <span class="o">=</span> <span class="n">RC</span><span class="p">(</span><span class="n">dt</span><span class="o">=</span><span class="mf">0.025</span><span class="p">,</span> <span class="n">npts</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span> <span class="n">mults</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">rot</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rc</span> <span class="o">=</span> <span class="n">Control</span><span class="p">(</span><span class="n">dt</span><span class="o">=</span><span class="mf">0.025</span><span class="p">,</span> <span class="n">npts</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span> <span class="n">mults</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">rot</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
 <section id="method-1">
@@ -578,7 +579,7 @@ running <code class="docutils literal notranslate"><span class="pre">Raysum</spa
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2020, Pascal Audet.</p>
+    <p>&#169; Copyright 2022, Wasja Bloch, Pascal Audet.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

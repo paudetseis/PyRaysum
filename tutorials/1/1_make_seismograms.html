@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Example 1: Compare PyRaysum with other synthetic and real data &mdash; pyraysum 0.2.0 documentation</title>
+  <title>Example 1: Compare PyRaysum with other synthetic and real data &mdash; pyraysum 0.3.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -16,6 +16,7 @@
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -94,8 +95,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Example 1: Compare PyRaysum with other synthetic and real data</li>
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">Example 1: Compare PyRaysum with other synthetic and real data</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../_sources/tutorials/1/1_make_seismograms.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -121,11 +122,11 @@ described
 <a class="reference external" href="https://paudetseis.github.io/PyRaysum/init.html#usage">here</a>, and
 execute the notebook from the Examples/notebooks/ directory.</p>
 </div></blockquote>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import obspy
-from obspy.clients.fdsn import Client
-from pyraysum import prs
-import matplotlib.pyplot as mp
-import numpy as np
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">obspy</span>
+<span class="kn">from</span> <span class="nn">obspy.clients.fdsn</span> <span class="kn">import</span> <span class="n">Client</span>
+<span class="kn">from</span> <span class="nn">pyraysum</span> <span class="kn">import</span> <span class="n">prs</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">mp</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 </pre></div>
 </div>
 <section id="loading-earthquake-data">
@@ -136,24 +137,24 @@ from station <code class="docutils literal notranslate"><span class="pre">HYB</s
 seismically transparent (i.e., homogeneous) cratonic crust. The
 earthquake arrives due east (back-azimuth equal to 90°), so that the
 east component in the seismogram is in the radial direction.</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Use the `IRIS` client
-client = Client(&quot;IRIS&quot;)
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Use the `IRIS` client</span>
+<span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">(</span><span class="s2">&quot;IRIS&quot;</span><span class="p">)</span>
 
-# Set the origin time to search catalogue
-t0 = obspy.UTCDateTime(&quot;2002-01-01T11:29:22&quot;)
+<span class="c1"># Set the origin time to search catalogue</span>
+<span class="n">t0</span> <span class="o">=</span> <span class="n">obspy</span><span class="o">.</span><span class="n">UTCDateTime</span><span class="p">(</span><span class="s2">&quot;2002-01-01T11:29:22&quot;</span><span class="p">)</span>
 
-# Fetch event object
-event = client.get_events(
-    starttime=t0,
-    endtime=t0 + 1,
-    minmagnitude=6.0,
-    maxmagnitude=6.5,
-    mindepth=100,
-)[0]
+<span class="c1"># Fetch event object</span>
+<span class="n">event</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_events</span><span class="p">(</span>
+    <span class="n">starttime</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span>
+    <span class="n">endtime</span><span class="o">=</span><span class="n">t0</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">minmagnitude</span><span class="o">=</span><span class="mf">6.0</span><span class="p">,</span>
+    <span class="n">maxmagnitude</span><span class="o">=</span><span class="mf">6.5</span><span class="p">,</span>
+    <span class="n">mindepth</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+<span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
-# Display event information
-print(event.origins[0])
-print(event.magnitudes[0])
+<span class="c1"># Display event information</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">origins</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">magnitudes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Origin</span>
@@ -174,15 +175,15 @@ print(event.magnitudes[0])
 few seconds later, the surface reflected pP wave arrives. Around 11:45,
 the S waves arrive. They are here shown only for orientation. We will
 only be interested in the short time interval between P and pP.</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Set start (t1) and end (t2) times of P-wave window
-t1 = t0 + 8*60. + 20.
-t2 = t0 + 8*60. + 45.
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set start (t1) and end (t2) times of P-wave window</span>
+<span class="n">t1</span> <span class="o">=</span> <span class="n">t0</span> <span class="o">+</span> <span class="mi">8</span><span class="o">*</span><span class="mf">60.</span> <span class="o">+</span> <span class="mf">20.</span>
+<span class="n">t2</span> <span class="o">=</span> <span class="n">t0</span> <span class="o">+</span> <span class="mi">8</span><span class="o">*</span><span class="mf">60.</span> <span class="o">+</span> <span class="mf">45.</span>
 
-# Here we fetch and plot -1 to +10 minutes following the P-wave window start time
-hybd = client.get_waveforms(&quot;G&quot;, &quot;HYB&quot;, &quot;&quot;, &quot;BH?&quot;, t1 - 60, t1 + 10*60)
-hybd.sort(reverse=True)
-print(hybd)
-_ = hybd.plot()
+<span class="c1"># Here we fetch and plot -1 to +10 minutes following the P-wave window start time</span>
+<span class="n">hybd</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_waveforms</span><span class="p">(</span><span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;HYB&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;BH?&quot;</span><span class="p">,</span> <span class="n">t1</span> <span class="o">-</span> <span class="mi">60</span><span class="p">,</span> <span class="n">t1</span> <span class="o">+</span> <span class="mi">10</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+<span class="n">hybd</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">hybd</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">hybd</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">3</span> <span class="n">Trace</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="ow">in</span> <span class="n">Stream</span><span class="p">:</span>
@@ -203,22 +204,22 @@ reverberations in a stratified medium using the matrix propagator method
 data with <code class="docutils literal notranslate"><span class="pre">pyraysum</span></code>. The incident teleseismic P wave is characterized
 by 90 degree back-azimuth and 0.06 s/km slowness. Note that we are here
 only looking at a much shorter time interval, i.e. 35 seconds of data.</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Load telewavesim data
-twt, twn, twe, twz = np.loadtxt(&quot;../data/telewavesim_baz090-slow006.dat&quot;, unpack=True)
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load telewavesim data</span>
+<span class="n">twt</span><span class="p">,</span> <span class="n">twn</span><span class="p">,</span> <span class="n">twe</span><span class="p">,</span> <span class="n">twz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="s2">&quot;../data/telewavesim_baz090-slow006.dat&quot;</span><span class="p">,</span> <span class="n">unpack</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-# Get time interval `dt` from data
-dt = twt[1] - twt[0]
+<span class="c1"># Get time interval `dt` from data</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="n">twt</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">twt</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-# Store into Stream, switch Z component polarity and set header
-twsd = obspy.Stream()
-for tr, channel in zip([twz, twn, twe], [&quot;Z&quot;, &quot;N&quot;, &quot;E&quot;]):
-    header = {&quot;delta&quot;: dt, &quot;station&quot;: &quot;tws&quot;, &quot;channel&quot;: channel}
-    trace = obspy.Trace(tr, header=header)
-    twsd.append(trace)
+<span class="c1"># Store into Stream, switch Z component polarity and set header</span>
+<span class="n">twsd</span> <span class="o">=</span> <span class="n">obspy</span><span class="o">.</span><span class="n">Stream</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">tr</span><span class="p">,</span> <span class="n">channel</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="n">twz</span><span class="p">,</span> <span class="n">twn</span><span class="p">,</span> <span class="n">twe</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;Z&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;E&quot;</span><span class="p">]):</span>
+    <span class="n">header</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;delta&quot;</span><span class="p">:</span> <span class="n">dt</span><span class="p">,</span> <span class="s2">&quot;station&quot;</span><span class="p">:</span> <span class="s2">&quot;tws&quot;</span><span class="p">,</span> <span class="s2">&quot;channel&quot;</span><span class="p">:</span> <span class="n">channel</span><span class="p">}</span>
+    <span class="n">trace</span> <span class="o">=</span> <span class="n">obspy</span><span class="o">.</span><span class="n">Trace</span><span class="p">(</span><span class="n">tr</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="n">header</span><span class="p">)</span>
+    <span class="n">twsd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trace</span><span class="p">)</span>
 
-# Make simple plot
-print(twsd)
-_ = twsd.plot()
+<span class="c1"># Make simple plot</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">twsd</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">twsd</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">3</span> <span class="n">Trace</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="ow">in</span> <span class="n">Stream</span><span class="p">:</span>
@@ -235,22 +236,22 @@ _ = twsd.plot()
 al (2000), which suggests a 32 km thick cratonic crust with P- and
 S-wave velocities of 6.55 and 3.50 km/s, repectively. In <code class="docutils literal notranslate"><span class="pre">pyraysum</span></code>,
 we define:</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Make a pyraysum model
-thickn = [32000, 0]
-rho = [2800, 3600]
-vp = [6550, 8100]
-vs = [3500, 4650]
-model = prs.Model(thickn, rho, vp, vs)
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Make a pyraysum model</span>
+<span class="n">thickn</span> <span class="o">=</span> <span class="p">[</span><span class="mi">32000</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="n">rho</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2800</span><span class="p">,</span> <span class="mi">3600</span><span class="p">]</span>
+<span class="n">vp</span> <span class="o">=</span> <span class="p">[</span><span class="mi">6550</span><span class="p">,</span> <span class="mi">8100</span><span class="p">]</span>
+<span class="n">vs</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3500</span><span class="p">,</span> <span class="mi">4650</span><span class="p">]</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">prs</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">thickn</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">vp</span><span class="p">,</span> <span class="n">vs</span><span class="p">)</span>
 
-# Plot model
-model.plot()
+<span class="c1"># Plot model</span>
+<span class="n">model</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
 <img alt="../../_images/output_9_0.png" src="../../_images/output_9_0.png" />
 <p>We again use the incident P-wave geometry of the Philippines earthquake:</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>baz = 90
-slow = 0.06
-geom = prs.Geometry(baz=[baz], slow=[slow])
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">baz</span> <span class="o">=</span> <span class="mi">90</span>
+<span class="n">slow</span> <span class="o">=</span> <span class="mf">0.06</span>
+<span class="n">geom</span> <span class="o">=</span> <span class="n">prs</span><span class="o">.</span><span class="n">Geometry</span><span class="p">(</span><span class="n">baz</span><span class="o">=</span><span class="n">baz</span><span class="p">,</span> <span class="n">slow</span><span class="o">=</span><span class="n">slow</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>In the run control (RC) parameters, we specify that we would like to: 1)
@@ -260,64 +261,75 @@ and use a sampling rate of 100 Hz (<code class="docutils literal notranslate"><s
 (<code class="docutils literal notranslate"><span class="pre">npts=2500</span></code>). This yields a 25s-long seismogram. The waveforms should
 not be shifted or aligned (<code class="docutils literal notranslate"><span class="pre">align=0</span></code>). Note that the unit amplitude
 points <em>toward</em> the source.</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Set `run` parameters
-rc = prs.RC(
-    verbose=False,
-    rot=0,
-    mults=2,
-    dt=1/100,
-    npts=2500,
-    align=0,
-)
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set `run` parameters</span>
+<span class="n">ctrl</span> <span class="o">=</span> <span class="n">prs</span><span class="o">.</span><span class="n">Control</span><span class="p">(</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">rot</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">mults</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">dt</span><span class="o">=</span><span class="mi">1</span><span class="o">/</span><span class="mi">100</span><span class="p">,</span>
+    <span class="n">npts</span><span class="o">=</span><span class="mi">2500</span><span class="p">,</span>
+    <span class="n">align</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span>
 
-# Run Raysum and get seismograms
-seismogram = prs.run(model, geom, rc)
+<span class="c1"># Run Raysum and get seismograms</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">prs</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">geom</span><span class="p">,</span> <span class="n">ctrl</span><span class="p">)</span>
 
-# Extract first set of seismograms (element `0` in `streams`)
-prsd = seismogram.streams[0]
-
-# Make simple plot
-print(prsd)
-_ = prsd.plot()
+<span class="c1"># Extract first (and only) ray from the result (ray index [0])</span>
+<span class="n">seis</span><span class="p">,</span> <span class="n">rfs</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">seis</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">3</span> <span class="n">Trace</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="ow">in</span> <span class="n">Stream</span><span class="p">:</span>
-<span class="o">.</span><span class="n">prs</span><span class="o">..</span><span class="n">Z</span> <span class="o">|</span> <span class="mi">1970</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="n">T00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mf">00.000000</span><span class="n">Z</span> <span class="o">-</span> <span class="mi">1970</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="n">T00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mf">24.990000</span><span class="n">Z</span> <span class="o">|</span> <span class="mf">100.0</span> <span class="n">Hz</span><span class="p">,</span> <span class="mi">2500</span> <span class="n">samples</span>
-<span class="o">.</span><span class="n">prs</span><span class="o">..</span><span class="n">N</span> <span class="o">|</span> <span class="mi">1970</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="n">T00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mf">00.000000</span><span class="n">Z</span> <span class="o">-</span> <span class="mi">1970</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="n">T00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mf">24.990000</span><span class="n">Z</span> <span class="o">|</span> <span class="mf">100.0</span> <span class="n">Hz</span><span class="p">,</span> <span class="mi">2500</span> <span class="n">samples</span>
-<span class="o">.</span><span class="n">prs</span><span class="o">..</span><span class="n">E</span> <span class="o">|</span> <span class="mi">1970</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="n">T00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mf">00.000000</span><span class="n">Z</span> <span class="o">-</span> <span class="mi">1970</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="n">T00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mf">24.990000</span><span class="n">Z</span> <span class="o">|</span> <span class="mf">100.0</span> <span class="n">Hz</span><span class="p">,</span> <span class="mi">2500</span> <span class="n">samples</span>
+<span class="o">...</span><span class="n">SYZ</span> <span class="o">|</span> <span class="mi">1970</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="n">T00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mf">00.000000</span><span class="n">Z</span> <span class="o">-</span> <span class="mi">1970</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="n">T00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mf">24.990000</span><span class="n">Z</span> <span class="o">|</span> <span class="mf">100.0</span> <span class="n">Hz</span><span class="p">,</span> <span class="mi">2500</span> <span class="n">samples</span>
+<span class="o">...</span><span class="n">SYN</span> <span class="o">|</span> <span class="mi">1970</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="n">T00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mf">00.000000</span><span class="n">Z</span> <span class="o">-</span> <span class="mi">1970</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="n">T00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mf">24.990000</span><span class="n">Z</span> <span class="o">|</span> <span class="mf">100.0</span> <span class="n">Hz</span><span class="p">,</span> <span class="mi">2500</span> <span class="n">samples</span>
+<span class="o">...</span><span class="n">SYE</span> <span class="o">|</span> <span class="mi">1970</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="n">T00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mf">00.000000</span><span class="n">Z</span> <span class="o">-</span> <span class="mi">1970</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="n">T00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mf">24.990000</span><span class="n">Z</span> <span class="o">|</span> <span class="mf">100.0</span> <span class="n">Hz</span><span class="p">,</span> <span class="mi">2500</span> <span class="n">samples</span>
 </pre></div>
 </div>
-<img alt="../../_images/output_13_1.png" src="../../_images/output_13_1.png" />
+<p>These are the synthetic seismograms. Once we calculate receiver
+functions, they will be strored in the second return value. Right now,
+this is an empty <code class="docutils literal notranslate"><span class="pre">Stream</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">rfs</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">0</span> <span class="n">Trace</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="ow">in</span> <span class="n">Stream</span><span class="p">:</span>
+</pre></div>
+</div>
+<p>Let’s continue working with the seismograms and make a quick plot.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">prsd</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">prsd</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../../_images/output_17_0.png" src="../../_images/output_17_0.png" />
 <p>We will now pre-process all data equally. We will filter them, and align
 and normalize them to the maximum amplitude on the vertical component of
 the measured seismogram.</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Set frequency corners in Hz
-fmin = 1./20.
-fmax = 1.
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set frequency corners in Hz</span>
+<span class="n">fmin</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">/</span><span class="mf">20.</span>
+<span class="n">fmax</span> <span class="o">=</span> <span class="mf">1.</span>
 
-# Demean and filter all data
-for dat in [hybd, twsd, prsd]:
-    dat.detrend(&quot;demean&quot;)
-    dat.filter(&quot;bandpass&quot;, freqmin=fmin, freqmax=fmax, zerophase=True)
+<span class="c1"># Demean and filter all data</span>
+<span class="k">for</span> <span class="n">dat</span> <span class="ow">in</span> <span class="p">[</span><span class="n">hybd</span><span class="p">,</span> <span class="n">twsd</span><span class="p">,</span> <span class="n">prsd</span><span class="p">]:</span>
+    <span class="n">dat</span><span class="o">.</span><span class="n">detrend</span><span class="p">(</span><span class="s2">&quot;demean&quot;</span><span class="p">)</span>
+    <span class="n">dat</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="s2">&quot;bandpass&quot;</span><span class="p">,</span> <span class="n">freqmin</span><span class="o">=</span><span class="n">fmin</span><span class="p">,</span> <span class="n">freqmax</span><span class="o">=</span><span class="n">fmax</span><span class="p">,</span> <span class="n">zerophase</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-# Extract the P-wave window in real data
-hybd.trim(t1, t2)
+<span class="c1"># Extract the P-wave window in real data</span>
+<span class="n">hybd</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">)</span>
 
-# Index of the maximum amplitude on the vertical component of the data
-imax = np.argmax(abs(hybd[0].data))
+<span class="c1"># Index of the maximum amplitude on the vertical component of the data</span>
+<span class="n">imax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">hybd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">))</span>
 
-# Cycle through both synthetic data and process them equally
-for trs in [prsd, twsd]:
-    jmax = np.argmax(abs(trs[0].data))  # maximum vertical amplitude
-    dt = hybd[0].times()[imax] - trs[0].times()[jmax]  # relative time shift of maximum
-    dt0 = hybd[0].stats.starttime - trs[0].stats.starttime  # absolute time difference
-    norm = hybd[0].data[imax] / trs[0].data[jmax]  # relative amplitude of vertical maximum
-    for tr in trs:
-        tr.stats.starttime += dt + dt0  # align peaks
-        tr.data *= norm  # normalize
-        tr.trim(t1, t2)  # cut around P-wave
-        if tr.stats.station == &quot;prs&quot;:
-            tr.stats.phase_amplitudes *= norm
+<span class="c1"># Cycle through both synthetic data and process them equally</span>
+<span class="k">for</span> <span class="n">trs</span> <span class="ow">in</span> <span class="p">[</span><span class="n">prsd</span><span class="p">,</span> <span class="n">twsd</span><span class="p">]:</span>
+    <span class="n">jmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">trs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">))</span>  <span class="c1"># maximum vertical amplitude</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="n">hybd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">times</span><span class="p">()[</span><span class="n">imax</span><span class="p">]</span> <span class="o">-</span> <span class="n">trs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">times</span><span class="p">()[</span><span class="n">jmax</span><span class="p">]</span>  <span class="c1"># relative time shift of maximum</span>
+    <span class="n">dt0</span> <span class="o">=</span> <span class="n">hybd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">starttime</span> <span class="o">-</span> <span class="n">trs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">starttime</span>  <span class="c1"># absolute time difference</span>
+    <span class="n">norm</span> <span class="o">=</span> <span class="n">hybd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">imax</span><span class="p">]</span> <span class="o">/</span> <span class="n">trs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">jmax</span><span class="p">]</span>  <span class="c1"># relative amplitude of vertical maximum</span>
+    <span class="k">for</span> <span class="n">tr</span> <span class="ow">in</span> <span class="n">trs</span><span class="p">:</span>
+        <span class="n">tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">starttime</span> <span class="o">+=</span> <span class="n">dt</span> <span class="o">+</span> <span class="n">dt0</span>  <span class="c1"># align peaks</span>
+        <span class="n">tr</span><span class="o">.</span><span class="n">data</span> <span class="o">*=</span> <span class="n">norm</span>  <span class="c1"># normalize</span>
+        <span class="n">tr</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">)</span>  <span class="c1"># cut around P-wave</span>
+        <span class="k">if</span> <span class="n">tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">station</span> <span class="o">==</span> <span class="s2">&quot;prs&quot;</span><span class="p">:</span>
+            <span class="n">tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">phase_amplitudes</span> <span class="o">*=</span> <span class="n">norm</span>
 </pre></div>
 </div>
 </section>
@@ -328,76 +340,76 @@ Hyderabad and the synthetic Telewavesim data. Note how the book-keeping
 infrastructure of <code class="docutils literal notranslate"><span class="pre">obspy.Trace</span></code> is used to store phase names, arrival
 times and amplitudes. These are used here to better interpret the
 seismograms.</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def plot(data, model):
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
 
-    lws = [4, 1]  # linewidths ...
-    cols = [&quot;darkgray&quot;, &quot;crimson&quot;]  # colors for data and model
+    <span class="n">lws</span> <span class="o">=</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>  <span class="c1"># linewidths ...</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;darkgray&quot;</span><span class="p">,</span> <span class="s2">&quot;crimson&quot;</span><span class="p">]</span>  <span class="c1"># colors for data and model</span>
 
-    # Subplot with 3 rows
-    fig, axs = mp.subplots(
-        nrows=3, ncols=1, figsize=(10, 6), tight_layout=True, sharex=True, sharey=True
-    )
+    <span class="c1"># Subplot with 3 rows</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span>
+        <span class="n">nrows</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">tight_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
 
-    # Cycle through components
-    for ax, dat, mod in zip(axs, data, model):
-        trs = [dat, mod]
+    <span class="c1"># Cycle through components</span>
+    <span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="n">dat</span><span class="p">,</span> <span class="n">mod</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">axs</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+        <span class="n">trs</span> <span class="o">=</span> <span class="p">[</span><span class="n">dat</span><span class="p">,</span> <span class="n">mod</span><span class="p">]</span>
 
-        # Cycle through data and model
-        for tr, lw, col in zip(trs, lws, cols):
-            ax.plot(
-                tr.times(),
-                tr.data,
-                label=tr.stats.station + &quot;.&quot; + tr.stats.channel,
-                lw=lw,
-                color=col,
-            )
+        <span class="c1"># Cycle through data and model</span>
+        <span class="k">for</span> <span class="n">tr</span><span class="p">,</span> <span class="n">lw</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">trs</span><span class="p">,</span> <span class="n">lws</span><span class="p">,</span> <span class="n">cols</span><span class="p">):</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                <span class="n">tr</span><span class="o">.</span><span class="n">times</span><span class="p">(),</span>
+                <span class="n">tr</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="n">tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">station</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">channel</span><span class="p">,</span>
+                <span class="n">lw</span><span class="o">=</span><span class="n">lw</span><span class="p">,</span>
+                <span class="n">color</span><span class="o">=</span><span class="n">col</span><span class="p">,</span>
+            <span class="p">)</span>
 
-            # Write phase info
-            if tr.stats.station == &quot;prs&quot;:
-                tim = np.nan
-                dy = 300
-                n = 1
-                # Time sorted, then reverse amplitude sorted
-                for pht, phn, phd, pha in sorted(
-                    zip(
-                        tr.stats.phase_times,
-                        tr.stats.phase_names,
-                        tr.stats.phase_descriptors,
-                        tr.stats.phase_amplitudes,
-                    ),
-                    key=lambda x: (x[0], -abs(x[3])),
-                ):
-                    # Plot all lables opposite of largest amplitude
-                    if abs(tim - pht) &lt; 1:
-                        n += 1
-                        pha = amp
-                    else:
-                        n = 1
-                    sign = -np.sign(pha)  # absolute amplitudes are here meaningless due to applied filter
-                    ax.text(pht, sign*n*dy, phn, ha=&quot;center&quot;, va=&quot;center&quot;)
-                    ax.text(pht, sign*3*dy + sign*n*dy, phd, ha=&quot;center&quot;, va=&quot;center&quot;)
-                    tim = pht
-                    amp = pha
+            <span class="c1"># Write phase info</span>
+            <span class="k">if</span> <span class="n">tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">station</span> <span class="o">==</span> <span class="s2">&quot;prs&quot;</span><span class="p">:</span>
+                <span class="n">tim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                <span class="n">dy</span> <span class="o">=</span> <span class="mi">300</span>
+                <span class="n">n</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="c1"># Time sorted, then reverse amplitude sorted</span>
+                <span class="k">for</span> <span class="n">pht</span><span class="p">,</span> <span class="n">phn</span><span class="p">,</span> <span class="n">phd</span><span class="p">,</span> <span class="n">pha</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span>
+                    <span class="nb">zip</span><span class="p">(</span>
+                        <span class="n">tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">phase_times</span><span class="p">,</span>
+                        <span class="n">tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">phase_names</span><span class="p">,</span>
+                        <span class="n">tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">phase_descriptors</span><span class="p">,</span>
+                        <span class="n">tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">phase_amplitudes</span><span class="p">,</span>
+                    <span class="p">),</span>
+                    <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">3</span><span class="p">])),</span>
+                <span class="p">):</span>
+                    <span class="c1"># Plot all lables opposite of largest amplitude</span>
+                    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">tim</span> <span class="o">-</span> <span class="n">pht</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="n">pha</span> <span class="o">=</span> <span class="n">amp</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">n</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="n">sign</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">pha</span><span class="p">)</span>  <span class="c1"># absolute amplitudes are here meaningless due to applied filter</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">pht</span><span class="p">,</span> <span class="n">sign</span><span class="o">*</span><span class="n">n</span><span class="o">*</span><span class="n">dy</span><span class="p">,</span> <span class="n">phn</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">)</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">pht</span><span class="p">,</span> <span class="n">sign</span><span class="o">*</span><span class="mi">3</span><span class="o">*</span><span class="n">dy</span> <span class="o">+</span> <span class="n">sign</span><span class="o">*</span><span class="n">n</span><span class="o">*</span><span class="n">dy</span><span class="p">,</span> <span class="n">phd</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">)</span>
+                    <span class="n">tim</span> <span class="o">=</span> <span class="n">pht</span>
+                    <span class="n">amp</span> <span class="o">=</span> <span class="n">pha</span>
 
-        ax.legend(frameon=False)
-        ax.set_axis_off()
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
 
-    # Only plot lowermost time axes
-    ax.set_axis_on()
-    ax.spines[[&quot;top&quot;, &quot;left&quot;, &quot;right&quot;, &quot;bottom&quot;]].set_visible(False)
-    ax.set_yticks([])
-    ax.set_xlabel(&quot;Time(s)&quot;)
+    <span class="c1"># Only plot lowermost time axes</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_on</span><span class="p">()</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">spines</span><span class="p">[[</span><span class="s2">&quot;top&quot;</span><span class="p">,</span> <span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">,</span> <span class="s2">&quot;bottom&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Time(s)&quot;</span><span class="p">)</span>
 
-    return fig
+    <span class="k">return</span> <span class="n">fig</span>
 </pre></div>
 </div>
 <section id="comparison-with-real-data">
 <h3>Comparison with real data<a class="headerlink" href="#comparison-with-real-data" title="Permalink to this heading"></a></h3>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>fig = plot(hybd, prsd)
-_ = fig.suptitle(&quot;Comparison between Pyraysum and seismogram recored at G.HYB&quot;)
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">plot</span><span class="p">(</span><span class="n">hybd</span><span class="p">,</span> <span class="n">prsd</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Comparison between Pyraysum and seismogram recored at G.HYB&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="../../_images/output_19_0.png" src="../../_images/output_19_0.png" />
+<img alt="../../_images/output_23_0.png" src="../../_images/output_23_0.png" />
 <p>The comparison with the real data shows that some complexity of the
 P-wave train can, in this simple example, be attributed to conversions
 and reflections of the seismic wave field in the cratonic crust. The
@@ -414,11 +426,11 @@ for subsurface properties instead of assuming them, as we did here.</p>
 </section>
 <section id="comparison-with-synthetic-data">
 <h3>Comparison with synthetic data<a class="headerlink" href="#comparison-with-synthetic-data" title="Permalink to this heading"></a></h3>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>fig = plot(twsd, prsd)
-_ = fig.suptitle(&quot;Comparison between PyRaysum and Telewavesim synthetics&quot;)
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">plot</span><span class="p">(</span><span class="n">twsd</span><span class="p">,</span> <span class="n">prsd</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Comparison between PyRaysum and Telewavesim synthetics&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="../../_images/output_22_0.png" src="../../_images/output_22_0.png" />
+<img alt="../../_images/output_26_0.png" src="../../_images/output_26_0.png" />
 <p>The comparison with synthetic data from Telewavesim shows a good match
 of the major phases. Note that the data need to be filtered, because raw
 telewavesim data suffer from aliasing at infinite frequencies.</p>
@@ -432,74 +444,73 @@ because the RC parameter <code class="docutils literal notranslate"><span class=
 multiples, i.e. reflections of the direct <em>P</em> wave. Reflections from
 <em>PS</em> are missing, most notably <em>PSpP</em>. To address this problem, we will
 next use the <code class="docutils literal notranslate"><span class="pre">RC.set_phaselist()</span></code> method to explicitly name the phases
-we wish to compute. The method implicitly sets <code class="docutils literal notranslate"><span class="pre">mults=3</span></code>.
-<code class="docutils literal notranslate"><span class="pre">Seismogram</span></code> has a dedicated method <code class="docutils literal notranslate"><span class="pre">descriptors()</span></code> to list unique
-phases present in the synthetic waveforms.</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>phl = seismogram.descriptors()
-eqp = prs.equivalent_phases(phl)
-print(&quot;Phases computed with mult=2:&quot;)
-print(phl)
-print()
-print(&quot;Dynamically equivalent phases:&quot;)
-print(eqp)
+we wish to compute. The method implicitly sets <code class="docutils literal notranslate"><span class="pre">mults=3</span></code>. <code class="docutils literal notranslate"><span class="pre">Result</span></code>
+has a dedicated method <code class="docutils literal notranslate"><span class="pre">descriptors()</span></code> to list unique phases present
+in the synthetic waveforms.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">phl</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">descriptors</span><span class="p">()</span>
+<span class="n">eqp</span> <span class="o">=</span> <span class="n">prs</span><span class="o">.</span><span class="n">equivalent_phases</span><span class="p">(</span><span class="n">phl</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Phases computed with mult=2:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">phl</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Dynamically equivalent phases:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">eqp</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Phases</span> <span class="n">computed</span> <span class="k">with</span> <span class="n">mult</span><span class="o">=</span><span class="mi">2</span><span class="p">:</span>
 <span class="p">[</span><span class="s1">&#39;1P0P&#39;</span><span class="p">,</span> <span class="s1">&#39;1P0P0p0P&#39;</span><span class="p">,</span> <span class="s1">&#39;1P0P0p0S&#39;</span><span class="p">,</span> <span class="s1">&#39;1P0P0s0S&#39;</span><span class="p">,</span> <span class="s1">&#39;1P0S&#39;</span><span class="p">]</span>
 
 <span class="n">Dynamically</span> <span class="n">equivalent</span> <span class="n">phases</span><span class="p">:</span>
-<span class="p">[</span><span class="s1">&#39;1P0S0s0P&#39;</span><span class="p">,</span> <span class="s1">&#39;1P0P0s0P&#39;</span><span class="p">,</span> <span class="s1">&#39;1P0S0p0P&#39;</span><span class="p">,</span> <span class="s1">&#39;1P0S0p0S&#39;</span><span class="p">]</span>
+<span class="p">[</span><span class="s1">&#39;1P0P0s0P&#39;</span><span class="p">,</span> <span class="s1">&#39;1P0S0p0P&#39;</span><span class="p">,</span> <span class="s1">&#39;1P0S0p0S&#39;</span><span class="p">,</span> <span class="s1">&#39;1P0S0s0P&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 <p>We will now set a phaselist that includes these phases using the
 <code class="docutils literal notranslate"><span class="pre">equivalent</span></code> option of <code class="docutils literal notranslate"><span class="pre">set_phaselist</span></code>.</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>rc.set_phaselist(phl, equivalent=True)
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ctrl</span><span class="o">.</span><span class="n">set_phaselist</span><span class="p">(</span><span class="n">phl</span><span class="p">,</span> <span class="n">equivalent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>And run <em>PyRaysum</em> and the post processing again:</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Run Raysum and get seismograms
-seismogram = prs.run(model, geom, rc)
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run Raysum and get seismograms</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">prs</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">geom</span><span class="p">,</span> <span class="n">ctrl</span><span class="p">)</span>
 
-# Extract first set of seismograms (element `0` in `streams`)
-prsd = seismogram.streams[0]
-prsd.filter(&quot;bandpass&quot;, freqmin=fmin, freqmax=fmax, zerophase=True)
+<span class="n">prsd</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">prsd</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="s2">&quot;bandpass&quot;</span><span class="p">,</span> <span class="n">freqmin</span><span class="o">=</span><span class="n">fmin</span><span class="p">,</span> <span class="n">freqmax</span><span class="o">=</span><span class="n">fmax</span><span class="p">,</span> <span class="n">zerophase</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-jmax = np.argmax(abs(prsd[0].data))  # maximum vertical amplitude
-dt = hybd[0].times()[imax] - prsd[0].times()[jmax]  # relative time shift of maximum
-dt0 = hybd[0].stats.starttime - prsd[0].stats.starttime  # absolute time difference
-norm = hybd[0].data[imax] / prsd[0].data[jmax]  # relative amplitude of vertical maximum
-for tr in prsd:
-    tr.stats.starttime += dt + dt0  # align peaks
-    tr.data *= norm  # normalize
-    tr.trim(t1, t2)  # cut around P-wave
-    if tr.stats.station == &quot;prs&quot;:
-        tr.stats.phase_amplitudes *= norm
+<span class="n">jmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">prsd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">))</span>  <span class="c1"># maximum vertical amplitude</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="n">hybd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">times</span><span class="p">()[</span><span class="n">imax</span><span class="p">]</span> <span class="o">-</span> <span class="n">prsd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">times</span><span class="p">()[</span><span class="n">jmax</span><span class="p">]</span>  <span class="c1"># relative time shift of maximum</span>
+<span class="n">dt0</span> <span class="o">=</span> <span class="n">hybd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">starttime</span> <span class="o">-</span> <span class="n">prsd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">starttime</span>  <span class="c1"># absolute time difference</span>
+<span class="n">norm</span> <span class="o">=</span> <span class="n">hybd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">imax</span><span class="p">]</span> <span class="o">/</span> <span class="n">prsd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">jmax</span><span class="p">]</span>  <span class="c1"># relative amplitude of vertical maximum</span>
+<span class="k">for</span> <span class="n">tr</span> <span class="ow">in</span> <span class="n">prsd</span><span class="p">:</span>
+    <span class="n">tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">starttime</span> <span class="o">+=</span> <span class="n">dt</span> <span class="o">+</span> <span class="n">dt0</span>  <span class="c1"># align peaks</span>
+    <span class="n">tr</span><span class="o">.</span><span class="n">data</span> <span class="o">*=</span> <span class="n">norm</span>  <span class="c1"># normalize</span>
+    <span class="n">tr</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">)</span>  <span class="c1"># cut around P-wave</span>
+    <span class="k">if</span> <span class="n">tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">station</span> <span class="o">==</span> <span class="s2">&quot;prs&quot;</span><span class="p">:</span>
+        <span class="n">tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">phase_amplitudes</span> <span class="o">*=</span> <span class="n">norm</span>
 
-fig = plot(twsd, prsd)
-_ = fig.suptitle(&quot;Comparison between PyRaysum and Telewavesim synthetics, including equivalent phases&quot;)
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot</span><span class="p">(</span><span class="n">twsd</span><span class="p">,</span> <span class="n">prsd</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Comparison between PyRaysum and Telewavesim synthetics, including equivalent phases&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="../../_images/output_29_0.png" src="../../_images/output_29_0.png" />
+<img alt="../../_images/output_33_0.png" src="../../_images/output_33_0.png" />
 <p>The amplitudes of the reflected phases are now better matched. To
 explore the actual amplitude contributions of the equivalent phases, we
 look them up in the metadata of the synthetic seismic trace:</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>print(&quot;Name, Time, Amplitude&quot;)
-f = &quot;{:4s}  {:&gt;4.1f}    {:&gt;7.0f}&quot;
-stats = prsd[0].stats
-for t, a, n in sorted(zip(stats.phase_times, stats.phase_amplitudes, stats.phase_names)):
-    print(f.format(n, t, a))
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Name, Time, Amplitude&quot;</span><span class="p">)</span>
+<span class="n">f</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{:4s}</span><span class="s2">  </span><span class="si">{:&gt;4.1f}</span><span class="s2">    </span><span class="si">{:&gt;7.3f}</span><span class="s2">&quot;</span>
+<span class="n">stats</span> <span class="o">=</span> <span class="n">prsd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">stats</span>
+<span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">stats</span><span class="o">.</span><span class="n">phase_times</span><span class="p">,</span> <span class="n">stats</span><span class="o">.</span><span class="n">phase_amplitudes</span><span class="p">,</span> <span class="n">stats</span><span class="o">.</span><span class="n">phase_names</span><span class="p">)):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">a</span><span class="p">))</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Name</span><span class="p">,</span> <span class="n">Time</span><span class="p">,</span> <span class="n">Amplitude</span>
-<span class="n">P</span>      <span class="mf">4.5</span>      <span class="mi">74495</span>
-<span class="n">PS</span>     <span class="mf">8.9</span>      <span class="o">-</span><span class="mi">2628</span>
-<span class="n">PpP</span>   <span class="mf">13.5</span>     <span class="o">-</span><span class="mi">10550</span>
-<span class="n">PsP</span>   <span class="mf">17.9</span>      <span class="o">-</span><span class="mi">6219</span>
-<span class="n">PpS</span>   <span class="mf">17.9</span>      <span class="o">-</span><span class="mi">2792</span>
-<span class="n">PSpP</span>  <span class="mf">17.9</span>        <span class="mi">829</span>
-<span class="n">PSsP</span>  <span class="mf">22.4</span>       <span class="o">-</span><span class="mi">966</span>
-<span class="n">PSpS</span>  <span class="mf">22.4</span>        <span class="mi">219</span>
-<span class="n">PsS</span>   <span class="mf">22.4</span>       <span class="mi">2648</span>
+<span class="n">P</span>      <span class="mf">4.5</span>      <span class="mf">1.830</span>
+<span class="n">PS</span>     <span class="mf">8.9</span>     <span class="o">-</span><span class="mf">0.065</span>
+<span class="n">PpP</span>   <span class="mf">13.5</span>     <span class="o">-</span><span class="mf">0.259</span>
+<span class="n">PsP</span>   <span class="mf">17.9</span>     <span class="o">-</span><span class="mf">0.153</span>
+<span class="n">PpS</span>   <span class="mf">17.9</span>     <span class="o">-</span><span class="mf">0.069</span>
+<span class="n">PSpP</span>  <span class="mf">17.9</span>      <span class="mf">0.020</span>
+<span class="n">PSsP</span>  <span class="mf">22.4</span>     <span class="o">-</span><span class="mf">0.024</span>
+<span class="n">PSpS</span>  <span class="mf">22.4</span>      <span class="mf">0.005</span>
+<span class="n">PsS</span>   <span class="mf">22.4</span>      <span class="mf">0.065</span>
 </pre></div>
 </div>
 </section>
@@ -540,7 +551,7 @@ structures: I. Theory. Physics of the Earth and Planetary interiors,
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2020, Pascal Audet.</p>
+    <p>&#169; Copyright 2022, Wasja Bloch, Pascal Audet.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

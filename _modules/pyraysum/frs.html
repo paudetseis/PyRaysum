@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyraysum.frs &mdash; pyraysum 0.3.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> pyraysum
+            <img src="../../_static/PyRaysum_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Quick Links</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../links.html">GitHub Repository</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../links.html#references">References</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../init.html">Licence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../init.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../init.html#usage">Usage</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html#modules">Modules</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/1/1_make_seismograms.html">Example 1: Compare PyRaysum with other synthetic and real data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/2/2_reproduce_Porter-2011.html">Example 2: Reproducing Receiver Functions for Dipping and Anisotropic Subsurface Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/3/3_invert_rf.html">Example 3: Invert a Receiver Function</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Jupyter Notebooks</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://nbviewer.jupyter.org/github/paudetseis/PyRaysum/blob/main/pyraysum/examples/notebooks/1_make_seismograms.ipynb">Example 1: Compare PyRaysum with other synthetic and real data</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://nbviewer.jupyter.org/github/paudetseis/PyRaysum/blob/main/pyraysum/examples/notebooks/2_reproduce_Porter-2011.ipynb">Example 2: Reproducing Figure 2 in Porter et al. (2011)</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://nbviewer.jupyter.org/github/paudetseis/PyRaysum/blob/main/pyraysum/examples/notebooks/3_invert_rf.ipynb">Example 3: Invert a receiver function</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pyraysum</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pyraysum.frs</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyraysum.frs</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2022 Wasja Bloch, Pascal Audet</span>
+
+<span class="c1"># This file is part of PyRaysum.</span>
+
+<span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
+<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># in the Software without restriction, including without limitation the rights</span>
+<span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
+<span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
+<span class="c1"># furnished to do so, subject to the following conditions:</span>
+
+<span class="c1"># The above copyright notice and this permission notice shall be included in</span>
+<span class="c1"># all copies or substantial portions of the Software.</span>
+
+<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
+<span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
+<span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
+<span class="c1"># LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span>
+<span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
+<span class="c1"># SOFTWARE.</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">signal</span>
+<span class="kn">from</span> <span class="nn">obspy</span> <span class="kn">import</span> <span class="n">Trace</span><span class="p">,</span> <span class="n">Stream</span><span class="p">,</span> <span class="n">UTCDateTime</span>
+<span class="kn">from</span> <span class="nn">numpy.fft</span> <span class="kn">import</span> <span class="n">fft</span><span class="p">,</span> <span class="n">ifft</span><span class="p">,</span> <span class="n">fftshift</span>
+
+<span class="c1"># Here to avoid circular import</span>
+<span class="n">_phnames</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;P&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="s2">&quot;p&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="s2">&quot;s&quot;</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="s2">&quot;t&quot;</span><span class="p">}</span>
+
+
+<div class="viewcode-block" id="read_traces"><a class="viewcode-back" href="../../api.html#pyraysum.frs.read_traces">[docs]</a><span class="k">def</span> <span class="nf">read_traces</span><span class="p">(</span><span class="n">traces</span><span class="p">,</span> <span class="n">rc</span><span class="p">,</span> <span class="n">geometry</span><span class="p">,</span> <span class="n">arrivals</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a :class:`Result` from the array produced by :meth:`fraysum.run_bare()`</span>
+<span class="sd">    and :meth:`fraysum.run_full`.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        rc (:class:`Control`):</span>
+<span class="sd">            Run-control parameters</span>
+<span class="sd">        geometry (:class:`Geometry`):</span>
+<span class="sd">            Ray parameters</span>
+<span class="sd">        arrivals (list):</span>
+<span class="sd">            Output of :meth:`read_arrivals`. List of arrival times, amplitudes, and</span>
+<span class="sd">            names</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list:</span>
+<span class="sd">            List of :class:`obspy.Stream` objects</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">npts</span> <span class="o">=</span> <span class="n">rc</span><span class="o">.</span><span class="n">npts</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="n">rc</span><span class="o">.</span><span class="n">dt</span>
+    <span class="n">rot</span> <span class="o">=</span> <span class="n">rc</span><span class="o">.</span><span class="n">rot</span>
+    <span class="n">shift</span> <span class="o">=</span> <span class="n">rc</span><span class="o">.</span><span class="n">shift</span>
+    <span class="n">ntr</span> <span class="o">=</span> <span class="n">geometry</span><span class="o">.</span><span class="n">ntr</span>
+
+    <span class="c1"># Crop unused overhang of oversized fortran arrays</span>
+    <span class="n">trs</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">traces</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:</span><span class="n">npts</span><span class="p">,</span> <span class="p">:</span><span class="n">ntr</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">npts</span> <span class="o">*</span> <span class="n">ntr</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">),</span>
+        <span class="n">traces</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="n">npts</span><span class="p">,</span> <span class="p">:</span><span class="n">ntr</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">npts</span> <span class="o">*</span> <span class="n">ntr</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">),</span>
+        <span class="n">traces</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:</span><span class="n">npts</span><span class="p">,</span> <span class="p">:</span><span class="n">ntr</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">npts</span> <span class="o">*</span> <span class="n">ntr</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">),</span>
+    <span class="p">]</span>
+
+    <span class="n">itr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">npts</span> <span class="o">*</span> <span class="p">[</span><span class="n">tr</span><span class="p">]</span> <span class="k">for</span> <span class="n">tr</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ntr</span><span class="p">)])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">npts</span> <span class="o">*</span> <span class="n">ntr</span><span class="p">)</span>
+
+    <span class="c1"># Component names</span>
+    <span class="k">if</span> <span class="n">rot</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># Rotate to seismometer convention</span>
+        <span class="n">component</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;E&quot;</span><span class="p">,</span> <span class="s2">&quot;Z&quot;</span><span class="p">]</span>
+        <span class="n">order</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">rot</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">component</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="s2">&quot;Z&quot;</span><span class="p">]</span>
+        <span class="n">order</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">rot</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">component</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;P&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">]</span>
+        <span class="n">order</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid value for &quot;rot&quot;: Must be 0, 1, 2&#39;</span><span class="p">))</span>
+
+    <span class="n">taxis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">npts</span><span class="p">)</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">-</span> <span class="n">shift</span>
+
+    <span class="n">streams</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">iitr</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ntr</span><span class="p">):</span>
+
+        <span class="c1"># Split by trace ID</span>
+        <span class="n">istr</span> <span class="o">=</span> <span class="n">itr</span> <span class="o">==</span> <span class="n">iitr</span>
+
+        <span class="c1"># Store into trace by component with stats information</span>
+        <span class="n">stream</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">ic</span> <span class="ow">in</span> <span class="n">order</span><span class="p">:</span>
+            <span class="n">stats</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;baz&quot;</span><span class="p">:</span> <span class="n">geometry</span><span class="p">[</span><span class="n">iitr</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                <span class="s2">&quot;slow&quot;</span><span class="p">:</span> <span class="n">geometry</span><span class="p">[</span><span class="n">iitr</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                <span class="s2">&quot;station&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;network&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;starttime&quot;</span><span class="p">:</span> <span class="n">UTCDateTime</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+                <span class="s2">&quot;delta&quot;</span><span class="p">:</span> <span class="n">dt</span><span class="p">,</span>
+                <span class="s2">&quot;channel&quot;</span><span class="p">:</span> <span class="s2">&quot;SY&quot;</span> <span class="o">+</span> <span class="n">component</span><span class="p">[</span><span class="n">ic</span><span class="p">],</span>
+                <span class="s2">&quot;taxis&quot;</span><span class="p">:</span> <span class="n">taxis</span><span class="p">,</span>
+            <span class="p">}</span>
+
+            <span class="k">if</span> <span class="n">arrivals</span><span class="p">:</span>
+                <span class="n">stats</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                    <span class="p">{</span>
+                        <span class="s2">&quot;phase_times&quot;</span><span class="p">:</span> <span class="n">arrivals</span><span class="p">[</span><span class="n">iitr</span><span class="p">][</span><span class="n">ic</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                        <span class="s2">&quot;phase_amplitudes&quot;</span><span class="p">:</span> <span class="n">arrivals</span><span class="p">[</span><span class="n">iitr</span><span class="p">][</span><span class="n">ic</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                        <span class="s2">&quot;phase_descriptors&quot;</span><span class="p">:</span> <span class="n">arrivals</span><span class="p">[</span><span class="n">iitr</span><span class="p">][</span><span class="n">ic</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span>
+                        <span class="s2">&quot;phase_names&quot;</span><span class="p">:</span> <span class="n">arrivals</span><span class="p">[</span><span class="n">iitr</span><span class="p">][</span><span class="n">ic</span><span class="p">][</span><span class="mi">3</span><span class="p">],</span>
+                        <span class="s2">&quot;conversion_names&quot;</span><span class="p">:</span> <span class="n">arrivals</span><span class="p">[</span><span class="n">iitr</span><span class="p">][</span><span class="n">ic</span><span class="p">][</span><span class="mi">4</span><span class="p">],</span>
+                    <span class="p">}</span>
+                <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">rot</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">component</span><span class="p">[</span><span class="n">ic</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;Z&quot;</span><span class="p">:</span>
+                <span class="c1"># Raysum has z down, change here to z up</span>
+                <span class="n">tr</span> <span class="o">=</span> <span class="n">Trace</span><span class="p">(</span><span class="n">data</span><span class="o">=-</span><span class="n">trs</span><span class="p">[</span><span class="n">ic</span><span class="p">][</span><span class="n">istr</span><span class="p">],</span> <span class="n">header</span><span class="o">=</span><span class="n">stats</span><span class="p">)</span>
+                <span class="n">tr</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">phase_amplitudes</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">tr</span> <span class="o">=</span> <span class="n">Trace</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">trs</span><span class="p">[</span><span class="n">ic</span><span class="p">][</span><span class="n">istr</span><span class="p">],</span> <span class="n">header</span><span class="o">=</span><span class="n">stats</span><span class="p">)</span>
+
+            <span class="n">stream</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tr</span><span class="p">)</span>
+
+        <span class="c1"># Store into Stream object and append to list</span>
+        <span class="n">streams</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">streams</span></div>
+
+
+<div class="viewcode-block" id="read_arrivals"><a class="viewcode-back" href="../../api.html#pyraysum.frs.read_arrivals">[docs]</a><span class="k">def</span> <span class="nf">read_arrivals</span><span class="p">(</span><span class="n">ttimes</span><span class="p">,</span> <span class="n">amplitudes</span><span class="p">,</span> <span class="n">phaselist</span><span class="p">,</span> <span class="n">geometry</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert the :const:`phaselist`, :const:`amplitude` and :const:`traveltime` output of</span>
+<span class="sd">    :meth:`fraysum.run_full()` to lists of phase arrival times, amplitudes, long phase</span>
+<span class="sd">    descriptors, short phase names, and conversion names.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        ttimes (np.array):</span>
+<span class="sd">            Travel time array ...</span>
+<span class="sd">        amplitudes (np.array):</span>
+<span class="sd">            Amplitude array ...</span>
+<span class="sd">        phaselist (np.array):</span>
+<span class="sd">            Phase identifier array returned by :func:`fraysum.run_full`</span>
+<span class="sd">        geometry (:class:`prs.Geometry`):</span>
+<span class="sd">            Ray geometry</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list:</span>
+<span class="sd">            3-component phase arrival lists, where indices translate to:</span>
+
+<span class="sd">            * :const:`0`: phase arrival times</span>
+<span class="sd">            * :const:`1`: phase amplitudes</span>
+<span class="sd">            * :const:`2`: (long) phase descriptors, e.g. &quot;1P0S&quot;</span>
+<span class="sd">            * :const:`3`: (short) phase names, e.g. &quot;PS&quot;</span>
+<span class="sd">            * :const:`4`: (intermediate) conversion names, e.g. &quot;P1S&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">dscrs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">phnms</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">convs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">iph</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">phaselist</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:])):</span>
+        <span class="n">dscr</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">phnm</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">conv</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">iseg</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">phaselist</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])):</span>
+            <span class="k">if</span> <span class="n">phaselist</span><span class="p">[</span><span class="n">iseg</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">iph</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># No more reflections / conversions</span>
+                <span class="n">dscrs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dscr</span><span class="p">)</span>
+                <span class="n">phnms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">phnm</span><span class="p">)</span>
+                <span class="n">convs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">conv</span><span class="p">)</span>
+                <span class="k">break</span>
+
+            <span class="n">phid</span> <span class="o">=</span> <span class="n">phaselist</span><span class="p">[</span><span class="n">iseg</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">iph</span><span class="p">]</span>
+            <span class="n">layn</span> <span class="o">=</span> <span class="n">phaselist</span><span class="p">[</span><span class="n">iseg</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">iph</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>  <span class="c1"># Python indexing</span>
+
+            <span class="n">phn</span> <span class="o">=</span> <span class="n">_phnames</span><span class="p">[</span><span class="n">phid</span><span class="p">]</span>
+            <span class="n">dscr</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">layn</span><span class="p">)</span> <span class="o">+</span> <span class="n">phn</span>
+
+            <span class="k">if</span> <span class="n">phn</span><span class="o">.</span><span class="n">isupper</span><span class="p">():</span>
+                <span class="c1"># Upward-conversion at top of layer below</span>
+                <span class="n">con</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">layn</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">phn</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">con</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">layn</span><span class="p">)</span> <span class="o">+</span> <span class="n">phn</span>
+
+            <span class="c1"># Omit not-converted segment from phase name and conversions</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">phnm</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">phn</span><span class="p">:</span>
+                    <span class="n">phn</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                    <span class="n">con</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                <span class="n">con</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+            <span class="c1"># Always prefix incoming wavetype to conversions</span>
+            <span class="k">if</span> <span class="n">iseg</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">con</span> <span class="o">=</span> <span class="n">phn</span>
+
+            <span class="n">phnm</span> <span class="o">+=</span> <span class="n">phn</span>
+            <span class="n">conv</span> <span class="o">+=</span> <span class="n">con</span>
+
+        <span class="k">if</span> <span class="n">phaselist</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">iph</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">break</span>
+
+    <span class="n">nphs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dscrs</span><span class="p">)</span>
+
+    <span class="n">dscrs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dscrs</span><span class="p">)</span>
+    <span class="n">phnms</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">phnms</span><span class="p">)</span>
+    <span class="n">convs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">convs</span><span class="p">)</span>
+
+    <span class="n">tanss</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">itr</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">geometry</span><span class="o">.</span><span class="n">ntr</span><span class="p">):</span>
+        <span class="n">tans</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">amplitudes</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])):</span>
+            <span class="n">amps</span> <span class="o">=</span> <span class="n">amplitudes</span><span class="p">[</span><span class="n">comp</span><span class="p">,</span> <span class="p">:</span><span class="n">nphs</span><span class="p">,</span> <span class="n">itr</span><span class="p">]</span>
+            <span class="n">ia</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">amps</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-6</span>  <span class="c1"># Dismiss 0 amplitude arrivals</span>
+            <span class="n">tans</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                    <span class="p">[</span><span class="n">ttimes</span><span class="p">[:</span><span class="n">nphs</span><span class="p">,</span> <span class="n">itr</span><span class="p">][</span><span class="n">ia</span><span class="p">],</span> <span class="n">amps</span><span class="p">[</span><span class="n">ia</span><span class="p">],</span> <span class="n">dscrs</span><span class="p">[</span><span class="n">ia</span><span class="p">],</span> <span class="n">phnms</span><span class="p">[</span><span class="n">ia</span><span class="p">],</span> <span class="n">convs</span><span class="p">[</span><span class="n">ia</span><span class="p">]],</span>
+                    <span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="n">tanss</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tans</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">tanss</span></div>
+
+
+<div class="viewcode-block" id="make_array"><a class="viewcode-back" href="../../api.html#pyraysum.frs.make_array">[docs]</a><span class="k">def</span> <span class="nf">make_array</span><span class="p">(</span><span class="n">geometry</span><span class="p">,</span> <span class="n">rc</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Initialize array for `NumPy`-based post processing</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        geometry (:class:`prs.Geometry`):</span>
+<span class="sd">            Recording geometry</span>
+<span class="sd">        rc (:class:`prs.Control`):</span>
+<span class="sd">            Run-control parameters</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        :const:`numpy.zeros((geometry.ntr, 2, rc.npts))`:</span>
+<span class="sd">            Array in shape to be used by :meth:`filterd_rf_array` and</span>
+<span class="sd">            :meth:`filtered_array`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">geometry</span><span class="o">.</span><span class="n">ntr</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">rc</span><span class="o">.</span><span class="n">npts</span><span class="p">))</span></div>
+
+
+<span class="n">cached_coefficients</span> <span class="o">=</span> <span class="p">{}</span>
+
+
+<span class="k">def</span> <span class="nf">_get_cached_bandpass_coefs</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="n">corners</span><span class="p">):</span>
+    <span class="c1"># from pyrocko.Trace.filter</span>
+    <span class="n">ck</span> <span class="o">=</span> <span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">corners</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">ck</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cached_coefficients</span><span class="p">:</span>
+        <span class="n">cached_coefficients</span><span class="p">[</span><span class="n">ck</span><span class="p">]</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">butter</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="n">corners</span><span class="p">,</span> <span class="n">btype</span><span class="o">=</span><span class="s2">&quot;band&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">cached_coefficients</span><span class="p">[</span><span class="n">ck</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="filtered_rf_array"><a class="viewcode-back" href="../../api.html#pyraysum.frs.filtered_rf_array">[docs]</a><span class="k">def</span> <span class="nf">filtered_rf_array</span><span class="p">(</span><span class="n">traces</span><span class="p">,</span> <span class="n">rfarray</span><span class="p">,</span> <span class="n">ntr</span><span class="p">,</span> <span class="n">npts</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">fmin</span><span class="p">,</span> <span class="n">fmax</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fast, `NumPy`-based, receiver function computation and filtering of</span>
+<span class="sd">    :meth:`fraysum.run_bare()` output</span>
+
+<span class="sd">    Roughly equivalent to subsequent calls to :func:`read_traces()`,</span>
+<span class="sd">    :meth:`Result.calculate_rfs()` and :meth:`Result.filter()`, stripped down</span>
+<span class="sd">    for computational efficiency, for use in inversion/probabilistic approaches.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        traces (np.ndarray):</span>
+<span class="sd">            Output of :meth:`fraysum.run_bare()`</span>
+<span class="sd">        rfarray (np.ndarray):</span>
+<span class="sd">            Initialized array of shape (ntr, 2, npts) to store output (See:</span>
+<span class="sd">            :func:`make_array()`)</span>
+<span class="sd">        ntr (int):</span>
+<span class="sd">            Number of traces (:attr:`Geometry.ntr`)</span>
+<span class="sd">        npts (int):</span>
+<span class="sd">            Number of points per trace (:attr:`Control.npts`)</span>
+<span class="sd">        dt (float):</span>
+<span class="sd">            Sampling interval (:attr:`Control.dt`)</span>
+<span class="sd">        fmin (float):</span>
+<span class="sd">            Lower bandpass frequency corner (Hz)</span>
+<span class="sd">        fmax (float):</span>
+<span class="sd">            Upper bandpass frequency corner (Hz)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None:</span>
+<span class="sd">            Output is written to :const:`rfarray`</span>
+
+<span class="sd">    Warning:</span>
+<span class="sd">        Assumes PVH alignment (ray-polarization), i.e. :attr:`Control.rot=2`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">order</span> <span class="o">=</span> <span class="mi">2</span>
+
+    <span class="k">def</span> <span class="nf">_bandpass</span><span class="p">(</span><span class="n">arr</span><span class="p">):</span>
+        <span class="c1"># from pyrocko.Trace.filter</span>
+        <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span> <span class="o">=</span> <span class="n">_get_cached_bandpass_coefs</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">fmin</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">fmax</span><span class="p">))</span>
+        <span class="n">arr</span> <span class="o">-=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+        <span class="n">firstpass</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">lfilter</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">arr</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">signal</span><span class="o">.</span><span class="n">lfilter</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">firstpass</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># Crop unused overhang of oversized fortran arrays and transpose to</span>
+    <span class="c1"># [traces[components[samples]]] order</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">traces</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:</span><span class="n">npts</span><span class="p">,</span> <span class="p">:</span><span class="n">ntr</span><span class="p">],</span> <span class="n">traces</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="n">npts</span><span class="p">,</span> <span class="p">:</span><span class="n">ntr</span><span class="p">],</span> <span class="n">traces</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:</span><span class="n">npts</span><span class="p">,</span> <span class="p">:</span><span class="n">ntr</span><span class="p">]]</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">trace</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="n">ft_ztr</span> <span class="o">=</span> <span class="n">fft</span><span class="p">(</span><span class="n">trace</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>  <span class="c1"># P or R or N</span>
+        <span class="n">ft_rfr</span> <span class="o">=</span> <span class="n">fft</span><span class="p">(</span><span class="n">trace</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>  <span class="c1"># V or T or E</span>
+        <span class="n">ft_rft</span> <span class="o">=</span> <span class="n">fft</span><span class="p">(</span><span class="n">trace</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>  <span class="c1"># H or Z or Z</span>
+
+        <span class="c1"># assuming PVH:</span>
+        <span class="n">rfarray</span><span class="p">[</span><span class="n">n</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">_bandpass</span><span class="p">(</span><span class="n">fftshift</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">ifft</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">ft_rfr</span><span class="p">,</span> <span class="n">ft_ztr</span><span class="p">)))))</span>
+        <span class="n">rfarray</span><span class="p">[</span><span class="n">n</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">_bandpass</span><span class="p">(</span><span class="n">fftshift</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">ifft</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">ft_rft</span><span class="p">,</span> <span class="n">ft_ztr</span><span class="p">)))))</span></div>
+
+
+<div class="viewcode-block" id="filtered_array"><a class="viewcode-back" href="../../api.html#pyraysum.frs.filtered_array">[docs]</a><span class="k">def</span> <span class="nf">filtered_array</span><span class="p">(</span><span class="n">traces</span><span class="p">,</span> <span class="n">rfarray</span><span class="p">,</span> <span class="n">ntr</span><span class="p">,</span> <span class="n">npts</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">fmin</span><span class="p">,</span> <span class="n">fmax</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fast, `NumPy`-based filtering of :meth:`fraysum.run_bare()` output</span>
+
+<span class="sd">    Roughly equivalent to subsequent calls to :func:`read_traces()`, and</span>
+<span class="sd">    :meth:`Result.filter()`, stripped down for computational efficiency,</span>
+<span class="sd">    for use in inversion/probabilistic approaches.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        traces (np.ndarray):</span>
+<span class="sd">            Output of :meth:`fraysum.run_bare()`</span>
+<span class="sd">        rfarray (np.ndarray):</span>
+<span class="sd">            Initialized array of shape (ntr, 2, npts) to store output (See:</span>
+<span class="sd">            :func:`make_array()`)</span>
+<span class="sd">        ntr (int):</span>
+<span class="sd">            Number of traces (:attr:`Geometry.ntr`)</span>
+<span class="sd">        npts (int):</span>
+<span class="sd">            Number of points per trace (:attr:`Control.npts`)</span>
+<span class="sd">        dt (float):</span>
+<span class="sd">            Sampling intervall (:attr:`Control.dt`)</span>
+<span class="sd">        fmin (float):</span>
+<span class="sd">            Lower bandpass frequency corner (Hz)</span>
+<span class="sd">        fmax (float):</span>
+<span class="sd">            Upper bandpass frequency corner (Hz)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None:</span>
+<span class="sd">            Output is written to :const:`rfarray`</span>
+
+<span class="sd">    Warning:</span>
+<span class="sd">        Assumes PVH alignment (ray-polarization), i.e. :attr:`Control.rot=2`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">npts2</span> <span class="o">=</span> <span class="n">npts</span> <span class="o">//</span> <span class="mi">2</span>
+    <span class="n">rem</span> <span class="o">=</span> <span class="n">npts</span> <span class="o">%</span> <span class="mi">2</span>
+
+    <span class="n">order</span> <span class="o">=</span> <span class="mi">2</span>
+
+    <span class="k">def</span> <span class="nf">_bandpass</span><span class="p">(</span><span class="n">arr</span><span class="p">):</span>
+        <span class="c1"># from pyrocko.Trace.filter</span>
+        <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span> <span class="o">=</span> <span class="n">_get_cached_bandpass_coefs</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">fmin</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">fmax</span><span class="p">))</span>
+        <span class="n">arr</span> <span class="o">-=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+        <span class="n">firstpass</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">lfilter</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">arr</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">signal</span><span class="o">.</span><span class="n">lfilter</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">firstpass</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># Crop unused overhang of oversized fortran arrays and transpose to</span>
+    <span class="c1"># [traces[components[samples]]] order</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">traces</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:</span><span class="n">npts</span><span class="p">,</span> <span class="p">:</span><span class="n">ntr</span><span class="p">],</span> <span class="n">traces</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="n">npts</span><span class="p">,</span> <span class="p">:</span><span class="n">ntr</span><span class="p">],</span> <span class="n">traces</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:</span><span class="n">npts</span><span class="p">,</span> <span class="p">:</span><span class="n">ntr</span><span class="p">]]</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">trace</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="c1"># assuming PVH:</span>
+        <span class="n">rfarray</span><span class="p">[</span><span class="n">n</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">npts2</span><span class="p">:]</span> <span class="o">=</span> <span class="n">_bandpass</span><span class="p">(</span><span class="n">trace</span><span class="p">[</span><span class="mi">1</span><span class="p">][:</span> <span class="n">npts2</span> <span class="o">+</span> <span class="n">rem</span><span class="p">])</span>  <span class="c1"># SV</span>
+        <span class="n">rfarray</span><span class="p">[</span><span class="n">n</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">npts2</span><span class="p">:]</span> <span class="o">=</span> <span class="n">_bandpass</span><span class="p">(</span><span class="n">trace</span><span class="p">[</span><span class="mi">2</span><span class="p">][:</span> <span class="n">npts2</span> <span class="o">+</span> <span class="n">rem</span><span class="p">])</span>  <span class="c1"># SH</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Wasja Bloch, Pascal Audet.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

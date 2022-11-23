@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyraysum.plot &mdash; pyraysum 0.2.0 documentation</title>
+  <title>pyraysum.plot &mdash; pyraysum 0.3.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -78,9 +79,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-      <li>pyraysum.plot</li>
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pyraysum.plot</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -90,7 +91,7 @@
            <div itemprop="articleBody">
              
   <h1>Source code for pyraysum.plot</h1><div class="highlight"><pre>
-<span></span><span class="c1"># Copyright 2020 Pascal Audet</span>
+<span></span><span class="c1"># Copyright 2022 Wasja Bloch, Pascal Audet</span>
 
 <span class="c1"># This file is part of PyRaysum.</span>
 
@@ -171,7 +172,7 @@
 
 
 <div class="viewcode-block" id="rf_wiggles"><a class="viewcode-back" href="../../api.html#pyraysum.plot.rf_wiggles">[docs]</a><span class="k">def</span> <span class="nf">rf_wiggles</span><span class="p">(</span><span class="n">rflist</span><span class="p">,</span> <span class="n">btyp</span><span class="o">=</span><span class="s1">&#39;baz&#39;</span><span class="p">,</span> <span class="n">wvtype</span><span class="o">=</span><span class="s1">&#39;P&#39;</span><span class="p">,</span> <span class="n">pws</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=-</span><span class="mf">5.</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
-               <span class="n">scale</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pcolor</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">ncolor</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+               <span class="n">scale</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pcolor</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">ncolor</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">axs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                <span class="n">ftitle</span><span class="o">=</span><span class="s1">&#39;Figure_rf_wiggle&#39;</span><span class="p">,</span>
                <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;png&#39;</span><span class="p">,</span> <span class="n">plot_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;linewidth&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="s1">&#39;black&#39;</span><span class="p">},</span>
                <span class="n">figure_kwargs</span><span class="o">=</span><span class="p">{}):</span>
@@ -179,7 +180,7 @@
 <span class="sd">    Plot receiver function seismograms sorted by back-azimuth or slowness.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        rflist (list or prs.Seismogram):</span>
+<span class="sd">        rflist (list or prs.Result):</span>
 <span class="sd">            list of `obspy.core.Stream &lt;https://tinyurl.com/3u8dv8s8&gt;`_ objects </span>
 <span class="sd">            containing receiver functions</span>
 <span class="sd">        btyp (str):</span>
@@ -196,6 +197,14 @@
 <span class="sd">            Amplitude scaling factor</span>
 <span class="sd">        save (bool):</span>
 <span class="sd">            Whether or not to save the figure</span>
+<span class="sd">        axs (4*tuple):</span>
+<span class="sd">            matplotlib axes to place the subplots.</span>
+<span class="sd">            </span>
+<span class="sd">                * axs[0]: radial stack</span>
+<span class="sd">                * axs[1]: radial section</span>
+<span class="sd">                * axs[2]: transverse stack</span>
+<span class="sd">                * axs[3]: transverse section</span>
+
 <span class="sd">        pcolor (str):</span>
 <span class="sd">            Color to fill positive wiggles</span>
 <span class="sd">        ncolor (str):</span>
@@ -234,14 +243,18 @@
     <span class="n">time</span> <span class="o">=</span> <span class="n">str1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">taxis</span>
 
     <span class="c1"># Initialize figure</span>
-    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="o">**</span><span class="n">figure_kwargs</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">axs</span><span class="p">:</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="o">**</span><span class="n">figure_kwargs</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
 
-    <span class="c1"># Get more control on subplots</span>
-    <span class="n">ax1</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.825</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">])</span>
-    <span class="n">ax2</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">])</span>
-    <span class="n">ax3</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">0.45</span><span class="p">,</span> <span class="mf">0.825</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">])</span>
-    <span class="n">ax4</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">0.45</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">])</span>
+        <span class="c1"># Get more control on subplots</span>
+        <span class="n">ax1</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.825</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">])</span>
+        <span class="n">ax2</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">])</span>
+        <span class="n">ax3</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">0.45</span><span class="p">,</span> <span class="mf">0.825</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">])</span>
+        <span class="n">ax4</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">0.45</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">,</span> <span class="n">ax3</span><span class="p">,</span> <span class="n">ax4</span> <span class="o">=</span> <span class="n">axs</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">ax1</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span>
 
     <span class="c1"># Plot stack of all traces from str1 on top left</span>
     <span class="n">ax1</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="n">tr1</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="n">tr1</span><span class="o">.</span><span class="n">data</span><span class="o">+</span><span class="mf">1e-6</span> <span class="o">&lt;=</span> <span class="mf">0.</span><span class="p">,</span>
@@ -344,14 +357,14 @@
 
 
 <div class="viewcode-block" id="stream_wiggles"><a class="viewcode-back" href="../../api.html#pyraysum.plot.stream_wiggles">[docs]</a><span class="k">def</span> <span class="nf">stream_wiggles</span><span class="p">(</span><span class="n">streamlist</span><span class="p">,</span> <span class="n">btyp</span><span class="o">=</span><span class="s1">&#39;baz&#39;</span><span class="p">,</span> <span class="n">wvtype</span><span class="o">=</span><span class="s1">&#39;P&#39;</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=-</span><span class="mf">5.</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="mf">20.</span><span class="p">,</span>
-                   <span class="n">scale</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pcolor</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">ncolor</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ftitle</span><span class="o">=</span><span class="s1">&#39;Figure_pw_wiggles&#39;</span><span class="p">,</span>
+                   <span class="n">scale</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pcolor</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">ncolor</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">axs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ftitle</span><span class="o">=</span><span class="s1">&#39;Figure_pw_wiggles&#39;</span><span class="p">,</span>
                    <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;png&#39;</span><span class="p">,</span> <span class="n">plot_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;linewidth&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="s1">&#39;black&#39;</span><span class="p">},</span>
                    <span class="n">figure_kwargs</span><span class="o">=</span><span class="p">{}):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Plot displacement seismograms sorted by back-azimuth or slowness.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        streamlist (list or prs.Seismogram):</span>
+<span class="sd">        streamlist (list or prs.Result):</span>
 <span class="sd">            list of `obspy.core.Stream &lt;https://tinyurl.com/3u8dv8s8&gt;`_ objects </span>
 <span class="sd">            containing displacement seismograms</span>
 <span class="sd">        btyp (str):</span>
@@ -370,6 +383,13 @@
 <span class="sd">            Color to fill negative wiggles</span>
 <span class="sd">        save (bool):</span>
 <span class="sd">            Whether or not to save the figure</span>
+<span class="sd">        axs (3*tuple):</span>
+<span class="sd">            matplotlib axes to place the subplots.</span>
+<span class="sd">            </span>
+<span class="sd">                * axs[0]: P or R section</span>
+<span class="sd">                * axs[1]: V or T section</span>
+<span class="sd">                * axs[2]: H or Z section</span>
+
 <span class="sd">        ftitle (str):</span>
 <span class="sd">            Filename of figure to be saved (without format suffix, see fmt)</span>
 <span class="sd">        fmt (str):</span>
@@ -399,15 +419,19 @@
     <span class="n">time</span> <span class="o">=</span> <span class="n">str1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">taxis</span>
 
     <span class="c1"># Initialize figure</span>
-    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="o">**</span><span class="n">figure_kwargs</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">axs</span><span class="p">:</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="o">**</span><span class="n">figure_kwargs</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
 
-    <span class="c1"># Get more control on subplots</span>
-    <span class="n">ax1</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.83</span><span class="p">])</span>
-    <span class="n">ax2</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.83</span><span class="p">])</span>
-    <span class="n">ax3</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.83</span><span class="p">])</span>
+        <span class="c1"># Get more control on subplots</span>
+        <span class="n">ax1</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.83</span><span class="p">])</span>
+        <span class="n">ax2</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.83</span><span class="p">])</span>
+        <span class="n">ax3</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.83</span><span class="p">])</span>
+        <span class="n">axes</span> <span class="o">=</span> <span class="p">[</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">,</span> <span class="n">ax3</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">axes</span> <span class="o">=</span> <span class="n">axs</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">ax1</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span>
 
-    <span class="n">axes</span> <span class="o">=</span> <span class="p">[</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">,</span> <span class="n">ax3</span><span class="p">]</span>
     <span class="n">streams</span> <span class="o">=</span> <span class="p">[</span><span class="n">str1</span><span class="p">,</span> <span class="n">str2</span><span class="p">,</span> <span class="n">str3</span><span class="p">]</span>
 
     <span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="n">st</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">streams</span><span class="p">):</span>
@@ -471,10 +495,10 @@
         <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">ls</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
 
     <span class="c1"># Remove labels on axes 2 and 3</span>
-    <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-    <span class="n">ax3</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-    <span class="n">ax2</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(())</span>
-    <span class="n">ax3</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(())</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(())</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(())</span>
 
     <span class="k">if</span> <span class="n">save</span><span class="p">:</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">ftitle</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="o">+</span><span class="n">fmt</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">fmt</span><span class="p">)</span>
@@ -490,8 +514,8 @@
 <span class="sd">    Plots 3-component wiggles.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        stream (`obspy.core.Stream &lt;https://tinyurl.com/3u8dv8s8&gt;`_):</span>
-<span class="sd">            Stream containing 3 traces</span>
+<span class="sd">        stream (:class:`~obspy.core.Stream`):</span>
+<span class="sd">            `obspy.core.Stream &lt;https://tinyurl.com/3u8dv8s8&gt;`_ containing 3 traces</span>
 <span class="sd">        tmin (float):</span>
 <span class="sd">            Lower bound of time axis (s)</span>
 <span class="sd">        tmax (float, optional):</span>
@@ -566,7 +590,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2020, Pascal Audet.</p>
+    <p>&#169; Copyright 2022, Wasja Bloch, Pascal Audet.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
