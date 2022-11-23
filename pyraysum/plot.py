@@ -1,4 +1,4 @@
-# Copyright 2020 Pascal Audet
+# Copyright 2022 Wasja Bloch, Pascal Audet
 
 # This file is part of PyRaysum.
 
@@ -421,8 +421,8 @@ def seis_wiggles(stream, tmin=-5., tmax=20., save=False,
     Plots 3-component wiggles.
 
     Args:
-        stream (`obspy.core.Stream <https://tinyurl.com/3u8dv8s8>`_):
-            Stream containing 3 traces
+        stream (:class:`~obspy.core.Stream`):
+            `obspy.core.Stream <https://tinyurl.com/3u8dv8s8>`_ containing 3 traces
         tmin (float):
             Lower bound of time axis (s)
         tmax (float, optional):

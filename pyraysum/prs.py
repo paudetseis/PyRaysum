@@ -107,7 +107,7 @@ class Model(object):
           Maximum number of layers defined in params.h
 
     Warning:
-        When setting :att:`vpvs`, :att:`vs` is adjusted to satisfy vs = vp / vpvs.
+        When setting `vpvs`, `vs` is adjusted to satisfy vs = vp / vpvs.
 
     The following attributes are set upon initialization and when executing
     :meth:`update()`. `f` prefixes indicate attributes used for interaction with
