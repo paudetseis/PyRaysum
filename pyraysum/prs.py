@@ -192,7 +192,7 @@ class Model(object):
         vpvs=1.73,
         maxlay=15,
     ):
-        def _get_val(v):
+        def _array(v):
             if v is not None:
                 return np.array(
                     [v] * self.nlay if isinstance(v, (int, float)) else v, dtype=float
@@ -205,25 +205,25 @@ class Model(object):
         except TypeError:
             self.nlay = 1
 
-        self._thickn = _get_val(thickn)
-        self._rho = _get_val(rho)
-        self._vp = _get_val(vp)
+        self._thickn = _array(thickn)
+        self._rho = _array(rho)
+        self._vp = _array(vp)
 
         if vs is None:
-            self._vpvs = _get_val(vpvs)
+            self._vpvs = _array(vpvs)
             self._vs = self._vp / self._vpvs
         else:
-            self._vs = _get_val(vs)
+            self._vs = _array(vs)
             self._vpvs = self._vp / self._vs
 
         self._flag = np.array(
             [flag] * self.nlay if isinstance(flag, int) else list(flag)
         )
-        self._ani = _get_val(ani)
-        self._trend = _get_val(trend)
-        self._plunge = _get_val(plunge)
-        self._strike = _get_val(strike)
-        self._dip = _get_val(dip)
+        self._ani = _array(ani)
+        self._trend = _array(trend)
+        self._plunge = _array(plunge)
+        self._strike = _array(strike)
+        self._dip = _array(dip)
 
         self.maxlay = maxlay
 
@@ -242,6 +242,117 @@ class Model(object):
         ]
         self._properties = ["_" + prop for prop in self.properties]
 
+        self._set_fattributes()
+        self._set_layers()
+
+    @property
+    def thickn(self):
+        return self._thickn
+
+    @thickn.setter
+    def thickn(self, value):
+        self._thickn = value
+        self._set_fattributes()
+        self._set_layers()
+
+    @property
+    def rho(self):
+        return self._rho
+
+    @rho.setter
+    def rho(self, value):
+        self._rho = value
+        self._set_fattributes()
+        self._set_layers()
+
+    @property
+    def vp(self):
+        return self._vp
+
+    @vp.setter
+    def vp(self, value):
+        self._vp = value
+        self._set_fattributes()
+        self._set_layers()
+
+    @property
+    def vpvs(self):
+        return self._vpvs
+
+    @vpvs.setter
+    def vpvs(self, value):
+        self._vpvs = value
+        self._set_fattributes()
+        self._set_layers()
+        self._update("vs")
+
+    @property
+    def vs(self):
+        return self._vs
+
+    @vs.setter
+    def vs(self, value):
+        self._vs = value
+        self._set_fattributes()
+        self._set_layers()
+
+    @property
+    def flag(self):
+        return self._flag
+
+    @flag.setter
+    def flag(self, value):
+        self._flag = value
+        self._set_fattributes()
+        self._set_layers()
+
+    @property
+    def ani(self):
+        return self._ani
+
+    @ani.setter
+    def ani(self, value):
+        self._ani = value
+        self._set_fattributes()
+        self._set_layers()
+
+    @property
+    def trend(self):
+        return self._trend
+
+    @trend.setter
+    def trend(self, value):
+        self._trend = value
+        self._set_fattributes()
+        self._set_layers()
+
+    @property
+    def plunge(self):
+        return self._plunge
+
+    @plunge.setter
+    def plunge(self, value):
+        self._plunge = value
+        self._set_fattributes()
+        self._set_layers()
+
+    @property
+    def strike(self):
+        return self._strike
+
+    @strike.setter
+    def strike(self, value):
+        self._strike = value
+        self._set_fattributes()
+        self._set_layers()
+
+    @property
+    def dip(self):
+        return self._dip
+
+    @dip.setter
+    def dip(self, value):
+        self._dip = value
         self._set_fattributes()
         self._set_layers()
 
