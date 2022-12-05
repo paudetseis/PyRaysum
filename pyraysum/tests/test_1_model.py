@@ -74,8 +74,13 @@ def test_getitem_setitem_add():
     model2[1, "plunge"] = 10
     assert model2[1]["plunge"] == 10
     assert model2[1, "plunge"] == 10
+    assert model2.plunge[1] == 10
     assert model2._plunge[1] == 10
     assert model2.fplunge[1] == 10 * np.pi / 180
+    
+    # @property.setter
+    model2.plunge[1] = 20
+    assert model2.plunge[1] == 20
 
     # Does anisotropy flag get (de-)activated automatically?
     model1[0, "ani"] = 10
@@ -84,6 +89,12 @@ def test_getitem_setitem_add():
     model1[0, "ani"] = 0
     assert model1[0]["ani"] == 0
     assert model1[0]["flag"] == 1
+
+    model1.ani[0] = 10
+    assert model1.ani[0] == 10
+
+    model1.ani[0] = 0
+    assert model1.ani[0] == 0
 
     model2[2] = {"plunge": 15, "thickn": 10000}
     assert model2[2, "plunge"] == 15
@@ -98,6 +109,10 @@ def test_getitem_setitem_add():
     assert model3[0, "thickn"] == model1[0, "thickn"]
     assert model3[3, "thickn"] == model2[0, "thickn"]
     assert model3[5, "thickn"] == model2[2, "thickn"]
+
+    assert model3.thickn[0] == model1.thickn[0]
+    assert model3.thickn[3]== model2.thickn[0]
+    assert model3.thickn[5] == model2.thickn[2]
 
     model4 = model1 + {"thickn": 5000, "rho": 3000, "vp": 6000}
     assert model4[3, "thickn"] == 5000

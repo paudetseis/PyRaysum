@@ -34,8 +34,10 @@ import fraysum
 from . import plot
 from .frs import read_arrivals, read_traces, _phnames
 
-_align = {0: "None", 1: "P", 2: "SV", 3: "SH"}
-_rot = {0: "ZNE", 1: "RTZ", 2: "PVH"}
+_alignn = {0: "none", 1: "P", 2: "SV", 3: "SH"}  # alignment name
+_aligni = {_alignn[k]: k for k in _alignn}  # alignment ID
+_rotn = {0: "ZNE", 1: "RTZ", 2: "PVH"}  # rotation name
+_roti = {_rotn[k]: k for k in _rotn}  # rotation ID
 _iphase = {"P": 1, "SV": 2, "SH": 3}
 _phids = {_phnames[k]: k for k in _phnames}  # inverse dictionary, imported in core
 _modhint = (
@@ -109,9 +111,10 @@ class Model(object):
     Warning:
         When setting `vpvs`, `vs` is adjusted to satisfy vs = vp / vpvs.
 
-    The following attributes are set upon initialization and when executing
-    :meth:`update()`. `f` prefixes indicate attributes used for interaction with
-    `fraysum.run_bare()` and `fraysum.run_full()`.
+    The following attributes are set upon initialization and when setting any of
+    the above model attributes. `f` prefixes indicate attributes used for
+    interaction with `fraysum.run_bare()` and `fraysum.run_full()`. Set these
+    directly for best performance.
 
         nlay
           Number of layers
@@ -192,7 +195,7 @@ class Model(object):
         vpvs=1.73,
         maxlay=15,
     ):
-        def _get_val(v):
+        def _array(v):
             if v is not None:
                 return np.array(
                     [v] * self.nlay if isinstance(v, (int, float)) else v, dtype=float
@@ -205,25 +208,25 @@ class Model(object):
         except TypeError:
             self.nlay = 1
 
-        self._thickn = _get_val(thickn)
-        self._rho = _get_val(rho)
-        self._vp = _get_val(vp)
+        self._thickn = _array(thickn)
+        self._rho = _array(rho)
+        self._vp = _array(vp)
 
         if vs is None:
-            self._vpvs = _get_val(vpvs)
+            self._vpvs = _array(vpvs)
             self._vs = self._vp / self._vpvs
         else:
-            self._vs = _get_val(vs)
+            self._vs = _array(vs)
             self._vpvs = self._vp / self._vs
 
         self._flag = np.array(
             [flag] * self.nlay if isinstance(flag, int) else list(flag)
         )
-        self._ani = _get_val(ani)
-        self._trend = _get_val(trend)
-        self._plunge = _get_val(plunge)
-        self._strike = _get_val(strike)
-        self._dip = _get_val(dip)
+        self._ani = _array(ani)
+        self._trend = _array(trend)
+        self._plunge = _array(plunge)
+        self._strike = _array(strike)
+        self._dip = _array(dip)
 
         self.maxlay = maxlay
 
@@ -242,6 +245,117 @@ class Model(object):
         ]
         self._properties = ["_" + prop for prop in self.properties]
 
+        self._set_fattributes()
+        self._set_layers()
+
+    @property
+    def thickn(self):
+        return self._thickn
+
+    @thickn.setter
+    def thickn(self, value):
+        self._thickn = value
+        self._set_fattributes()
+        self._set_layers()
+
+    @property
+    def rho(self):
+        return self._rho
+
+    @rho.setter
+    def rho(self, value):
+        self._rho = value
+        self._set_fattributes()
+        self._set_layers()
+
+    @property
+    def vp(self):
+        return self._vp
+
+    @vp.setter
+    def vp(self, value):
+        self._vp = value
+        self._set_fattributes()
+        self._set_layers()
+
+    @property
+    def vpvs(self):
+        return self._vpvs
+
+    @vpvs.setter
+    def vpvs(self, value):
+        self._vpvs = value
+        self._set_fattributes()
+        self._set_layers()
+        self._update("vs")
+
+    @property
+    def vs(self):
+        return self._vs
+
+    @vs.setter
+    def vs(self, value):
+        self._vs = value
+        self._set_fattributes()
+        self._set_layers()
+
+    @property
+    def flag(self):
+        return self._flag
+
+    @flag.setter
+    def flag(self, value):
+        self._flag = value
+        self._set_fattributes()
+        self._set_layers()
+
+    @property
+    def ani(self):
+        return self._ani
+
+    @ani.setter
+    def ani(self, value):
+        self._ani = value
+        self._set_fattributes()
+        self._set_layers()
+
+    @property
+    def trend(self):
+        return self._trend
+
+    @trend.setter
+    def trend(self, value):
+        self._trend = value
+        self._set_fattributes()
+        self._set_layers()
+
+    @property
+    def plunge(self):
+        return self._plunge
+
+    @plunge.setter
+    def plunge(self, value):
+        self._plunge = value
+        self._set_fattributes()
+        self._set_layers()
+
+    @property
+    def strike(self):
+        return self._strike
+
+    @strike.setter
+    def strike(self, value):
+        self._strike = value
+        self._set_fattributes()
+        self._set_layers()
+
+    @property
+    def dip(self):
+        return self._dip
+
+    @dip.setter
+    def dip(self, value):
+        self._dip = value
         self._set_fattributes()
         self._set_layers()
 
@@ -1227,24 +1341,28 @@ class Control(object):
         align (int):
             ID for time alignment of seismograms
 
-                * 0: do not align
-                * 1: align at `P`
-                * 2: align at `SV`
-                * 3: align at `SH`
+                * 0 or "none": do not align
+                * 1 or "P": align at `P`
+                * 2 or "SV": align at `SV`
+                * 3 or "SH": align at `SH`
 
         shift (float or None):
             Time shift in seconds (positive shift moves seismograms
             to greater lags). If ``None``, set to :attr:`dt`, to include direct wave when
             :const:`align` > 0.
-        rot (int):
+        rot (int or str):
             ID for rotation:
 
-                * 0: ZNE (up, north, east [left-handed]);
-                * 1: RTZ (radial, transverse, down [positive towards source])
-                * 2: PVH (P-, SH-, SV-polarization [positive in ray direction])
+                * 0 or "ZNE": up, north, east [left-handed]
+                * 1 or "RTZ": radial, transverse, down [positive towards source]
+                * 2 or "PVH": P-, SH-, SV-polarization [positive in ray direction]
 
-        verbose (int):
-            Verbosity. :const:`0` - silent; :const:`1` - verbose
+        verbose (int or bool):
+            Verbosity:
+
+                * :const:`0` or :const:`False`: silent
+                * :const:`1` or :const:`True`: verbose
+
         maxseg (int):
             Maximum number of segments per ray, as defined in param.h
         maxtr (int):
@@ -1283,18 +1401,17 @@ class Control(object):
         maxsamp=100000,
     ):
 
-        self.parameters = [0] * 17  # Allocate for setters
-        self.verbose = int(verbose)
-        self.wvtype = wvtype
-        self.mults = int(mults)
-        self.npts = int(npts)
-        self.dt = float(dt)
-        self.align = int(align)
-        self.rot = int(rot)
+        self._verbose = int(verbose)
+        self._wvtype = wvtype
+        self._mults = int(mults)
+        self._npts = int(npts)
+        self._dt = float(dt)
+        self._align = int(align)
+        self._rot = int(rot)
         if shift is None:
-            self.shift = self.dt
+            self._shift = self._dt
         else:
-            self.shift = float(shift)
+            self._shift = float(shift)
 
         self._iphase = _iphase[self.wvtype]
         self._numph = np.int32(0)
@@ -1306,7 +1423,7 @@ class Control(object):
             np.zeros((maxseg, 2, maxph), dtype=np.int32)
         )
         self._nseg = np.asfortranarray(np.zeros(maxph), dtype=np.int32)
-        self.update()
+        self._update()
 
     @property
     def verbose(self):
@@ -1314,7 +1431,7 @@ class Control(object):
 
     @verbose.setter
     def verbose(self, value):
-        if value not in [0, 1, "0", "1"]:
+        if value not in [0, 1, "0", "1", True, False]:
             msg = "verbose must be 0 or 1, not: " + str(value)
             raise ValueError(msg)
         self._verbose = int(value)
@@ -1370,10 +1487,19 @@ class Control(object):
 
     @align.setter
     def align(self, value):
-        if value not in [0, 1, 2, 3, "0", "1", "2", "3"]:
-            msg = "align must be 0, 1, 2, or 3, not: " + str(value)
+        alignids = [*_aligni] + [*_alignn]
+        if value not in alignids:
+            msg = (
+                "align must be "
+                + ", ".join([str(alignid) for alignid in alignids])
+                + ". Not: "
+                + str(value)
+            )
             raise ValueError(msg)
-        self._align = int(value)
+        try:
+            self._align = _aligni[value]
+        except KeyError:
+            self._align = int(value)
         self.parameters[4] = self._align
 
     @property
@@ -1382,10 +1508,19 @@ class Control(object):
 
     @rot.setter
     def rot(self, value):
-        if value not in [0, 1, 2, "0", "1", "2"]:
-            msg = "rot must be 0, 1, or 2, not: " + str(value)
+        rotids = [*_roti] + [*_rotn]
+        if value not in rotids:
+            msg = (
+                "rot must be: "
+                + ", ".join([str(rotid) for rotid in rotids])
+                + ". Not: "
+                + str(value)
+            )
             raise ValueError(msg)
-        self._rot = int(value)
+        try:
+            self._rot = _roti[value]
+        except KeyError:
+            self._rot = int(value)
         self.parameters[6] = self._rot
 
     @property
@@ -1410,11 +1545,11 @@ class Control(object):
         out += "Sample rate (seconds): "
         out += "{:}\n".format(self.dt)
         out += "Alignment: "
-        out += "{:}\n".format(_align[self.align])
+        out += "{:}\n".format(_alignn[self.align])
         out += "Shift of traces (seconds): "
         out += "{:}\n".format(self.shift)
         out += "Rotation to output: "
-        out += "{:}".format(_rot[self.rot])
+        out += "{:}".format(_rotn[self.rot])
         return out
 
     def _prs_str(self):
@@ -1518,7 +1653,7 @@ class Control(object):
                 self._phaselist[iseg, 0, iph] = layn + 1  # Fortran indexing
                 self._phaselist[iseg, 1, iph] = phid
 
-        self.update()
+        self._update()
 
     def null_phaselist(self, mults=2):
         """
@@ -1539,7 +1674,7 @@ class Control(object):
         )
         self.mults = mults
 
-    def update(self):
+    def _update(self):
         """
         Explicitly update :attr:`parameters`
         """
@@ -1635,7 +1770,7 @@ class Result(object):
     def __str__(self):
         msg = "Result contains:\n"
         msg += "{:d} synthetic {:}-seismogram(s)\n".format(
-            len(self.streams), _rot[self.rc.rot]
+            len(self.streams), _rotn[self.rc.rot]
         )
         msg += "{:d} synthetic receiver function(s)\n".format(len(self.rfs))
         if self.model:
