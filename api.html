@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Classes &mdash; pyraysum 0.3.0 documentation</title>
+  <title>Classes &mdash; pyraysum 0.3.1 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -86,7 +86,6 @@
 <li class="toctree-l4"><a class="reference internal" href="#pyraysum.prs.Control.parameters"><code class="docutils literal notranslate"><span class="pre">Control.parameters</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pyraysum.prs.Control.set_phaselist"><code class="docutils literal notranslate"><span class="pre">Control.set_phaselist()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pyraysum.prs.Control.null_phaselist"><code class="docutils literal notranslate"><span class="pre">Control.null_phaselist()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyraysum.prs.Control.update"><code class="docutils literal notranslate"><span class="pre">Control.update()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pyraysum.prs.Control.save"><code class="docutils literal notranslate"><span class="pre">Control.save()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pyraysum.prs.Control.write"><code class="docutils literal notranslate"><span class="pre">Control.write()</span></code></a></li>
 </ul>
@@ -220,9 +219,10 @@ Defaults to 1.73. Ignored if <code class="xref py py-const docutils literal notr
 <p class="admonition-title">Warning</p>
 <p>When setting <cite>vpvs</cite>, <cite>vs</cite> is adjusted to satisfy vs = vp / vpvs.</p>
 </div>
-<p>The following attributes are set upon initialization and when executing
-<code class="xref py py-meth docutils literal notranslate"><span class="pre">update()</span></code>. <cite>f</cite> prefixes indicate attributes used for interaction with
-<cite>fraysum.run_bare()</cite> and <cite>fraysum.run_full()</cite>.</p>
+<p>The following attributes are set upon initialization and when setting any of
+the above model attributes. <cite>f</cite> prefixes indicate attributes used for
+interaction with <cite>fraysum.run_bare()</cite> and <cite>fraysum.run_full()</cite>. Set these
+directly for best performance.</p>
 <blockquote>
 <div><dl class="simple">
 <dt>nlay</dt><dd><p>Number of layers</p>
@@ -636,26 +636,33 @@ by <cite>fraysum.run_bare()</cite> and <cite>fraysum.run_full()</cite></p>
 <li><p><strong>align</strong> (<em>int</em>) – <p>ID for time alignment of seismograms</p>
 <blockquote>
 <div><ul>
-<li><p>0: do not align</p></li>
-<li><p>1: align at <cite>P</cite></p></li>
-<li><p>2: align at <cite>SV</cite></p></li>
-<li><p>3: align at <cite>SH</cite></p></li>
+<li><p>0 or “none”: do not align</p></li>
+<li><p>1 or “P”: align at <cite>P</cite></p></li>
+<li><p>2 or “SV”: align at <cite>SV</cite></p></li>
+<li><p>3 or “SH”: align at <cite>SH</cite></p></li>
 </ul>
 </div></blockquote>
 </p></li>
 <li><p><strong>shift</strong> (<em>float</em><em> or </em><em>None</em>) – Time shift in seconds (positive shift moves seismograms
 to greater lags). If <code class="docutils literal notranslate"><span class="pre">None</span></code>, set to <code class="xref py py-attr docutils literal notranslate"><span class="pre">dt</span></code>, to include direct wave when
 <code class="xref py py-const docutils literal notranslate"><span class="pre">align</span></code> &gt; 0.</p></li>
-<li><p><strong>rot</strong> (<em>int</em>) – <p>ID for rotation:</p>
+<li><p><strong>rot</strong> (<em>int</em><em> or </em><em>str</em>) – <p>ID for rotation:</p>
 <blockquote>
 <div><ul>
-<li><p>0: ZNE (up, north, east [left-handed]);</p></li>
-<li><p>1: RTZ (radial, transverse, down [positive towards source])</p></li>
-<li><p>2: PVH (P-, SH-, SV-polarization [positive in ray direction])</p></li>
+<li><p>0 or “ZNE”: up, north, east [left-handed]</p></li>
+<li><p>1 or “RTZ”: radial, transverse, down [positive towards source]</p></li>
+<li><p>2 or “PVH”: P-, SH-, SV-polarization [positive in ray direction]</p></li>
 </ul>
 </div></blockquote>
 </p></li>
-<li><p><strong>verbose</strong> (<em>int</em>) – Verbosity. <code class="xref py py-const docutils literal notranslate"><span class="pre">0</span></code> - silent; <code class="xref py py-const docutils literal notranslate"><span class="pre">1</span></code> - verbose</p></li>
+<li><p><strong>verbose</strong> (<em>int</em><em> or </em><em>bool</em>) – <p>Verbosity:</p>
+<blockquote>
+<div><ul>
+<li><p><code class="xref py py-const docutils literal notranslate"><span class="pre">0</span></code> or <code class="xref py py-const docutils literal notranslate"><span class="pre">False</span></code>: silent</p></li>
+<li><p><code class="xref py py-const docutils literal notranslate"><span class="pre">1</span></code> or <code class="xref py py-const docutils literal notranslate"><span class="pre">True</span></code>: verbose</p></li>
+</ul>
+</div></blockquote>
+</p></li>
 <li><p><strong>maxseg</strong> (<em>int</em>) – Maximum number of segments per ray, as defined in param.h</p></li>
 <li><p><strong>maxtr</strong> (<em>int</em>) – Maximum number of traces, as defined in param.h</p></li>
 <li><p><strong>maxph</strong> (<em>int</em>) – Maximum number of phases per trace, as defined in param.h</p></li>
@@ -743,12 +750,6 @@ contributions of equivalent phases may be missing.</p>
 <dd class="field-odd"><p><strong>mults</strong> (<em>int</em>) – Set <code class="xref py py-attr docutils literal notranslate"><span class="pre">Control.mults</span></code> to this value.</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pyraysum.prs.Control.update">
-<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyraysum/prs.html#Control.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyraysum.prs.Control.update" title="Permalink to this definition"></a></dt>
-<dd><p>Explicitly update <a class="reference internal" href="#pyraysum.prs.Control.parameters" title="pyraysum.prs.Control.parameters"><code class="xref py py-attr docutils literal notranslate"><span class="pre">parameters</span></code></a></p>
 </dd></dl>
 
 <dl class="py method">

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyraysum.prs &mdash; pyraysum 0.3.0 documentation</title>
+  <title>pyraysum.prs &mdash; pyraysum 0.3.1 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -127,8 +127,10 @@
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">plot</span>
 <span class="kn">from</span> <span class="nn">.frs</span> <span class="kn">import</span> <span class="n">read_arrivals</span><span class="p">,</span> <span class="n">read_traces</span><span class="p">,</span> <span class="n">_phnames</span>
 
-<span class="n">_align</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;None&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;P&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="s2">&quot;SV&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="s2">&quot;SH&quot;</span><span class="p">}</span>
-<span class="n">_rot</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;ZNE&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;RTZ&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="s2">&quot;PVH&quot;</span><span class="p">}</span>
+<span class="n">_alignn</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;P&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="s2">&quot;SV&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="s2">&quot;SH&quot;</span><span class="p">}</span>  <span class="c1"># alignment name</span>
+<span class="n">_aligni</span> <span class="o">=</span> <span class="p">{</span><span class="n">_alignn</span><span class="p">[</span><span class="n">k</span><span class="p">]:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">_alignn</span><span class="p">}</span>  <span class="c1"># alignment ID</span>
+<span class="n">_rotn</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;ZNE&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;RTZ&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="s2">&quot;PVH&quot;</span><span class="p">}</span>  <span class="c1"># rotation name</span>
+<span class="n">_roti</span> <span class="o">=</span> <span class="p">{</span><span class="n">_rotn</span><span class="p">[</span><span class="n">k</span><span class="p">]:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">_rotn</span><span class="p">}</span>  <span class="c1"># rotation ID</span>
 <span class="n">_iphase</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;P&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;SV&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;SH&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">}</span>
 <span class="n">_phids</span> <span class="o">=</span> <span class="p">{</span><span class="n">_phnames</span><span class="p">[</span><span class="n">k</span><span class="p">]:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">_phnames</span><span class="p">}</span>  <span class="c1"># inverse dictionary, imported in core</span>
 <span class="n">_modhint</span> <span class="o">=</span> <span class="p">(</span>
@@ -202,9 +204,10 @@
 <span class="sd">    Warning:</span>
 <span class="sd">        When setting `vpvs`, `vs` is adjusted to satisfy vs = vp / vpvs.</span>
 
-<span class="sd">    The following attributes are set upon initialization and when executing</span>
-<span class="sd">    :meth:`update()`. `f` prefixes indicate attributes used for interaction with</span>
-<span class="sd">    `fraysum.run_bare()` and `fraysum.run_full()`.</span>
+<span class="sd">    The following attributes are set upon initialization and when setting any of</span>
+<span class="sd">    the above model attributes. `f` prefixes indicate attributes used for</span>
+<span class="sd">    interaction with `fraysum.run_bare()` and `fraysum.run_full()`. Set these</span>
+<span class="sd">    directly for best performance.</span>
 
 <span class="sd">        nlay</span>
 <span class="sd">          Number of layers</span>
@@ -285,7 +288,7 @@
         <span class="n">vpvs</span><span class="o">=</span><span class="mf">1.73</span><span class="p">,</span>
         <span class="n">maxlay</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="k">def</span> <span class="nf">_get_val</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">_array</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
                     <span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nlay</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span> <span class="k">else</span> <span class="n">v</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span>
@@ -298,25 +301,25 @@
         <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">nlay</span> <span class="o">=</span> <span class="mi">1</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_thickn</span> <span class="o">=</span> <span class="n">_get_val</span><span class="p">(</span><span class="n">thickn</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_rho</span> <span class="o">=</span> <span class="n">_get_val</span><span class="p">(</span><span class="n">rho</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_vp</span> <span class="o">=</span> <span class="n">_get_val</span><span class="p">(</span><span class="n">vp</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_thickn</span> <span class="o">=</span> <span class="n">_array</span><span class="p">(</span><span class="n">thickn</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rho</span> <span class="o">=</span> <span class="n">_array</span><span class="p">(</span><span class="n">rho</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vp</span> <span class="o">=</span> <span class="n">_array</span><span class="p">(</span><span class="n">vp</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">vs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_vpvs</span> <span class="o">=</span> <span class="n">_get_val</span><span class="p">(</span><span class="n">vpvs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_vpvs</span> <span class="o">=</span> <span class="n">_array</span><span class="p">(</span><span class="n">vpvs</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_vs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vp</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vpvs</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_vs</span> <span class="o">=</span> <span class="n">_get_val</span><span class="p">(</span><span class="n">vs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_vs</span> <span class="o">=</span> <span class="n">_array</span><span class="p">(</span><span class="n">vs</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_vpvs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vp</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vs</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_flag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
             <span class="p">[</span><span class="n">flag</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nlay</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">flag</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">else</span> <span class="nb">list</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_ani</span> <span class="o">=</span> <span class="n">_get_val</span><span class="p">(</span><span class="n">ani</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_trend</span> <span class="o">=</span> <span class="n">_get_val</span><span class="p">(</span><span class="n">trend</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_plunge</span> <span class="o">=</span> <span class="n">_get_val</span><span class="p">(</span><span class="n">plunge</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_strike</span> <span class="o">=</span> <span class="n">_get_val</span><span class="p">(</span><span class="n">strike</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_dip</span> <span class="o">=</span> <span class="n">_get_val</span><span class="p">(</span><span class="n">dip</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ani</span> <span class="o">=</span> <span class="n">_array</span><span class="p">(</span><span class="n">ani</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_trend</span> <span class="o">=</span> <span class="n">_array</span><span class="p">(</span><span class="n">trend</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_plunge</span> <span class="o">=</span> <span class="n">_array</span><span class="p">(</span><span class="n">plunge</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_strike</span> <span class="o">=</span> <span class="n">_array</span><span class="p">(</span><span class="n">strike</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dip</span> <span class="o">=</span> <span class="n">_array</span><span class="p">(</span><span class="n">dip</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">maxlay</span> <span class="o">=</span> <span class="n">maxlay</span>
 
@@ -335,6 +338,117 @@
         <span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_properties</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">prop</span> <span class="k">for</span> <span class="n">prop</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">]</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_fattributes</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_layers</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">thickn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_thickn</span>
+
+    <span class="nd">@thickn</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">thickn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_thickn</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_fattributes</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_layers</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">rho</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rho</span>
+
+    <span class="nd">@rho</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">rho</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rho</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_fattributes</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_layers</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">vp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vp</span>
+
+    <span class="nd">@vp</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">vp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vp</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_fattributes</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_layers</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">vpvs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vpvs</span>
+
+    <span class="nd">@vpvs</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">vpvs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vpvs</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_fattributes</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_layers</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="s2">&quot;vs&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">vs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vs</span>
+
+    <span class="nd">@vs</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">vs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vs</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_fattributes</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_layers</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flag</span>
+
+    <span class="nd">@flag</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">flag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_flag</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_fattributes</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_layers</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ani</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ani</span>
+
+    <span class="nd">@ani</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">ani</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ani</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_fattributes</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_layers</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">trend</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trend</span>
+
+    <span class="nd">@trend</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">trend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_trend</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_fattributes</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_layers</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">plunge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plunge</span>
+
+    <span class="nd">@plunge</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">plunge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_plunge</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_fattributes</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_layers</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">strike</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_strike</span>
+
+    <span class="nd">@strike</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">strike</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_strike</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_fattributes</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_layers</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">dip</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dip</span>
+
+    <span class="nd">@dip</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">dip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dip</span> <span class="o">=</span> <span class="n">value</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_fattributes</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_layers</span><span class="p">()</span>
 
@@ -1320,24 +1434,28 @@
 <span class="sd">        align (int):</span>
 <span class="sd">            ID for time alignment of seismograms</span>
 
-<span class="sd">                * 0: do not align</span>
-<span class="sd">                * 1: align at `P`</span>
-<span class="sd">                * 2: align at `SV`</span>
-<span class="sd">                * 3: align at `SH`</span>
+<span class="sd">                * 0 or &quot;none&quot;: do not align</span>
+<span class="sd">                * 1 or &quot;P&quot;: align at `P`</span>
+<span class="sd">                * 2 or &quot;SV&quot;: align at `SV`</span>
+<span class="sd">                * 3 or &quot;SH&quot;: align at `SH`</span>
 
 <span class="sd">        shift (float or None):</span>
 <span class="sd">            Time shift in seconds (positive shift moves seismograms</span>
 <span class="sd">            to greater lags). If ``None``, set to :attr:`dt`, to include direct wave when</span>
 <span class="sd">            :const:`align` &gt; 0.</span>
-<span class="sd">        rot (int):</span>
+<span class="sd">        rot (int or str):</span>
 <span class="sd">            ID for rotation:</span>
 
-<span class="sd">                * 0: ZNE (up, north, east [left-handed]);</span>
-<span class="sd">                * 1: RTZ (radial, transverse, down [positive towards source])</span>
-<span class="sd">                * 2: PVH (P-, SH-, SV-polarization [positive in ray direction])</span>
+<span class="sd">                * 0 or &quot;ZNE&quot;: up, north, east [left-handed]</span>
+<span class="sd">                * 1 or &quot;RTZ&quot;: radial, transverse, down [positive towards source]</span>
+<span class="sd">                * 2 or &quot;PVH&quot;: P-, SH-, SV-polarization [positive in ray direction]</span>
 
-<span class="sd">        verbose (int):</span>
-<span class="sd">            Verbosity. :const:`0` - silent; :const:`1` - verbose</span>
+<span class="sd">        verbose (int or bool):</span>
+<span class="sd">            Verbosity:</span>
+
+<span class="sd">                * :const:`0` or :const:`False`: silent</span>
+<span class="sd">                * :const:`1` or :const:`True`: verbose</span>
+
 <span class="sd">        maxseg (int):</span>
 <span class="sd">            Maximum number of segments per ray, as defined in param.h</span>
 <span class="sd">        maxtr (int):</span>
@@ -1376,18 +1494,17 @@
         <span class="n">maxsamp</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span>
     <span class="p">):</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">17</span>  <span class="c1"># Allocate for setters</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">verbose</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">wvtype</span> <span class="o">=</span> <span class="n">wvtype</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mults</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">mults</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">npts</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">npts</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">align</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">align</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">rot</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">rot</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">verbose</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wvtype</span> <span class="o">=</span> <span class="n">wvtype</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mults</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">mults</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_npts</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">npts</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dt</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_align</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">align</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rot</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">rot</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">shift</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">shift</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_shift</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dt</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">shift</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">shift</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_shift</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">shift</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_iphase</span> <span class="o">=</span> <span class="n">_iphase</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">wvtype</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_numph</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
@@ -1399,7 +1516,7 @@
             <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">maxseg</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">maxph</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_nseg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asfortranarray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">maxph</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">verbose</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1407,7 +1524,7 @@
 
     <span class="nd">@verbose</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">verbose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;verbose must be 0 or 1, not: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
@@ -1463,10 +1580,19 @@
 
     <span class="nd">@align</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">align</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">,</span> <span class="s2">&quot;3&quot;</span><span class="p">]:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;align must be 0, 1, 2, or 3, not: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">alignids</span> <span class="o">=</span> <span class="p">[</span><span class="o">*</span><span class="n">_aligni</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="o">*</span><span class="n">_alignn</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">alignids</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;align must be &quot;</span>
+                <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">alignid</span><span class="p">)</span> <span class="k">for</span> <span class="n">alignid</span> <span class="ow">in</span> <span class="n">alignids</span><span class="p">])</span>
+                <span class="o">+</span> <span class="s2">&quot;. Not: &quot;</span>
+                <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="p">)</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_align</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_align</span> <span class="o">=</span> <span class="n">_aligni</span><span class="p">[</span><span class="n">value</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_align</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_align</span>
 
     <span class="nd">@property</span>
@@ -1475,10 +1601,19 @@
 
     <span class="nd">@rot</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">rot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">]:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;rot must be 0, 1, or 2, not: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">rotids</span> <span class="o">=</span> <span class="p">[</span><span class="o">*</span><span class="n">_roti</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="o">*</span><span class="n">_rotn</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">rotids</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;rot must be: &quot;</span>
+                <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">rotid</span><span class="p">)</span> <span class="k">for</span> <span class="n">rotid</span> <span class="ow">in</span> <span class="n">rotids</span><span class="p">])</span>
+                <span class="o">+</span> <span class="s2">&quot;. Not: &quot;</span>
+                <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="p">)</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_rot</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_rot</span> <span class="o">=</span> <span class="n">_roti</span><span class="p">[</span><span class="n">value</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_rot</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rot</span>
 
     <span class="nd">@property</span>
@@ -1503,11 +1638,11 @@
         <span class="n">out</span> <span class="o">+=</span> <span class="s2">&quot;Sample rate (seconds): &quot;</span>
         <span class="n">out</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="si">{:}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
         <span class="n">out</span> <span class="o">+=</span> <span class="s2">&quot;Alignment: &quot;</span>
-        <span class="n">out</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="si">{:}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">_align</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">align</span><span class="p">])</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="si">{:}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">_alignn</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">align</span><span class="p">])</span>
         <span class="n">out</span> <span class="o">+=</span> <span class="s2">&quot;Shift of traces (seconds): &quot;</span>
         <span class="n">out</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="si">{:}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shift</span><span class="p">)</span>
         <span class="n">out</span> <span class="o">+=</span> <span class="s2">&quot;Rotation to output: &quot;</span>
-        <span class="n">out</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="si">{:}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">_rot</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">rot</span><span class="p">])</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="si">{:}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">_rotn</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">rot</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">out</span>
 
     <span class="k">def</span> <span class="nf">_prs_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1611,7 +1746,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_phaselist</span><span class="p">[</span><span class="n">iseg</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">iph</span><span class="p">]</span> <span class="o">=</span> <span class="n">layn</span> <span class="o">+</span> <span class="mi">1</span>  <span class="c1"># Fortran indexing</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_phaselist</span><span class="p">[</span><span class="n">iseg</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">iph</span><span class="p">]</span> <span class="o">=</span> <span class="n">phid</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="Control.null_phaselist"><a class="viewcode-back" href="../../api.html#pyraysum.prs.Control.null_phaselist">[docs]</a>    <span class="k">def</span> <span class="nf">null_phaselist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mults</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1632,7 +1767,7 @@
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mults</span> <span class="o">=</span> <span class="n">mults</span></div>
 
-<div class="viewcode-block" id="Control.update"><a class="viewcode-back" href="../../api.html#pyraysum.prs.Control.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Explicitly update :attr:`parameters`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1649,7 +1784,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_nseg</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_numph</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_phaselist</span><span class="p">,</span>
-        <span class="p">]</span></div>
+        <span class="p">]</span>
 
 <div class="viewcode-block" id="Control.save"><a class="viewcode-back" href="../../api.html#pyraysum.prs.Control.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="s2">&quot;raysum-param&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;prs&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1728,7 +1863,7 @@
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Result contains:</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="si">{:d}</span><span class="s2"> synthetic </span><span class="si">{:}</span><span class="s2">-seismogram(s)</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">streams</span><span class="p">),</span> <span class="n">_rot</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">rc</span><span class="o">.</span><span class="n">rot</span><span class="p">]</span>
+            <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">streams</span><span class="p">),</span> <span class="n">_rotn</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">rc</span><span class="o">.</span><span class="n">rot</span><span class="p">]</span>
         <span class="p">)</span>
         <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="si">{:d}</span><span class="s2"> synthetic receiver function(s)</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rfs</span><span class="p">))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">:</span>
