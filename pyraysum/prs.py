@@ -1424,17 +1424,18 @@ class Control(object):
         maxsamp=100000,
     ):
 
-        self._verbose = int(verbose)
-        self._wvtype = wvtype
-        self._mults = int(mults)
-        self._npts = int(npts)
-        self._dt = float(dt)
-        self._align = int(align)
-        self._rot = int(rot)
+        self.parameters = [0] * 11
+        self.verbose = verbose
+        self.wvtype = wvtype
+        self.mults = mults
+        self.npts = npts
+        self.dt = dt
+        self.align = align
+        self.rot = rot
         if shift is None:
-            self._shift = self._dt
+            self.shift = self.dt
         else:
-            self._shift = float(shift)
+            self.shift = shift
 
         self._iphase = _iphase[self.wvtype]
         self._numph = np.int32(0)

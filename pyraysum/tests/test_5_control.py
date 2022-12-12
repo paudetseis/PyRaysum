@@ -1,7 +1,7 @@
 from pyraysum import Control
 
 def test_def_control():
-    ctrl = Control()
+    ctrl = Control(align="SV", rot="PVH")
 
     assert ctrl.verbose == 0
 
