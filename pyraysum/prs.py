@@ -31,8 +31,8 @@ from numpy.fft import fft, ifft, fftshift
 from copy import deepcopy
 import fraysum
 
-from . import plot
-from .frs import read_arrivals, read_traces, _phnames
+from pyraysum import plot
+from pyraysum.frs import read_arrivals, read_traces, _phnames
 
 _alignn = {0: "none", 1: "P", 2: "SV", 3: "SH"}  # alignment name
 _aligni = {_alignn[k]: k for k in _alignn}  # alignment ID
@@ -111,10 +111,10 @@ class Model(object):
     Warning:
         When setting `vpvs`, `vs` is adjusted to satisfy vs = vp / vpvs.
 
-    The following attributes are set upon initialization and when setting any of
-    the above model attributes. `f` prefixes indicate attributes used for
-    interaction with `fraysum.run_bare()` and `fraysum.run_full()`. Set these
-    directly for best performance.
+    The following attributes are set upon initialization and when execuding
+    Model.update() after setting any of the above model attributes. `f` prefixes
+    indicate attributes used for interaction with `fraysum.run_bare()` and
+    `fraysum.run_full()`. Set these directly for best performance.
 
         nlay
           Number of layers
@@ -152,9 +152,15 @@ class Model(object):
               0.0  4500.0  8000.0  4600.0    1    0.0     0.0    0.0    0.0   0.0
         >>> model[0]["thickn"]
         10000.0
+        >>> model.thickn[0]
+        10000.0
+        >>> model.thickn[0] = 15000  # model.fthickn has not yet changed
+        >>> model.update()  # Now everything works as expected
+        >>> model.fthickn[0]
+        15000.0
         >>> model[1, "vp"]
         8000.0
-        >>> model[1, "vp"] = 7400.
+        >>> model[1, "vp"] = 7400.  # Does not require model.update()
         >>> model[1, "vp"]
         7400.0
         >>> model[1] = {"vs": 4200., "rho": 4000.}
@@ -168,13 +174,13 @@ class Model(object):
         >>> model += [5000, 3600, 8000, 4000]  # thickn, rho, vp, vs
         >>> print(model)
         #  thickn     rho      vp      vs  flag aniso   trend plunge strike   dip
-          10000.0  3000.0  6000.0  3500.0    1    0.0     0.0    0.0    0.0   0.0
+          15000.0  3000.0  6000.0  3500.0    1    0.0     0.0    0.0    0.0   0.0
            5000.0  4000.0  8000.0  4000.0    1    0.0     0.0    0.0    0.0   0.0
            5000.0  3600.0  8000.0  4000.0    1    0.0     0.0    0.0    0.0   0.0
         >>> model += {"thickn": 0, "rho": 3800, "vp": 8500., "dip": 20, "strike": 90}
         >>> print(model)
         #  thickn     rho      vp      vs  flag aniso   trend plunge strike   dip
-          10000.0  3000.0  6000.0  3500.0    1    0.0     0.0    0.0    0.0   0.0
+          15000.0  3000.0  6000.0  3500.0    1    0.0     0.0    0.0    0.0   0.0
            5000.0  4000.0  8000.0  4000.0    1    0.0     0.0    0.0    0.0   0.0
            5000.0  3600.0  8000.0  4000.0    1    0.0     0.0    0.0    0.0   0.0
               0.0  3800.0  8500.0  4913.3    1    0.0     0.0    0.0   90.0  20.0
@@ -287,7 +293,7 @@ class Model(object):
         self._vpvs = value
         self._set_fattributes()
         self._set_layers()
-        self._update("vs")
+        self.update("vs")
 
     @property
     def vs(self):
@@ -404,9 +410,9 @@ class Model(object):
                 self.__dict__["_flag"][lay] = 1
 
             if att == "vpvs":
-                self._update(change="vs")
+                self.update(change="vs")
             else:
-                self._update()
+                self.update()
 
     def __len__(self):
         return self.nlay
@@ -479,6 +485,7 @@ class Model(object):
                 f"Increase maxlay in params.h and when constucting this Model object."
             )
             raise IndexError(msg)
+
         tail = np.zeros(self.maxlay - self.nlay)
         self.fthickn = np.asfortranarray(np.append(self._thickn, tail))
         self.frho = np.asfortranarray(np.append(self._rho, tail))
@@ -528,7 +535,7 @@ class Model(object):
 
         return buf.strip("\n")
 
-    def _update(self, change="vpvs"):
+    def update(self, change="vpvs"):
         """
         Update all attributes after one of them was changed.
 
@@ -685,7 +692,7 @@ class Model(object):
             if self._ani[lay] != 0:
                 self._flag[lay] = 0
 
-            self._update(change=change)
+            self.update(change=change)
             changed.append((attribute, lay, self.__dict__[_attribute][lay]))
 
             if verbose:
@@ -711,7 +718,7 @@ class Model(object):
         self._thickn[n + 1] /= 2
         self.nlay += 1
 
-        self._update()
+        self.update()
 
     def remove_layer(self, n):
         """
@@ -726,7 +733,7 @@ class Model(object):
             self.__dict__[att] = np.delete(self.__dict__[att], n)
 
         self.nlay -= 1
-        self._update()
+        self.update()
 
     def average_layers(self, top, bottom):
         """
@@ -766,7 +773,7 @@ class Model(object):
             "rho": sum(self._rho[top:bottom] * weights),
         }
 
-        for att in self.properties:
+        for att in self._properties:
             try:
                 self.__dict__[att][top] = layer[att]
             except KeyError:
@@ -774,7 +781,7 @@ class Model(object):
             self.__dict__[att] = np.delete(self.__dict__[att], range(top + 1, bottom))
 
         self.nlay -= bottom - top - 1
-        self._update()
+        self.update()
 
     def save(self, fname="sample.mod", comment="", hint=False, version="prs"):
         """
@@ -1176,6 +1183,22 @@ class Geometry(object):
         self.rays = [*zip(self._baz, self._slow, self._dn, self._de)]
 
         self._set_fattributes()
+
+    @property
+    def baz(self):
+        return self._baz
+
+    @property
+    def slow(self):
+        return self._slow
+
+    @property
+    def dn(self):
+        return self._dn
+
+    @property
+    def de(self):
+        return self._de
 
     def __getitem__(self, iray):
         if isinstance(iray, tuple):

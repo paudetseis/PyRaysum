@@ -82,6 +82,11 @@ def test_getitem_setitem_add():
     model2.plunge[1] = 20
     assert model2.plunge[1] == 20
 
+    # TODO: The above did not trigger the setter yet
+    model2.update()
+    assert model2.fplunge[1] == 20 * np.pi / 180
+    assert model2[1, "plunge"] == 20
+
     # Does anisotropy flag get (de-)activated automatically?
     model1[0, "ani"] = 10
     assert model1[0]["ani"] == 10

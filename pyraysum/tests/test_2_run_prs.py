@@ -95,7 +95,7 @@ def test_filtered_rf_array():
     rc = Control(dt=dt, rot=rot, mults=mults, align=align, wvtype=wvtype, verbose=verbose,
             npts=npts)
 
-    rfarray = np.zeros((geom.ntr, 2, npts))
+    rfarray = frs.make_array(geom, rc)
 
     # To time this, do:
     # print(timeit('_run()', number=50, globals=globals()))
