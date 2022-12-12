@@ -124,8 +124,8 @@
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
 <span class="kn">import</span> <span class="nn">fraysum</span>
 
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">plot</span>
-<span class="kn">from</span> <span class="nn">.frs</span> <span class="kn">import</span> <span class="n">read_arrivals</span><span class="p">,</span> <span class="n">read_traces</span><span class="p">,</span> <span class="n">_phnames</span>
+<span class="kn">from</span> <span class="nn">pyraysum</span> <span class="kn">import</span> <span class="n">plot</span>
+<span class="kn">from</span> <span class="nn">pyraysum.frs</span> <span class="kn">import</span> <span class="n">read_arrivals</span><span class="p">,</span> <span class="n">read_traces</span><span class="p">,</span> <span class="n">_phnames</span>
 
 <span class="n">_alignn</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;P&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="s2">&quot;SV&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="s2">&quot;SH&quot;</span><span class="p">}</span>  <span class="c1"># alignment name</span>
 <span class="n">_aligni</span> <span class="o">=</span> <span class="p">{</span><span class="n">_alignn</span><span class="p">[</span><span class="n">k</span><span class="p">]:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">_alignn</span><span class="p">}</span>  <span class="c1"># alignment ID</span>
@@ -204,10 +204,10 @@
 <span class="sd">    Warning:</span>
 <span class="sd">        When setting `vpvs`, `vs` is adjusted to satisfy vs = vp / vpvs.</span>
 
-<span class="sd">    The following attributes are set upon initialization and when setting any of</span>
-<span class="sd">    the above model attributes. `f` prefixes indicate attributes used for</span>
-<span class="sd">    interaction with `fraysum.run_bare()` and `fraysum.run_full()`. Set these</span>
-<span class="sd">    directly for best performance.</span>
+<span class="sd">    The following attributes are set upon initialization and when execuding</span>
+<span class="sd">    Model.update() after setting any of the above model attributes. `f` prefixes</span>
+<span class="sd">    indicate attributes used for interaction with `fraysum.run_bare()` and</span>
+<span class="sd">    `fraysum.run_full()`. Set these directly for best performance.</span>
 
 <span class="sd">        nlay</span>
 <span class="sd">          Number of layers</span>
@@ -245,9 +245,15 @@
 <span class="sd">              0.0  4500.0  8000.0  4600.0    1    0.0     0.0    0.0    0.0   0.0</span>
 <span class="sd">        &gt;&gt;&gt; model[0][&quot;thickn&quot;]</span>
 <span class="sd">        10000.0</span>
+<span class="sd">        &gt;&gt;&gt; model.thickn[0]</span>
+<span class="sd">        10000.0</span>
+<span class="sd">        &gt;&gt;&gt; model.thickn[0] = 15000  # model.fthickn has not yet changed</span>
+<span class="sd">        &gt;&gt;&gt; model.update()  # Now everything works as expected</span>
+<span class="sd">        &gt;&gt;&gt; model.fthickn[0]</span>
+<span class="sd">        15000.0</span>
 <span class="sd">        &gt;&gt;&gt; model[1, &quot;vp&quot;]</span>
 <span class="sd">        8000.0</span>
-<span class="sd">        &gt;&gt;&gt; model[1, &quot;vp&quot;] = 7400.</span>
+<span class="sd">        &gt;&gt;&gt; model[1, &quot;vp&quot;] = 7400.  # Does not require model.update()</span>
 <span class="sd">        &gt;&gt;&gt; model[1, &quot;vp&quot;]</span>
 <span class="sd">        7400.0</span>
 <span class="sd">        &gt;&gt;&gt; model[1] = {&quot;vs&quot;: 4200., &quot;rho&quot;: 4000.}</span>
@@ -261,13 +267,13 @@
 <span class="sd">        &gt;&gt;&gt; model += [5000, 3600, 8000, 4000]  # thickn, rho, vp, vs</span>
 <span class="sd">        &gt;&gt;&gt; print(model)</span>
 <span class="sd">        #  thickn     rho      vp      vs  flag aniso   trend plunge strike   dip</span>
-<span class="sd">          10000.0  3000.0  6000.0  3500.0    1    0.0     0.0    0.0    0.0   0.0</span>
+<span class="sd">          15000.0  3000.0  6000.0  3500.0    1    0.0     0.0    0.0    0.0   0.0</span>
 <span class="sd">           5000.0  4000.0  8000.0  4000.0    1    0.0     0.0    0.0    0.0   0.0</span>
 <span class="sd">           5000.0  3600.0  8000.0  4000.0    1    0.0     0.0    0.0    0.0   0.0</span>
 <span class="sd">        &gt;&gt;&gt; model += {&quot;thickn&quot;: 0, &quot;rho&quot;: 3800, &quot;vp&quot;: 8500., &quot;dip&quot;: 20, &quot;strike&quot;: 90}</span>
 <span class="sd">        &gt;&gt;&gt; print(model)</span>
 <span class="sd">        #  thickn     rho      vp      vs  flag aniso   trend plunge strike   dip</span>
-<span class="sd">          10000.0  3000.0  6000.0  3500.0    1    0.0     0.0    0.0    0.0   0.0</span>
+<span class="sd">          15000.0  3000.0  6000.0  3500.0    1    0.0     0.0    0.0    0.0   0.0</span>
 <span class="sd">           5000.0  4000.0  8000.0  4000.0    1    0.0     0.0    0.0    0.0   0.0</span>
 <span class="sd">           5000.0  3600.0  8000.0  4000.0    1    0.0     0.0    0.0    0.0   0.0</span>
 <span class="sd">              0.0  3800.0  8500.0  4913.3    1    0.0     0.0    0.0   90.0  20.0</span>
@@ -380,7 +386,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_vpvs</span> <span class="o">=</span> <span class="n">value</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_fattributes</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_layers</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="s2">&quot;vs&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s2">&quot;vs&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">vs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -497,9 +503,9 @@
                 <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;_flag&quot;</span><span class="p">][</span><span class="n">lay</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
 
             <span class="k">if</span> <span class="n">att</span> <span class="o">==</span> <span class="s2">&quot;vpvs&quot;</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">change</span><span class="o">=</span><span class="s2">&quot;vs&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">change</span><span class="o">=</span><span class="s2">&quot;vs&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nlay</span>
@@ -572,6 +578,7 @@
                 <span class="sa">f</span><span class="s2">&quot;Increase maxlay in params.h and when constucting this Model object.&quot;</span>
             <span class="p">)</span>
             <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
         <span class="n">tail</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">maxlay</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">nlay</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fthickn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asfortranarray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_thickn</span><span class="p">,</span> <span class="n">tail</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">frho</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asfortranarray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rho</span><span class="p">,</span> <span class="n">tail</span><span class="p">))</span>
@@ -621,7 +628,7 @@
 
         <span class="k">return</span> <span class="n">buf</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">change</span><span class="o">=</span><span class="s2">&quot;vpvs&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="Model.update"><a class="viewcode-back" href="../../api.html#pyraysum.prs.Model.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">change</span><span class="o">=</span><span class="s2">&quot;vpvs&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Update all attributes after one of them was changed.</span>
 
@@ -649,7 +656,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_fattributes</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_set_layers</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_layers</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="Model.copy"><a class="viewcode-back" href="../../api.html#pyraysum.prs.Model.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return a copy of the model&quot;&quot;&quot;</span>
@@ -778,7 +785,7 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ani</span><span class="p">[</span><span class="n">lay</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_flag</span><span class="p">[</span><span class="n">lay</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">change</span><span class="o">=</span><span class="n">change</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">change</span><span class="o">=</span><span class="n">change</span><span class="p">)</span>
             <span class="n">changed</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">attribute</span><span class="p">,</span> <span class="n">lay</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">_attribute</span><span class="p">][</span><span class="n">lay</span><span class="p">]))</span>
 
             <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
@@ -804,7 +811,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_thickn</span><span class="p">[</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/=</span> <span class="mi">2</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nlay</span> <span class="o">+=</span> <span class="mi">1</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="Model.remove_layer"><a class="viewcode-back" href="../../api.html#pyraysum.prs.Model.remove_layer">[docs]</a>    <span class="k">def</span> <span class="nf">remove_layer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -819,7 +826,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">att</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">att</span><span class="p">],</span> <span class="n">n</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">nlay</span> <span class="o">-=</span> <span class="mi">1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="Model.average_layers"><a class="viewcode-back" href="../../api.html#pyraysum.prs.Model.average_layers">[docs]</a>    <span class="k">def</span> <span class="nf">average_layers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -859,7 +866,7 @@
             <span class="s2">&quot;rho&quot;</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rho</span><span class="p">[</span><span class="n">top</span><span class="p">:</span><span class="n">bottom</span><span class="p">]</span> <span class="o">*</span> <span class="n">weights</span><span class="p">),</span>
         <span class="p">}</span>
 
-        <span class="k">for</span> <span class="n">att</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">att</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_properties</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">att</span><span class="p">][</span><span class="n">top</span><span class="p">]</span> <span class="o">=</span> <span class="n">layer</span><span class="p">[</span><span class="n">att</span><span class="p">]</span>
             <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
@@ -867,7 +874,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">att</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">att</span><span class="p">],</span> <span class="nb">range</span><span class="p">(</span><span class="n">top</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">bottom</span><span class="p">))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">nlay</span> <span class="o">-=</span> <span class="n">bottom</span> <span class="o">-</span> <span class="n">top</span> <span class="o">-</span> <span class="mi">1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="Model.save"><a class="viewcode-back" href="../../api.html#pyraysum.prs.Model.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="s2">&quot;sample.mod&quot;</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">hint</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;prs&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1270,6 +1277,22 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_fattributes</span><span class="p">()</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">baz</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_baz</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">slow</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_slow</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">dn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dn</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">de</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_de</span>
+
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iray</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">iray</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
             <span class="c1"># geometry[0, &quot;baz&quot;]</span>
@@ -1494,17 +1517,18 @@
         <span class="n">maxsamp</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span>
     <span class="p">):</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">verbose</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_wvtype</span> <span class="o">=</span> <span class="n">wvtype</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_mults</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">mults</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_npts</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">npts</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_dt</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_align</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">align</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_rot</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">rot</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">11</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wvtype</span> <span class="o">=</span> <span class="n">wvtype</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mults</span> <span class="o">=</span> <span class="n">mults</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">npts</span> <span class="o">=</span> <span class="n">npts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">align</span> <span class="o">=</span> <span class="n">align</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rot</span> <span class="o">=</span> <span class="n">rot</span>
         <span class="k">if</span> <span class="n">shift</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_shift</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dt</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">shift</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_shift</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">shift</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">shift</span> <span class="o">=</span> <span class="n">shift</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_iphase</span> <span class="o">=</span> <span class="n">_iphase</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">wvtype</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_numph</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>

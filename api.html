@@ -56,6 +56,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Classes</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#model">Model</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#pyraysum.prs.Model"><code class="docutils literal notranslate"><span class="pre">Model</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyraysum.prs.Model.update"><code class="docutils literal notranslate"><span class="pre">Model.update()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pyraysum.prs.Model.copy"><code class="docutils literal notranslate"><span class="pre">Model.copy()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pyraysum.prs.Model.change"><code class="docutils literal notranslate"><span class="pre">Model.change()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pyraysum.prs.Model.split_layer"><code class="docutils literal notranslate"><span class="pre">Model.split_layer()</span></code></a></li>
@@ -219,10 +220,10 @@ Defaults to 1.73. Ignored if <code class="xref py py-const docutils literal notr
 <p class="admonition-title">Warning</p>
 <p>When setting <cite>vpvs</cite>, <cite>vs</cite> is adjusted to satisfy vs = vp / vpvs.</p>
 </div>
-<p>The following attributes are set upon initialization and when setting any of
-the above model attributes. <cite>f</cite> prefixes indicate attributes used for
-interaction with <cite>fraysum.run_bare()</cite> and <cite>fraysum.run_full()</cite>. Set these
-directly for best performance.</p>
+<p>The following attributes are set upon initialization and when execuding
+Model.update() after setting any of the above model attributes. <cite>f</cite> prefixes
+indicate attributes used for interaction with <cite>fraysum.run_bare()</cite> and
+<cite>fraysum.run_full()</cite>. Set these directly for best performance.</p>
 <blockquote>
 <div><dl class="simple">
 <dt>nlay</dt><dd><p>Number of layers</p>
@@ -261,9 +262,15 @@ by <cite>fraysum.run_bare()</cite> and <cite>fraysum.run_full()</cite></p>
 <span class="go">      0.0  4500.0  8000.0  4600.0    1    0.0     0.0    0.0    0.0   0.0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;thickn&quot;</span><span class="p">]</span>
 <span class="go">10000.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">thickn</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">10000.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">thickn</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">15000</span>  <span class="c1"># model.fthickn has not yet changed</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>  <span class="c1"># Now everything works as expected</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">fthickn</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">15000.0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;vp&quot;</span><span class="p">]</span>
 <span class="go">8000.0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;vp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">7400.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;vp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">7400.</span>  <span class="c1"># Does not require model.update()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;vp&quot;</span><span class="p">]</span>
 <span class="go">7400.0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;vs&quot;</span><span class="p">:</span> <span class="mf">4200.</span><span class="p">,</span> <span class="s2">&quot;rho&quot;</span><span class="p">:</span> <span class="mf">4000.</span><span class="p">}</span>
@@ -277,18 +284,41 @@ by <cite>fraysum.run_bare()</cite> and <cite>fraysum.run_full()</cite></p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">+=</span> <span class="p">[</span><span class="mi">5000</span><span class="p">,</span> <span class="mi">3600</span><span class="p">,</span> <span class="mi">8000</span><span class="p">,</span> <span class="mi">4000</span><span class="p">]</span>  <span class="c1"># thickn, rho, vp, vs</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
 <span class="go">#  thickn     rho      vp      vs  flag aniso   trend plunge strike   dip</span>
-<span class="go">  10000.0  3000.0  6000.0  3500.0    1    0.0     0.0    0.0    0.0   0.0</span>
+<span class="go">  15000.0  3000.0  6000.0  3500.0    1    0.0     0.0    0.0    0.0   0.0</span>
 <span class="go">   5000.0  4000.0  8000.0  4000.0    1    0.0     0.0    0.0    0.0   0.0</span>
 <span class="go">   5000.0  3600.0  8000.0  4000.0    1    0.0     0.0    0.0    0.0   0.0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">+=</span> <span class="p">{</span><span class="s2">&quot;thickn&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;rho&quot;</span><span class="p">:</span> <span class="mi">3800</span><span class="p">,</span> <span class="s2">&quot;vp&quot;</span><span class="p">:</span> <span class="mf">8500.</span><span class="p">,</span> <span class="s2">&quot;dip&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">&quot;strike&quot;</span><span class="p">:</span> <span class="mi">90</span><span class="p">}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
 <span class="go">#  thickn     rho      vp      vs  flag aniso   trend plunge strike   dip</span>
-<span class="go">  10000.0  3000.0  6000.0  3500.0    1    0.0     0.0    0.0    0.0   0.0</span>
+<span class="go">  15000.0  3000.0  6000.0  3500.0    1    0.0     0.0    0.0    0.0   0.0</span>
 <span class="go">   5000.0  4000.0  8000.0  4000.0    1    0.0     0.0    0.0    0.0   0.0</span>
 <span class="go">   5000.0  3600.0  8000.0  4000.0    1    0.0     0.0    0.0    0.0   0.0</span>
 <span class="go">      0.0  3800.0  8500.0  4913.3    1    0.0     0.0    0.0   90.0  20.0</span>
 </pre></div>
 </div>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyraysum.prs.Model.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">change</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'vpvs'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyraysum/prs.html#Model.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyraysum.prs.Model.update" title="Permalink to this definition"></a></dt>
+<dd><p>Update all attributes after one of them was changed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>change</strong> (<em>str</em>) – <p>Decide which of <code class="xref py py-attr docutils literal notranslate"><span class="pre">vp</span></code>, <code class="xref py py-attr docutils literal notranslate"><span class="pre">vs</span></code> or <code class="xref py py-attr docutils literal notranslate"><span class="pre">vpvs</span></code> should
+depend on the other two:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>’vpvs’</cite>: Calculate <code class="xref py py-attr docutils literal notranslate"><span class="pre">vpvs</span></code> from <cite>vpvs = vp / vs</cite></p></li>
+<li><p><cite>’vp’</cite>: Calculate <code class="xref py py-attr docutils literal notranslate"><span class="pre">vp</span></code> from <cite>vp = vs * vpvs</cite></p></li>
+<li><p><cite>’vs’</cite>: Calculate <code class="xref py py-attr docutils literal notranslate"><span class="pre">vs</span></code> from <cite>vs = vp / vpvs</cite></p></li>
+</ul>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="pyraysum.prs.Model.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyraysum/prs.html#Model.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyraysum.prs.Model.copy" title="Permalink to this definition"></a></dt>
