@@ -57,10 +57,10 @@ geometry = Geometry(baz=range(0, 360, 30), slow=0.07)
 geometry.plot()
 
 # Set sampling intervall, number of points, alignment and coordinate rotation
-ctrl = Control(dt=1/20, npts=800, align="P", rot="PVH")
+control = Control(dt=1/20, npts=800, align="P", rot="PVH")
 
 # Run the simulation
-result = run(mod, geom, ctrl, rf=True)
+result = run(model, geometry, control, rf=True)
 
 # Filter below 2s period
 result.filter("rfs", "lowpass", freq=1/2)
