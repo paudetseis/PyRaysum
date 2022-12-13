@@ -767,10 +767,10 @@ class Model(object):
         weights = self._thickn[top:bottom] / thickn
 
         layer = {
-            "thickn": thickn,
-            "vp": sum(self._vp[top:bottom] * weights),
-            "vs": sum(self._vs[top:bottom] * weights),
-            "rho": sum(self._rho[top:bottom] * weights),
+            "_thickn": thickn,
+            "_vp": sum(self._vp[top:bottom] * weights),
+            "_vs": sum(self._vs[top:bottom] * weights),
+            "_rho": sum(self._rho[top:bottom] * weights),
         }
 
         for att in self._properties:

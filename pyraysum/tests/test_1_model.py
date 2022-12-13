@@ -128,3 +128,12 @@ def test_getitem_setitem_add():
     with pytest.raises(TypeError):
         # Only can add another model
         model1 + 5
+
+def test_average_model():
+    model = Model([1000, 1000, 0], [1000, 3000, 4000], [1000, 3000, 4000], [1000, 3000, 4000])
+    model.average_layers(0, 2)
+    assert model[0, "vp"] == 2000
+    assert model[0, "vs"] == 2000
+    assert model[0, "rho"] == 2000
+    assert model[0, "thickn"] == 2000
+    assert model.nlay == 2
