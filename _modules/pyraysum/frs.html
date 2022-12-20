@@ -327,8 +327,8 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        :const:`numpy.zeros((geometry.ntr, 2, rc.npts))`:</span>
-<span class="sd">            Array in shape to be used by :meth:`filterd_rf_array` and</span>
-<span class="sd">            :meth:`filtered_array`.</span>
+<span class="sd">            Array in shape to be used by :func:`filtered_rf_array` and</span>
+<span class="sd">            :func:`filtered_array`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">geometry</span><span class="o">.</span><span class="n">ntr</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">rc</span><span class="o">.</span><span class="n">npts</span><span class="p">))</span></div>
 
@@ -373,10 +373,10 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        None:</span>
-<span class="sd">            Output is written to :const:`rfarray`</span>
+<span class="sd">            None. Output is written to :const:`rfarray`</span>
 
 <span class="sd">    Warning:</span>
-<span class="sd">        Assumes PVH alignment (ray-polarization), i.e. :attr:`Control.rot=2`.</span>
+<span class="sd">        Assumes PVH alignment (ray-polarization), i.e. :attr:`Control.rot=&quot;PVH&quot;`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">order</span> <span class="o">=</span> <span class="mi">2</span>
@@ -431,10 +431,10 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        None:</span>
-<span class="sd">            Output is written to :const:`rfarray`</span>
+<span class="sd">            None. Output is written to :const:`rfarray`</span>
 
 <span class="sd">    Warning:</span>
-<span class="sd">        Assumes PVH alignment (ray-polarization), i.e. :attr:`Control.rot=2`.</span>
+<span class="sd">        Assumes PVH alignment (ray-polarization), i.e. :attr:`Control.rot=&quot;PVH&quot;`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">npts2</span> <span class="o">=</span> <span class="n">npts</span> <span class="o">//</span> <span class="mi">2</span>

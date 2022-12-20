@@ -204,10 +204,12 @@
 <span class="sd">    Warning:</span>
 <span class="sd">        When setting `vpvs`, `vs` is adjusted to satisfy vs = vp / vpvs.</span>
 
-<span class="sd">    The following attributes are set upon initialization and when execuding</span>
-<span class="sd">    Model.update() after setting any of the above model attributes. `f` prefixes</span>
-<span class="sd">    indicate attributes used for interaction with `fraysum.run_bare()` and</span>
-<span class="sd">    `fraysum.run_full()`. Set these directly for best performance.</span>
+<span class="sd">    The following attributes are set upon initialization, when setting a layer property</span>
+<span class="sd">    via :meth:`Model.__setitem__()` (i.e. :attr:`model[0]` or :attr:`model[0,</span>
+<span class="sd">    &quot;thickn&quot;]`), and when execuding :meth:`Model.update()` after setting a single</span>
+<span class="sd">    element of the above model attributes. `f` prefixes indicate attributes used for</span>
+<span class="sd">    interaction with `fraysum.run_bare()` and `fraysum.run_full()`. Set these directly</span>
+<span class="sd">    for best performance.</span>
 
 <span class="sd">        nlay</span>
 <span class="sd">          Number of layers</span>
@@ -459,6 +461,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_layers</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ilay</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a layer or property of the model&quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="c1"># model[0, &quot;thickn&quot;]</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="n">ilay</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">ilay</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
@@ -471,6 +474,7 @@
                 <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">lay</span><span class="p">[</span><span class="n">ilay</span><span class="p">]</span> <span class="k">for</span> <span class="n">lay</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layatt</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set a layer or property of the model&quot;&quot;&quot;</span>
 
         <span class="n">lays</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">atts</span> <span class="o">=</span> <span class="p">[]</span>
@@ -605,7 +609,7 @@
         <span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">_v12str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Raysum version 1.2 .mod file convention&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Legacy Raysum .mod file convention&quot;&quot;&quot;</span>
         <span class="n">buf</span> <span class="o">=</span> <span class="s2">&quot;#  thickn     rho      vp      vs  flag p-aniso  s-aniso   trend &quot;</span>
         <span class="n">buf</span> <span class="o">+=</span> <span class="s2">&quot;plunge strike   dip</span><span class="se">\n</span><span class="s2">&quot;</span>
 
@@ -679,7 +683,7 @@
 <span class="sd">               (attribute, layer, new value)</span>
 
 <span class="sd">        Note:</span>
-<span class="sd">            In the ``command`` argument, each substring has the form:</span>
+<span class="sd">            In the :data:`command` argument, each substring has the form:</span>
 
 <span class="sd">            KEY LAYER SIGN VAL;</span>
 
@@ -705,7 +709,7 @@
 <span class="sd">            VAL (float) is the value to set / increase / decrease</span>
 
 <span class="sd">        Hint:</span>
-<span class="sd">            For example, :py:meth:`Model.change(&#39;t0+10;psp0-0.2;d1+5;s1=45&#39;)` does:</span>
+<span class="sd">            For example, ``Model.change(&#39;t0+10;psp0-0.2;d1+5;s1=45&#39;)`` does:</span>
 
 <span class="sd">                1. Increase the thickness of the first layer by 10 km</span>
 <span class="sd">                2. Decrease Vp/Vs of the of the first layer by 0.2, holding Vs</span>
@@ -890,7 +894,7 @@
 <span class="sd">            fname (str): Name of the output file (including extension)</span>
 <span class="sd">            comment (str): String to write into file header</span>
 <span class="sd">            hint (bool): Include usage comment to model file</span>
-<span class="sd">            version (&quot;prs&quot; or &quot;1.2&quot;): Use PyRaysum or Raysum1.2 file format</span>
+<span class="sd">            version (&quot;prs&quot; or &quot;raysum&quot;): Use PyRaysum or Raysum file format</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">comment</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">):</span>
@@ -912,7 +916,7 @@
 
         <span class="k">if</span> <span class="n">version</span> <span class="o">==</span> <span class="s2">&quot;prs&quot;</span><span class="p">:</span>
             <span class="n">buf</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
-        <span class="k">elif</span> <span class="n">version</span> <span class="o">==</span> <span class="s2">&quot;1.2&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">version</span> <span class="o">==</span> <span class="s2">&quot;raysum&quot;</span><span class="p">:</span>
             <span class="n">buf</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_v12str</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Unknown version: </span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -1448,7 +1452,7 @@
 <span class="sd">                * 0: no multiple</span>
 <span class="sd">                * 1: First interface multiples only</span>
 <span class="sd">                * 2: all first-order multiples (once reflected from the surface)</span>
-<span class="sd">                * 3: supply phases to be computed via meth:`Control.set_phaselist()`</span>
+<span class="sd">                * 3: supply phases to be computed via :meth:`Control.set_phaselist`</span>
 
 <span class="sd">        npts (int):</span>
 <span class="sd">            Number of samples in time series</span>
@@ -1726,7 +1730,8 @@
 <span class="sd">                SEGMENT is the index of the model layer.</span>
 
 <span class="sd">            equivalent (bool):</span>
-<span class="sd">                Augment phaselist by equivalent phases (e.g., &#39;1P0P0s0P&#39;; &#39;1P0S0p0P&#39;)</span>
+<span class="sd">                Augment phaselist by equivalent phases (e.g., `&#39;1P0P0s0P&#39;`;</span>
+<span class="sd">                `&#39;1P0S0p0P&#39;`)</span>
 
 <span class="sd">            kinematic (bool):</span>
 <span class="sd">                Limit equivalent phases to those with same polarity as input phases</span>
@@ -1734,21 +1739,34 @@
 <span class="sd">        Raises:</span>
 <span class="sd">            IndexError: If resulting phaselist is longer than :const:`maxph`.</span>
 
+<span class="sd">        Caution:</span>
+<span class="sd">            At every interface, S-wave energy split up into a slow and a fast S-wave,</span>
+<span class="sd">            `S` and `T`, regardless of layer anisotropy. Make sure to include all</span>
+<span class="sd">            contributions when setting a explicit phaselist. It is best to inspect the</span>
+<span class="sd">            output of :meth:`Result.descriptors()` of a previous run with</span>
+<span class="sd">            :attr:`mults=2` for the ray combinations relevant for your problem.</span>
+
+<span class="sd">        Caution:</span>
+<span class="sd">            Using :const:`equivalent=False` may produce incorrect amplitudes, because</span>
+<span class="sd">            contributions of equivalent phases may be missing. At the same time,</span>
+<span class="sd">            amplitudes are oftentimes correct within 10%. Using :const:`equivalent=True`</span>
+<span class="sd">            may cause performance issues.</span>
+
 <span class="sd">        Hint:</span>
 <span class="sd">            In a two layer model (index `0` is the topmost subsurface layer, index `1`</span>
 <span class="sd">            is the underlying half-space) the :const:`descriptors` compute the phases:</span>
 
 <span class="sd">            * ``[&#39;1P0P&#39;]``: direct P-wave</span>
-<span class="sd">            * ``[&#39;1P0S&#39;]``: P-to-S converted wave</span>
-<span class="sd">            * ``[&#39;1P0P&#39;, &#39;1P0S&#39;]``: direct P-wave and P-to-S converted wave</span>
+<span class="sd">            * ``[&#39;1P0S&#39;]``: P-to-S1 converted wave</span>
+<span class="sd">            * ``[&#39;1P0T&#39;]``: P-to-S2 converted wave</span>
+<span class="sd">            * ``[&#39;1P0P&#39;, &#39;1P0S&#39;, &#39;1P0T]``: direct P-wave and all P-to-S converted waves</span>
 <span class="sd">            * ``[&#39;1P0P0s0S&#39;]``: P reflected s at the surface, reflected S at the top of the half-space</span>
 
-<span class="sd">        Caution:</span>
-<span class="sd">            Using :const:`equivalent=False` may produce incorrect amplitudes, because</span>
-<span class="sd">            contributions of equivalent phases may be missing.</span>
+<span class="sd">        See also:</span>
+<span class="sd">            :meth:`Result.descriptors()` returns all phases computed in a previous run.</span>
 
 <span class="sd">        See also:</span>
-<span class="sd">            To output equivalent phases, see :meth:`~pyraysum.prs.equivalent_phases()`</span>
+<span class="sd">            :meth:`~pyraysum.prs.equivalent_phases()` outputs equivalent phases explicitly</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">mults</span> <span class="o">=</span> <span class="mi">3</span>
@@ -1824,13 +1842,13 @@
 <span class="sd">        Args:</span>
 <span class="sd">            fname: (str)</span>
 <span class="sd">                Name of file</span>
-<span class="sd">            version: (&quot;prs&quot; or &quot;1.2&quot;)</span>
-<span class="sd">                Pyraysum or Raysum v1.2 compatible</span>
+<span class="sd">            version: (&quot;prs&quot; or &quot;raysum&quot;)</span>
+<span class="sd">                Pyraysum or Raysum raysum compatible</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">version</span> <span class="o">==</span> <span class="s2">&quot;prs&quot;</span><span class="p">:</span>
             <span class="n">buf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prs_str</span><span class="p">()</span>
-        <span class="k">elif</span> <span class="n">version</span> <span class="o">==</span> <span class="s2">&quot;1.2&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">version</span> <span class="o">==</span> <span class="s2">&quot;raysum&quot;</span><span class="p">:</span>
             <span class="n">buf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_v12_str</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Unknown version: </span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -1854,7 +1872,7 @@
 <span class="sd">            Recording geometry</span>
 <span class="sd">        rc (:class:`~pyraysum.prs.Control`):</span>
 <span class="sd">            Run-control parameters</span>
-<span class="sd">        streams (List):</span>
+<span class="sd">        streams (list):</span>
 <span class="sd">            List of :class:`~obspy.core.Stream` objects.</span>
 
 <span class="sd">    If created with :const:`mode=&#39;full&#39;` in :meth:`run()`, the :attr:`stats` attribute</span>
@@ -2167,6 +2185,9 @@
 <span class="sd">        :class:`~pyraysum.prs.Result`:</span>
 <span class="sd">            Synthetic seimograms</span>
 
+<span class="sd">    Hint:</span>
+<span class="sd">        Best performance is achived by calling :func:`fraysum.run_bare`</span>
+
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
 <span class="sd">    &gt;&gt;&gt; from pyraysum import prs, Model, Geometry, Control</span>
@@ -2233,13 +2254,17 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Reads model parameters from file</span>
 
+<span class="sd">    Parameters:</span>
+<span class="sd">        version (&quot;prs&quot; or &quot;raysum&quot;):</span>
+<span class="sd">            File has PyRaysum or Raysum format</span>
+
 <span class="sd">    Returns:</span>
 <span class="sd">        :class:`~pyraysum.prs.Model`:</span>
 <span class="sd">            Seismic velocity model</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="n">modfile</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
-    <span class="k">if</span> <span class="n">version</span> <span class="o">==</span> <span class="s2">&quot;1.2&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">version</span> <span class="o">==</span> <span class="s2">&quot;raysum&quot;</span><span class="p">:</span>
         <span class="c1"># ignore s-anisotropy</span>
         <span class="n">vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">vals</span><span class="p">[:</span><span class="mi">6</span><span class="p">],</span> <span class="n">vals</span><span class="p">[</span><span class="mi">7</span><span class="p">:]))</span>
 
@@ -2270,6 +2295,10 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Read Raysum run control parameters from file.</span>
 
+<span class="sd">    Parameters:</span>
+<span class="sd">        version: (&quot;prs&quot; or &quot;raysum&quot;)</span>
+<span class="sd">            File has PyRaysum or Raysum format</span>
+
 <span class="sd">    Returns:</span>
 <span class="sd">        :class:`~pyraysum.prs.Control`:</span>
 <span class="sd">            Run control parameters</span>
@@ -2287,7 +2316,7 @@
 
     <span class="k">if</span> <span class="n">version</span> <span class="o">==</span> <span class="s2">&quot;prs&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">Control</span><span class="p">(</span><span class="o">*</span><span class="n">buf</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">version</span> <span class="o">==</span> <span class="s2">&quot;1.2&quot;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">version</span> <span class="o">==</span> <span class="s2">&quot;raysum&quot;</span><span class="p">:</span>
         <span class="n">rc</span> <span class="o">=</span> <span class="n">Control</span><span class="p">(</span>
             <span class="n">mults</span><span class="o">=</span><span class="n">buf</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">npts</span><span class="o">=</span><span class="n">buf</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">dt</span><span class="o">=</span><span class="n">buf</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">align</span><span class="o">=</span><span class="n">buf</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">shift</span><span class="o">=</span><span class="n">buf</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">rot</span><span class="o">=</span><span class="n">buf</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span>
         <span class="p">)</span>

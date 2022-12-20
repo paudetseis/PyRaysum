@@ -220,10 +220,12 @@ Defaults to 1.73. Ignored if <code class="xref py py-const docutils literal notr
 <p class="admonition-title">Warning</p>
 <p>When setting <cite>vpvs</cite>, <cite>vs</cite> is adjusted to satisfy vs = vp / vpvs.</p>
 </div>
-<p>The following attributes are set upon initialization and when execuding
-Model.update() after setting any of the above model attributes. <cite>f</cite> prefixes
-indicate attributes used for interaction with <cite>fraysum.run_bare()</cite> and
-<cite>fraysum.run_full()</cite>. Set these directly for best performance.</p>
+<p>The following attributes are set upon initialization, when setting a layer property
+via <code class="xref py py-meth docutils literal notranslate"><span class="pre">Model.__setitem__()</span></code> (i.e. <code class="xref py py-attr docutils literal notranslate"><span class="pre">model[0]</span></code> or <code class="xref py py-attr docutils literal notranslate"><span class="pre">model[0,</span>
+<span class="pre">&quot;thickn&quot;]</span></code>), and when execuding <a class="reference internal" href="#pyraysum.prs.Model.update" title="pyraysum.prs.Model.update"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Model.update()</span></code></a> after setting a single
+element of the above model attributes. <cite>f</cite> prefixes indicate attributes used for
+interaction with <cite>fraysum.run_bare()</cite> and <cite>fraysum.run_full()</cite>. Set these directly
+for best performance.</p>
 <blockquote>
 <div><dl class="simple">
 <dt>nlay</dt><dd><p>Number of layers</p>
@@ -346,7 +348,7 @@ depend on the other two:</p>
 </dl>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>In the <code class="docutils literal notranslate"><span class="pre">command</span></code> argument, each substring has the form:</p>
+<p>In the <code class="xref py py-data docutils literal notranslate"><span class="pre">command</span></code> argument, each substring has the form:</p>
 <p>KEY LAYER SIGN VAL;</p>
 <p>where</p>
 <p>KEY [t|vp|vs|psp|pss|s|d|a|tr|pl] is the attribute to change</p>
@@ -370,7 +372,7 @@ depend on the other two:</p>
 </div>
 <div class="admonition hint">
 <p class="admonition-title">Hint</p>
-<p>For example, <code class="xref py py-meth docutils literal notranslate"><span class="pre">Model.change('t0+10;psp0-0.2;d1+5;s1=45')()</span></code> does:</p>
+<p>For example, <code class="docutils literal notranslate"><span class="pre">Model.change('t0+10;psp0-0.2;d1+5;s1=45')</span></code> does:</p>
 <blockquote>
 <div><ol class="arabic simple">
 <li><p>Increase the thickness of the first layer by 10 km</p></li>
@@ -445,7 +447,7 @@ thicknesses and averaged vp, vs, and rho.</p>
 <li><p><strong>fname</strong> (<em>str</em>) – Name of the output file (including extension)</p></li>
 <li><p><strong>comment</strong> (<em>str</em>) – String to write into file header</p></li>
 <li><p><strong>hint</strong> (<em>bool</em>) – Include usage comment to model file</p></li>
-<li><p><strong>version</strong> (<em>&quot;prs&quot;</em><em> or </em><em>&quot;1.2&quot;</em>) – Use PyRaysum or Raysum1.2 file format</p></li>
+<li><p><strong>version</strong> (<em>&quot;prs&quot;</em><em> or </em><em>&quot;raysum&quot;</em>) – Use PyRaysum or Raysum file format</p></li>
 </ul>
 </dd>
 </dl>
@@ -657,7 +659,7 @@ by <cite>fraysum.run_bare()</cite> and <cite>fraysum.run_full()</cite></p>
 <li><p>0: no multiple</p></li>
 <li><p>1: First interface multiples only</p></li>
 <li><p>2: all first-order multiples (once reflected from the surface)</p></li>
-<li><p>3: supply phases to be computed via meth:<cite>Control.set_phaselist()</cite></p></li>
+<li><p>3: supply phases to be computed via <a class="reference internal" href="#pyraysum.prs.Control.set_phaselist" title="pyraysum.prs.Control.set_phaselist"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Control.set_phaselist()</span></code></a></p></li>
 </ul>
 </div></blockquote>
 </p></li>
@@ -741,7 +743,8 @@ PHASE is:</p>
 </div></blockquote>
 <p>SEGMENT is the index of the model layer.</p>
 </p></li>
-<li><p><strong>equivalent</strong> (<em>bool</em>) – Augment phaselist by equivalent phases (e.g., ‘1P0P0s0P’; ‘1P0S0p0P’)</p></li>
+<li><p><strong>equivalent</strong> (<em>bool</em>) – Augment phaselist by equivalent phases (e.g., <cite>‘1P0P0s0P’</cite>;
+<cite>‘1P0S0p0P’</cite>)</p></li>
 <li><p><strong>kinematic</strong> (<em>bool</em>) – Limit equivalent phases to those with same polarity as input phases</p></li>
 </ul>
 </dd>
@@ -749,25 +752,40 @@ PHASE is:</p>
 <dd class="field-even"><p><strong>IndexError</strong> – If resulting phaselist is longer than <code class="xref py py-const docutils literal notranslate"><span class="pre">maxph</span></code>.</p>
 </dd>
 </dl>
+<div class="admonition caution">
+<p class="admonition-title">Caution</p>
+<p>At every interface, S-wave energy split up into a slow and a fast S-wave,
+<cite>S</cite> and <cite>T</cite>, regardless of layer anisotropy. Make sure to include all
+contributions when setting a explicit phaselist. It is best to inspect the
+output of <a class="reference internal" href="#pyraysum.prs.Result.descriptors" title="pyraysum.prs.Result.descriptors"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Result.descriptors()</span></code></a> of a previous run with
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">mults=2</span></code> for the ray combinations relevant for your problem.</p>
+</div>
+<div class="admonition caution">
+<p class="admonition-title">Caution</p>
+<p>Using <code class="xref py py-const docutils literal notranslate"><span class="pre">equivalent=False</span></code> may produce incorrect amplitudes, because
+contributions of equivalent phases may be missing. At the same time,
+amplitudes are oftentimes correct within 10%. Using <code class="xref py py-const docutils literal notranslate"><span class="pre">equivalent=True</span></code>
+may cause performance issues.</p>
+</div>
 <div class="admonition hint">
 <p class="admonition-title">Hint</p>
 <p>In a two layer model (index <cite>0</cite> is the topmost subsurface layer, index <cite>1</cite>
 is the underlying half-space) the <code class="xref py py-const docutils literal notranslate"><span class="pre">descriptors</span></code> compute the phases:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">['1P0P']</span></code>: direct P-wave</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">['1P0S']</span></code>: P-to-S converted wave</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">['1P0P',</span> <span class="pre">'1P0S']</span></code>: direct P-wave and P-to-S converted wave</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">['1P0S']</span></code>: P-to-S1 converted wave</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">['1P0T']</span></code>: P-to-S2 converted wave</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">['1P0P',</span> <span class="pre">'1P0S',</span> <span class="pre">'1P0T]</span></code>: direct P-wave and all P-to-S converted waves</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">['1P0P0s0S']</span></code>: P reflected s at the surface, reflected S at the top of the half-space</p></li>
 </ul>
 </div>
-<div class="admonition caution">
-<p class="admonition-title">Caution</p>
-<p>Using <code class="xref py py-const docutils literal notranslate"><span class="pre">equivalent=False</span></code> may produce incorrect amplitudes, because
-contributions of equivalent phases may be missing.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#pyraysum.prs.Result.descriptors" title="pyraysum.prs.Result.descriptors"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Result.descriptors()</span></code></a> returns all phases computed in a previous run.</p>
 </div>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p>To output equivalent phases, see <a class="reference internal" href="#pyraysum.prs.equivalent_phases" title="pyraysum.prs.equivalent_phases"><code class="xref py py-meth docutils literal notranslate"><span class="pre">equivalent_phases()</span></code></a></p>
+<p><a class="reference internal" href="#pyraysum.prs.equivalent_phases" title="pyraysum.prs.equivalent_phases"><code class="xref py py-meth docutils literal notranslate"><span class="pre">equivalent_phases()</span></code></a> outputs equivalent phases explicitly</p>
 </div>
 </dd></dl>
 
@@ -797,8 +815,8 @@ contributions of equivalent phases may be missing.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>fname</strong> – (str)
 Name of file</p></li>
-<li><p><strong>version</strong> – (“prs” or “1.2”)
-Pyraysum or Raysum v1.2 compatible</p></li>
+<li><p><strong>version</strong> – (“prs” or “raysum”)
+Pyraysum or Raysum raysum compatible</p></li>
 </ul>
 </dd>
 </dl>
@@ -822,7 +840,7 @@ to calculate receiver functions, filter and plot the results. See
 <li><p><strong>model</strong> (<a class="reference internal" href="#pyraysum.prs.Model" title="pyraysum.prs.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>) – Subsurface velocity model</p></li>
 <li><p><strong>geometry</strong> (<a class="reference internal" href="#pyraysum.prs.Geometry" title="pyraysum.prs.Geometry"><code class="xref py py-class docutils literal notranslate"><span class="pre">Geometry</span></code></a>) – Recording geometry</p></li>
 <li><p><strong>rc</strong> (<a class="reference internal" href="#pyraysum.prs.Control" title="pyraysum.prs.Control"><code class="xref py py-class docutils literal notranslate"><span class="pre">Control</span></code></a>) – Run-control parameters</p></li>
-<li><p><strong>streams</strong> (<em>List</em>) – List of <code class="xref py py-class docutils literal notranslate"><span class="pre">Stream</span></code> objects.</p></li>
+<li><p><strong>streams</strong> (<em>list</em>) – List of <code class="xref py py-class docutils literal notranslate"><span class="pre">Stream</span></code> objects.</p></li>
 </ul>
 </dd>
 </dl>
@@ -974,6 +992,10 @@ binaries.</p>
 <dd class="field-odd"><p><a class="reference internal" href="#pyraysum.prs.Result" title="pyraysum.prs.Result"><code class="xref py py-class docutils literal notranslate"><span class="pre">Result</span></code></a></p>
 </dd>
 </dl>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>Best performance is achived by calling <code class="xref py py-func docutils literal notranslate"><span class="pre">fraysum.run_bare()</span></code></p>
+</div>
 <p class="rubric">Example</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyraysum</span> <span class="kn">import</span> <span class="n">prs</span><span class="p">,</span> <span class="n">Model</span><span class="p">,</span> <span class="n">Geometry</span><span class="p">,</span> <span class="n">Control</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Define two-layer model with isotropic crust over isotropic half-space</span>
@@ -1004,11 +1026,14 @@ binaries.</p>
 <span class="sig-prename descclassname"><span class="pre">pyraysum.prs.</span></span><span class="sig-name descname"><span class="pre">read_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">modfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'prs'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyraysum/prs.html#read_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyraysum.prs.read_model" title="Permalink to this definition"></a></dt>
 <dd><p>Reads model parameters from file</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>Seismic velocity model</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>version</strong> (<em>&quot;prs&quot;</em><em> or </em><em>&quot;raysum&quot;</em>) – File has PyRaysum or Raysum format</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference internal" href="#pyraysum.prs.Model" title="pyraysum.prs.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a></p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Seismic velocity model</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#pyraysum.prs.Model" title="pyraysum.prs.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1032,11 +1057,15 @@ binaries.</p>
 <span class="sig-prename descclassname"><span class="pre">pyraysum.prs.</span></span><span class="sig-name descname"><span class="pre">read_control</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paramfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'prs'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyraysum/prs.html#read_control"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyraysum.prs.read_control" title="Permalink to this definition"></a></dt>
 <dd><p>Read Raysum run control parameters from file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>Run control parameters</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>version</strong> – (“prs” or “raysum”)
+File has PyRaysum or Raysum format</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference internal" href="#pyraysum.prs.Control" title="pyraysum.prs.Control"><code class="xref py py-class docutils literal notranslate"><span class="pre">Control</span></code></a></p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Run control parameters</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#pyraysum.prs.Control" title="pyraysum.prs.Control"><code class="xref py py-class docutils literal notranslate"><span class="pre">Control</span></code></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1139,8 +1168,8 @@ descriptors, short phase names, and conversion names.</p>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Array in shape to be used by <code class="xref py py-meth docutils literal notranslate"><span class="pre">filterd_rf_array()</span></code> and
-<a class="reference internal" href="#pyraysum.frs.filtered_array" title="pyraysum.frs.filtered_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">filtered_array()</span></code></a>.</p>
+<dd class="field-even"><p>Array in shape to be used by <a class="reference internal" href="#pyraysum.frs.filtered_rf_array" title="pyraysum.frs.filtered_rf_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">filtered_rf_array()</span></code></a> and
+<a class="reference internal" href="#pyraysum.frs.filtered_array" title="pyraysum.frs.filtered_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">filtered_array()</span></code></a>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><code class="xref py py-const docutils literal notranslate"><span class="pre">numpy.zeros((geometry.ntr,</span> <span class="pre">2,</span> <span class="pre">rc.npts))</span></code></p>
@@ -1170,7 +1199,7 @@ for computational efficiency, for use in inversion/probabilistic approaches.</p>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Output is written to <code class="xref py py-const docutils literal notranslate"><span class="pre">rfarray</span></code></p>
+<dd class="field-even"><p>None. Output is written to <code class="xref py py-const docutils literal notranslate"><span class="pre">rfarray</span></code></p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>None</p>
@@ -1178,7 +1207,7 @@ for computational efficiency, for use in inversion/probabilistic approaches.</p>
 </dl>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>Assumes PVH alignment (ray-polarization), i.e. <code class="xref py py-attr docutils literal notranslate"><span class="pre">Control.rot=2</span></code>.</p>
+<p>Assumes PVH alignment (ray-polarization), i.e. <code class="xref py py-attr docutils literal notranslate"><span class="pre">Control.rot=&quot;PVH&quot;</span></code>.</p>
 </div>
 </dd></dl>
 
@@ -1203,7 +1232,7 @@ for use in inversion/probabilistic approaches.</p>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Output is written to <code class="xref py py-const docutils literal notranslate"><span class="pre">rfarray</span></code></p>
+<dd class="field-even"><p>None. Output is written to <code class="xref py py-const docutils literal notranslate"><span class="pre">rfarray</span></code></p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>None</p>
@@ -1211,7 +1240,7 @@ for use in inversion/probabilistic approaches.</p>
 </dl>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>Assumes PVH alignment (ray-polarization), i.e. <code class="xref py py-attr docutils literal notranslate"><span class="pre">Control.rot=2</span></code>.</p>
+<p>Assumes PVH alignment (ray-polarization), i.e. <code class="xref py py-attr docutils literal notranslate"><span class="pre">Control.rot=&quot;PVH&quot;</span></code>.</p>
 </div>
 </dd></dl>
 
