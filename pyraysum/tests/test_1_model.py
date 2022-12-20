@@ -22,11 +22,11 @@ def test_read_model_aniso():
 
 
 def test_write_read_model_v1_2():
-    """Write and read a raysum v1.2 model"""
+    """Write and read a legavy raysum model"""
     model = prs.read_model(anisofile)
     tmpf = tempfile.NamedTemporaryFile(delete=False)
-    model.write(tmpf.name, version="1.2")
-    model = prs.read_model(tmpf.name, version="1.2")
+    model.write(tmpf.name, version="raysum")
+    model = prs.read_model(tmpf.name, version="raysum")
     remove(tmpf.name)
     assert isinstance(model, Model)
     assert model[1, "ani"] == -20.0

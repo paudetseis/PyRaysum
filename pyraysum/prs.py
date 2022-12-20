@@ -111,10 +111,12 @@ class Model(object):
     Warning:
         When setting `vpvs`, `vs` is adjusted to satisfy vs = vp / vpvs.
 
-    The following attributes are set upon initialization and when execuding
-    Model.update() after setting any of the above model attributes. `f` prefixes
-    indicate attributes used for interaction with `fraysum.run_bare()` and
-    `fraysum.run_full()`. Set these directly for best performance.
+    The following attributes are set upon initialization, when setting a layer property
+    via :meth:`Model.__setitem__()` (i.e. :attr:`model[0]` or :attr:`model[0,
+    "thickn"]`), and when execuding :meth:`Model.update()` after setting a single
+    element of the above model attributes. `f` prefixes indicate attributes used for
+    interaction with `fraysum.run_bare()` and `fraysum.run_full()`. Set these directly
+    for best performance.
 
         nlay
           Number of layers
@@ -366,6 +368,7 @@ class Model(object):
         self._set_layers()
 
     def __getitem__(self, ilay):
+        """Get a layer or property of the model"""
         try:
             # model[0, "thickn"]
             return self.layers[ilay[0]][ilay[1]]
@@ -378,6 +381,7 @@ class Model(object):
                 return np.array([lay[ilay] for lay in self.layers])
 
     def __setitem__(self, layatt, value):
+        """Set a layer or property of the model"""
 
         lays = []
         atts = []
@@ -512,7 +516,7 @@ class Model(object):
         ]
 
     def _v12str(self):
-        """Raysum version 1.2 .mod file convention"""
+        """Legacy Raysum .mod file convention"""
         buf = "#  thickn     rho      vp      vs  flag p-aniso  s-aniso   trend "
         buf += "plunge strike   dip\n"
 
@@ -586,7 +590,7 @@ class Model(object):
                (attribute, layer, new value)
 
         Note:
-            In the ``command`` argument, each substring has the form:
+            In the :data:`command` argument, each substring has the form:
 
             KEY LAYER SIGN VAL;
 
@@ -612,7 +616,7 @@ class Model(object):
             VAL (float) is the value to set / increase / decrease
 
         Hint:
-            For example, :py:meth:`Model.change('t0+10;psp0-0.2;d1+5;s1=45')` does:
+            For example, ``Model.change('t0+10;psp0-0.2;d1+5;s1=45')`` does:
 
                 1. Increase the thickness of the first layer by 10 km
                 2. Decrease Vp/Vs of the of the first layer by 0.2, holding Vs
@@ -797,7 +801,7 @@ class Model(object):
             fname (str): Name of the output file (including extension)
             comment (str): String to write into file header
             hint (bool): Include usage comment to model file
-            version ("prs" or "1.2"): Use PyRaysum or Raysum1.2 file format
+            version ("prs" or "raysum"): Use PyRaysum or Raysum file format
         """
 
         if not comment.startswith("#"):
@@ -819,7 +823,7 @@ class Model(object):
 
         if version == "prs":
             buf += self.__str__()
-        elif version == "1.2":
+        elif version == "raysum":
             buf += self._v12str()
         else:
             msg = f"Unknown version: {version}"
@@ -1355,7 +1359,7 @@ class Control(object):
                 * 0: no multiple
                 * 1: First interface multiples only
                 * 2: all first-order multiples (once reflected from the surface)
-                * 3: supply phases to be computed via meth:`Control.set_phaselist()`
+                * 3: supply phases to be computed via :meth:`Control.set_phaselist`
 
         npts (int):
             Number of samples in time series
@@ -1633,7 +1637,8 @@ class Control(object):
                 SEGMENT is the index of the model layer.
 
             equivalent (bool):
-                Augment phaselist by equivalent phases (e.g., '1P0P0s0P'; '1P0S0p0P')
+                Augment phaselist by equivalent phases (e.g., `'1P0P0s0P'`;
+                `'1P0S0p0P'`)
 
             kinematic (bool):
                 Limit equivalent phases to those with same polarity as input phases
@@ -1641,21 +1646,34 @@ class Control(object):
         Raises:
             IndexError: If resulting phaselist is longer than :const:`maxph`.
 
+        Caution:
+            At every interface, S-wave energy split up into a slow and a fast S-wave,
+            `S` and `T`, regardless of layer anisotropy. Make sure to include all
+            contributions when setting a explicit phaselist. It is best to inspect the
+            output of :meth:`Result.descriptors()` of a previous run with
+            :attr:`mults=2` for the ray combinations relevant for your problem.
+
+        Caution:
+            Using :const:`equivalent=False` may produce incorrect amplitudes, because
+            contributions of equivalent phases may be missing. At the same time,
+            amplitudes are oftentimes correct within 10%. Using :const:`equivalent=True`
+            may cause performance issues.
+
         Hint:
             In a two layer model (index `0` is the topmost subsurface layer, index `1`
             is the underlying half-space) the :const:`descriptors` compute the phases:
 
             * ``['1P0P']``: direct P-wave
-            * ``['1P0S']``: P-to-S converted wave
-            * ``['1P0P', '1P0S']``: direct P-wave and P-to-S converted wave
+            * ``['1P0S']``: P-to-S1 converted wave
+            * ``['1P0T']``: P-to-S2 converted wave
+            * ``['1P0P', '1P0S', '1P0T]``: direct P-wave and all P-to-S converted waves
             * ``['1P0P0s0S']``: P reflected s at the surface, reflected S at the top of the half-space
 
-        Caution:
-            Using :const:`equivalent=False` may produce incorrect amplitudes, because
-            contributions of equivalent phases may be missing.
+        See also:
+            :meth:`Result.descriptors()` returns all phases computed in a previous run.
 
         See also:
-            To output equivalent phases, see :meth:`~pyraysum.prs.equivalent_phases()`
+            :meth:`~pyraysum.prs.equivalent_phases()` outputs equivalent phases explicitly
         """
 
         self.mults = 3
@@ -1731,13 +1749,13 @@ class Control(object):
         Args:
             fname: (str)
                 Name of file
-            version: ("prs" or "1.2")
-                Pyraysum or Raysum v1.2 compatible
+            version: ("prs" or "raysum")
+                Pyraysum or Raysum raysum compatible
         """
 
         if version == "prs":
             buf = self._prs_str()
-        elif version == "1.2":
+        elif version == "raysum":
             buf = self._v12_str()
         else:
             msg = f"Unknown version: {version}"
@@ -1761,7 +1779,7 @@ class Result(object):
             Recording geometry
         rc (:class:`~pyraysum.prs.Control`):
             Run-control parameters
-        streams (List):
+        streams (list):
             List of :class:`~obspy.core.Stream` objects.
 
     If created with :const:`mode='full'` in :meth:`run()`, the :attr:`stats` attribute
@@ -2074,6 +2092,9 @@ def run(model, geometry, rc, mode="full", rf=False):
         :class:`~pyraysum.prs.Result`:
             Synthetic seimograms
 
+    Hint:
+        Best performance is achived by calling :func:`fraysum.run_bare`
+
     Example
     -------
     >>> from pyraysum import prs, Model, Geometry, Control
@@ -2140,13 +2161,17 @@ def read_model(modfile, encoding=None, version="prs"):
     """
     Reads model parameters from file
 
+    Parameters:
+        version ("prs" or "raysum"):
+            File has PyRaysum or Raysum format
+
     Returns:
         :class:`~pyraysum.prs.Model`:
             Seismic velocity model
     """
 
     vals = np.genfromtxt(modfile, encoding=encoding).T
-    if version == "1.2":
+    if version == "raysum":
         # ignore s-anisotropy
         vals = np.vstack((vals[:6], vals[7:]))
 
@@ -2177,6 +2202,10 @@ def read_control(paramfile, version="prs"):
     """
     Read Raysum run control parameters from file.
 
+    Parameters:
+        version: ("prs" or "raysum")
+            File has PyRaysum or Raysum format
+
     Returns:
         :class:`~pyraysum.prs.Control`:
             Run control parameters
@@ -2194,7 +2223,7 @@ def read_control(paramfile, version="prs"):
 
     if version == "prs":
         return Control(*buf)
-    elif version == "1.2":
+    elif version == "raysum":
         rc = Control(
             mults=buf[0], npts=buf[1], dt=buf[2], align=buf[4], shift=buf[5], rot=buf[6]
         )
