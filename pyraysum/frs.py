@@ -234,8 +234,8 @@ def make_array(geometry, rc):
 
     Returns:
         :const:`numpy.zeros((geometry.ntr, 2, rc.npts))`:
-            Array in shape to be used by :meth:`filterd_rf_array` and
-            :meth:`filtered_array`.
+            Array in shape to be used by :func:`filtered_rf_array` and
+            :func:`filtered_array`.
     """
     return np.zeros((geometry.ntr, 2, rc.npts))
 
@@ -280,10 +280,10 @@ def filtered_rf_array(traces, rfarray, ntr, npts, dt, fmin, fmax):
 
     Returns:
         None:
-            Output is written to :const:`rfarray`
+            None. Output is written to :const:`rfarray`
 
     Warning:
-        Assumes PVH alignment (ray-polarization), i.e. :attr:`Control.rot=2`.
+        Assumes PVH alignment (ray-polarization), i.e. :attr:`Control.rot="PVH"`.
     """
 
     order = 2
@@ -338,10 +338,10 @@ def filtered_array(traces, rfarray, ntr, npts, dt, fmin, fmax):
 
     Returns:
         None:
-            Output is written to :const:`rfarray`
+            None. Output is written to :const:`rfarray`
 
     Warning:
-        Assumes PVH alignment (ray-polarization), i.e. :attr:`Control.rot=2`.
+        Assumes PVH alignment (ray-polarization), i.e. :attr:`Control.rot="PVH"`.
     """
 
     npts2 = npts // 2
