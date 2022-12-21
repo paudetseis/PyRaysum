@@ -22,7 +22,7 @@ Authors: [Wasja Bloch](https://www.eoas.ubc.ca/people/wasjabloch), [Pascal Audet
 
 #### Installation
 
-*PyRaysum* can be installed from the command line.
+*PyRaysum* can be installed from PyPI or from source.
 
 To avoid conflicts with other programs, it is recommended to install *PyRaysum* inside a designated `conda` environment (called here `prs`) alongside its dependecies.
 ```
@@ -30,7 +30,15 @@ conda create -n prs python fortran-compiler obspy -c conda-forge
 conda activate prs
 ```
 
-*PyRaysum* can then be downloaded from *GitHub* and installed via `pip`.
+##### Installing from PyPI
+
+```
+pip install pyraysum
+```
+
+##### Installing from source
+
+The source code of *PyRaysum* can also be downloaded from *GitHub* and installed via `pip`.
 
 ```
 git clone https://github.com/paudetseis/PyRaysum.git
