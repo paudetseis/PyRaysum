@@ -60,10 +60,12 @@ Activate the newly created environment:
 
 You can interchange the name ``prs`` for any environment name you like.
 
-Installing latest version from PyPi
+Installing latest version from PyPI
 +++++++++++++++++++++++++++++++++++
 
-*This option is not available at this time*
+.. sourcecode:: bash
+
+   pip install pyraysum
 
 Installing development version from source
 ++++++++++++++++++++++++++++++++++++++++++
