@@ -123,7 +123,7 @@
 
 
 <div class="viewcode-block" id="read_traces"><a class="viewcode-back" href="../../api.html#pyraysum.frs.read_traces">[docs]</a><span class="k">def</span> <span class="nf">read_traces</span><span class="p">(</span><span class="n">traces</span><span class="p">,</span> <span class="n">rc</span><span class="p">,</span> <span class="n">geometry</span><span class="p">,</span> <span class="n">arrivals</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Create a :class:`Result` from the array produced by :meth:`fraysum.run_bare()`</span>
 <span class="sd">    and :meth:`fraysum.run_full`.</span>
 
@@ -220,7 +220,7 @@
 
 
 <div class="viewcode-block" id="read_arrivals"><a class="viewcode-back" href="../../api.html#pyraysum.frs.read_arrivals">[docs]</a><span class="k">def</span> <span class="nf">read_arrivals</span><span class="p">(</span><span class="n">ttimes</span><span class="p">,</span> <span class="n">amplitudes</span><span class="p">,</span> <span class="n">phaselist</span><span class="p">,</span> <span class="n">geometry</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convert the :const:`phaselist`, :const:`amplitude` and :const:`traveltime` output of</span>
 <span class="sd">    :meth:`fraysum.run_full()` to lists of phase arrival times, amplitudes, long phase</span>
 <span class="sd">    descriptors, short phase names, and conversion names.</span>
@@ -316,7 +316,7 @@
 
 
 <div class="viewcode-block" id="make_array"><a class="viewcode-back" href="../../api.html#pyraysum.frs.make_array">[docs]</a><span class="k">def</span> <span class="nf">make_array</span><span class="p">(</span><span class="n">geometry</span><span class="p">,</span> <span class="n">rc</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Initialize array for `NumPy`-based post processing</span>
 
 <span class="sd">    Parameters:</span>
@@ -346,7 +346,7 @@
 
 
 <div class="viewcode-block" id="filtered_rf_array"><a class="viewcode-back" href="../../api.html#pyraysum.frs.filtered_rf_array">[docs]</a><span class="k">def</span> <span class="nf">filtered_rf_array</span><span class="p">(</span><span class="n">traces</span><span class="p">,</span> <span class="n">rfarray</span><span class="p">,</span> <span class="n">ntr</span><span class="p">,</span> <span class="n">npts</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">fmin</span><span class="p">,</span> <span class="n">fmax</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Fast, `NumPy`-based, receiver function computation and filtering of</span>
 <span class="sd">    :meth:`fraysum.run_bare()` output</span>
 
@@ -405,7 +405,7 @@
 
 
 <div class="viewcode-block" id="filtered_array"><a class="viewcode-back" href="../../api.html#pyraysum.frs.filtered_array">[docs]</a><span class="k">def</span> <span class="nf">filtered_array</span><span class="p">(</span><span class="n">traces</span><span class="p">,</span> <span class="n">rfarray</span><span class="p">,</span> <span class="n">ntr</span><span class="p">,</span> <span class="n">npts</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">fmin</span><span class="p">,</span> <span class="n">fmax</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Fast, `NumPy`-based filtering of :meth:`fraysum.run_bare()` output</span>
 
 <span class="sd">    Roughly equivalent to subsequent calls to :func:`read_traces()`, and</span>

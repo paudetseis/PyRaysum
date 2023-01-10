@@ -168,7 +168,7 @@
 
 
 <div class="viewcode-block" id="Model"><a class="viewcode-back" href="../../api.html#pyraysum.prs.Model">[docs]</a><span class="k">class</span> <span class="nc">Model</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Model of the subsurface seismic velocity structure.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Model of the subsurface seismic velocity structure.</span>
 
 <span class="sd">    .. note::</span>
 <span class="sd">       This object holds the infromation of the .mod file in classic Raysum</span>
@@ -461,7 +461,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_layers</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ilay</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get a layer or property of the model&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a layer or property of the model&quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="c1"># model[0, &quot;thickn&quot;]</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="n">ilay</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">ilay</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
@@ -474,7 +474,7 @@
                 <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">lay</span><span class="p">[</span><span class="n">ilay</span><span class="p">]</span> <span class="k">for</span> <span class="n">lay</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layatt</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Set a layer or property of the model&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set a layer or property of the model&quot;&quot;&quot;</span>
 
         <span class="n">lays</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">atts</span> <span class="o">=</span> <span class="p">[]</span>
@@ -609,7 +609,7 @@
         <span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">_v12str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Legacy Raysum .mod file convention&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Legacy Raysum .mod file convention&quot;&quot;&quot;</span>
         <span class="n">buf</span> <span class="o">=</span> <span class="s2">&quot;#  thickn     rho      vp      vs  flag p-aniso  s-aniso   trend &quot;</span>
         <span class="n">buf</span> <span class="o">+=</span> <span class="s2">&quot;plunge strike   dip</span><span class="se">\n</span><span class="s2">&quot;</span>
 
@@ -633,7 +633,7 @@
         <span class="k">return</span> <span class="n">buf</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Model.update"><a class="viewcode-back" href="../../api.html#pyraysum.prs.Model.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">change</span><span class="o">=</span><span class="s2">&quot;vpvs&quot;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Update all attributes after one of them was changed.</span>
 
 <span class="sd">        Parameters:</span>
@@ -663,11 +663,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_layers</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="Model.copy"><a class="viewcode-back" href="../../api.html#pyraysum.prs.Model.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return a copy of the model&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a copy of the model&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Model.change"><a class="viewcode-back" href="../../api.html#pyraysum.prs.Model.change">[docs]</a>    <span class="k">def</span> <span class="nf">change</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Change layer properties using a command string.</span>
 
 <span class="sd">        Args:</span>
@@ -799,7 +799,7 @@
         <span class="k">return</span> <span class="n">changed</span></div>
 
 <div class="viewcode-block" id="Model.split_layer"><a class="viewcode-back" href="../../api.html#pyraysum.prs.Model.split_layer">[docs]</a>    <span class="k">def</span> <span class="nf">split_layer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Split layer `n` into two with half the thickness each, but otherwise</span>
 <span class="sd">        identical parameters.</span>
 
@@ -818,7 +818,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="Model.remove_layer"><a class="viewcode-back" href="../../api.html#pyraysum.prs.Model.remove_layer">[docs]</a>    <span class="k">def</span> <span class="nf">remove_layer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Remove layer `n`</span>
 
 <span class="sd">        Args:</span>
@@ -833,7 +833,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="Model.average_layers"><a class="viewcode-back" href="../../api.html#pyraysum.prs.Model.average_layers">[docs]</a>    <span class="k">def</span> <span class="nf">average_layers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Combine layers between top and bottom indices into one with summed</span>
 <span class="sd">        thicknesses and averaged vp, vs, and rho.</span>
 
@@ -881,13 +881,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="Model.save"><a class="viewcode-back" href="../../api.html#pyraysum.prs.Model.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="s2">&quot;sample.mod&quot;</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">hint</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;prs&quot;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Alias for :class:`write()`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fname</span><span class="o">=</span><span class="n">fname</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="n">comment</span><span class="p">,</span> <span class="n">hint</span><span class="o">=</span><span class="n">hint</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="n">version</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Model.write"><a class="viewcode-back" href="../../api.html#pyraysum.prs.Model.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="s2">&quot;sample.mod&quot;</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">hint</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;prs&quot;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Write seismic velocity model to disk as Raysum ASCII model file</span>
 
 <span class="sd">        Args:</span>
@@ -926,7 +926,7 @@
             <span class="n">fil</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Model.plot"><a class="viewcode-back" href="../../api.html#pyraysum.prs.Model.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zmax</span><span class="o">=</span><span class="mf">75.0</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Plot model as stair case, layers and labeled interfaces, and show it</span>
 
 <span class="sd">        Args:</span>
@@ -955,7 +955,7 @@
         <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="Model.plot_profile"><a class="viewcode-back" href="../../api.html#pyraysum.prs.Model.plot_profile">[docs]</a>    <span class="k">def</span> <span class="nf">plot_profile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zmax</span><span class="o">=</span><span class="mf">75.0</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Plot model as stair case and show it</span>
 
 <span class="sd">        Args:</span>
@@ -1017,7 +1017,7 @@
         <span class="k">return</span> <span class="n">ax</span></div>
 
 <div class="viewcode-block" id="Model.plot_layers"><a class="viewcode-back" href="../../api.html#pyraysum.prs.Model.plot_layers">[docs]</a>    <span class="k">def</span> <span class="nf">plot_layers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zmax</span><span class="o">=</span><span class="mf">75.0</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Plot model as horizontal layers and show it</span>
 
 <span class="sd">        Args:</span>
@@ -1082,7 +1082,7 @@
         <span class="k">return</span> <span class="n">ax</span></div>
 
 <div class="viewcode-block" id="Model.plot_interfaces"><a class="viewcode-back" href="../../api.html#pyraysum.prs.Model.plot_interfaces">[docs]</a>    <span class="k">def</span> <span class="nf">plot_interfaces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zmax</span><span class="o">=</span><span class="mi">75</span><span class="p">,</span> <span class="n">info</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;vp&quot;</span><span class="p">,</span> <span class="s2">&quot;vs&quot;</span><span class="p">,</span> <span class="s2">&quot;vpvs&quot;</span><span class="p">,</span> <span class="s2">&quot;rho&quot;</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Plot model as labeled interfaces with possibly dipping layers</span>
 
 <span class="sd">        Args:</span>
@@ -1186,7 +1186,7 @@
 
 
 <div class="viewcode-block" id="Geometry"><a class="viewcode-back" href="../../api.html#pyraysum.prs.Geometry">[docs]</a><span class="k">class</span> <span class="nc">Geometry</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Ray geometry of seismic events and station configuration.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Ray geometry of seismic events and station configuration.</span>
 
 <span class="sd">    One set of synthetic traces will be computed for each array element.</span>
 
@@ -1390,17 +1390,17 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">fbaz</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fslow</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fdn</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fde</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ntr</span><span class="p">]</span>
 
 <div class="viewcode-block" id="Geometry.copy"><a class="viewcode-back" href="../../api.html#pyraysum.prs.Geometry.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return a copy of the geometry&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a copy of the geometry&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Geometry.save"><a class="viewcode-back" href="../../api.html#pyraysum.prs.Geometry.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="s2">&quot;sample.geom&quot;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Alias for :meth:`write()`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fname</span><span class="o">=</span><span class="n">fname</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Geometry.write"><a class="viewcode-back" href="../../api.html#pyraysum.prs.Geometry.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="s2">&quot;sample.geom&quot;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Write ray geometry to disk as ascii file</span>
 
 <span class="sd">        Parameters:</span>
@@ -1414,7 +1414,7 @@
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Geometry written to: &quot;</span> <span class="o">+</span> <span class="n">fname</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Geometry.plot"><a class="viewcode-back" href="../../api.html#pyraysum.prs.Geometry.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Plot ray geometry in polar coordinates</span>
 
 <span class="sd">        Returns:</span>
@@ -1440,7 +1440,7 @@
 
 
 <div class="viewcode-block" id="Control"><a class="viewcode-back" href="../../api.html#pyraysum.prs.Control">[docs]</a><span class="k">class</span> <span class="nc">Control</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Run Control parameters for :meth:`prs.run()`.</span>
 
 <span class="sd">    Parameters:</span>
@@ -1710,7 +1710,7 @@
         <span class="k">return</span> <span class="n">out</span>
 
 <div class="viewcode-block" id="Control.set_phaselist"><a class="viewcode-back" href="../../api.html#pyraysum.prs.Control.set_phaselist">[docs]</a>    <span class="k">def</span> <span class="nf">set_phaselist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">descriptors</span><span class="p">,</span> <span class="n">equivalent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">kinematic</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Explicitly set phases to be calculated.</span>
 
 <span class="sd">        Parameters:</span>
@@ -1791,7 +1791,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="Control.null_phaselist"><a class="viewcode-back" href="../../api.html#pyraysum.prs.Control.null_phaselist">[docs]</a>    <span class="k">def</span> <span class="nf">null_phaselist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mults</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Do not use phaselist, but compute using :const:`mults` keyword.</span>
 
 <span class="sd">        Args:</span>
@@ -1810,7 +1810,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">mults</span> <span class="o">=</span> <span class="n">mults</span></div>
 
     <span class="k">def</span> <span class="nf">_update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Explicitly update :attr:`parameters`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1829,14 +1829,14 @@
         <span class="p">]</span>
 
 <div class="viewcode-block" id="Control.save"><a class="viewcode-back" href="../../api.html#pyraysum.prs.Control.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="s2">&quot;raysum-param&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;prs&quot;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Alias for :class:`~pyraysum.prs.Control.write()`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fname</span><span class="o">=</span><span class="n">fname</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="n">version</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Control.write"><a class="viewcode-back" href="../../api.html#pyraysum.prs.Control.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="s2">&quot;raysum-param&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;prs&quot;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Write parameter file to disk</span>
 
 <span class="sd">        Args:</span>
@@ -1859,7 +1859,7 @@
 
 
 <div class="viewcode-block" id="Result"><a class="viewcode-back" href="../../api.html#pyraysum.prs.Result">[docs]</a><span class="k">class</span> <span class="nc">Result</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Result of a PyRaysum wavefield simulation. 3-component synthetic seismograms</span>
 <span class="sd">    are strored as a list of streams in the stream attribute. Includes methods</span>
 <span class="sd">    to calculate receiver functions, filter and plot the results. See</span>
@@ -1953,7 +1953,7 @@
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">streams</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Result.calculate_rfs"><a class="viewcode-back" href="../../api.html#pyraysum.prs.Result.calculate_rfs">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_rfs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate receiver functions from spectral division of displacement traces.</span>
 <span class="sd">        Will be stored in :attr:`rflist`.</span>
 
@@ -2021,7 +2021,7 @@
         <span class="k">return</span></div>
 
 <div class="viewcode-block" id="Result.descriptors"><a class="viewcode-back" href="../../api.html#pyraysum.prs.Result.descriptors">[docs]</a>    <span class="k">def</span> <span class="nf">descriptors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            list</span>
 <span class="sd">                Unique list of all phase descriptors present</span>
@@ -2052,7 +2052,7 @@
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">phl</span><span class="p">)))</span></div>
 
 <div class="viewcode-block" id="Result.write"><a class="viewcode-back" href="../../api.html#pyraysum.prs.Result.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="s2">&quot;sample.tr&quot;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Write streams to file, using legacy Raysum trace format</span>
 
 <span class="sd">        Parameters:</span>
@@ -2086,7 +2086,7 @@
             <span class="n">fid</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Result.plot"><a class="viewcode-back" href="../../api.html#pyraysum.prs.Result.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">typ</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Plot the displacement seismograms and/or receiver functions stored in</span>
 <span class="sd">        :class:`~pyraysum.prs.Result` streams.</span>
 
@@ -2118,7 +2118,7 @@
             <span class="k">raise</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="Result.filter"><a class="viewcode-back" href="../../api.html#pyraysum.prs.Result.filter">[docs]</a>    <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">typ</span><span class="p">,</span> <span class="n">ftype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        Filters the displacement seismograms and/or receiver functions stored</span>
 <span class="sd">        in :class:`~pyraysum.prs.Result` streams.</span>
@@ -2164,7 +2164,7 @@
 
 
 <div class="viewcode-block" id="run"><a class="viewcode-back" href="../../api.html#pyraysum.prs.run">[docs]</a><span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">geometry</span><span class="p">,</span> <span class="n">rc</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="n">rf</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Run a wave-field simulation. This function calls the compiled :mod:`fraysum`</span>
 <span class="sd">    binaries.</span>
 
@@ -2251,7 +2251,7 @@
 
 
 <div class="viewcode-block" id="read_model"><a class="viewcode-back" href="../../api.html#pyraysum.prs.read_model">[docs]</a><span class="k">def</span> <span class="nf">read_model</span><span class="p">(</span><span class="n">modfile</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;prs&quot;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Reads model parameters from file</span>
 
 <span class="sd">    Parameters:</span>
@@ -2272,7 +2272,7 @@
 
 
 <div class="viewcode-block" id="read_geometry"><a class="viewcode-back" href="../../api.html#pyraysum.prs.read_geometry">[docs]</a><span class="k">def</span> <span class="nf">read_geometry</span><span class="p">(</span><span class="n">geomfile</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Reads geometry parameters from file</span>
 
 <span class="sd">    Returns:</span>
@@ -2292,7 +2292,7 @@
 
 
 <div class="viewcode-block" id="read_control"><a class="viewcode-back" href="../../api.html#pyraysum.prs.read_control">[docs]</a><span class="k">def</span> <span class="nf">read_control</span><span class="p">(</span><span class="n">paramfile</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;prs&quot;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Read Raysum run control parameters from file.</span>
 
 <span class="sd">    Parameters:</span>
@@ -2324,7 +2324,7 @@
 
 
 <div class="viewcode-block" id="equivalent_phases"><a class="viewcode-back" href="../../api.html#pyraysum.prs.equivalent_phases">[docs]</a><span class="k">def</span> <span class="nf">equivalent_phases</span><span class="p">(</span><span class="n">descriptors</span><span class="p">,</span> <span class="n">kinematic</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return descriptors of equivalent phases, i.e. those arriving at the same time as</span>
 <span class="sd">    the input phases</span>
 

@@ -176,18 +176,18 @@ conda environment (see below).</p>
 <p>We recommend creating a custom
 <a class="reference external" href="https://conda.io/docs/user-guide/tasks/manage-environments.html">conda environment</a>
 where <code class="docutils literal notranslate"><span class="pre">pyraysum</span></code> can be installed along with its dependencies:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda create -n prs <span class="nv">python</span><span class="o">=</span><span class="m">3</span>.8 fortran-compiler obspy -c conda-forge
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>prs<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.8<span class="w"> </span>fortran-compiler<span class="w"> </span>obspy<span class="w"> </span>-c<span class="w"> </span>conda-forge
 </pre></div>
 </div>
 <p>Activate the newly created environment:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda activate prs
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>activate<span class="w"> </span>prs
 </pre></div>
 </div>
 <p>You can interchange the name <code class="docutils literal notranslate"><span class="pre">prs</span></code> for any environment name you like.</p>
 </section>
 <section id="installing-latest-version-from-pypi">
 <h2>Installing latest version from PyPI<a class="headerlink" href="#installing-latest-version-from-pypi" title="Permalink to this heading"></a></h2>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install pyraysum
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>pyraysum
 </pre></div>
 </div>
 </section>
@@ -196,14 +196,14 @@ where <code class="docutils literal notranslate"><span class="pre">pyraysum</spa
 <ul class="simple">
 <li><p>Clone the repository:</p></li>
 </ul>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/paudetseis/PyRaysum.git
-<span class="nb">cd</span> PyRaysum
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/paudetseis/PyRaysum.git
+<span class="nb">cd</span><span class="w"> </span>PyRaysum
 </pre></div>
 </div>
 <ul class="simple">
 <li><p>Install using <code class="docutils literal notranslate"><span class="pre">pip</span></code>:</p></li>
 </ul>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install .
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>.
 </pre></div>
 </div>
 </section>
@@ -213,15 +213,15 @@ where <code class="docutils literal notranslate"><span class="pre">pyraysum</spa
 <ul class="simple">
 <li><p>Install <code class="docutils literal notranslate"><span class="pre">pytest</span></code></p></li>
 </ul>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install pytest
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>install<span class="w"> </span>pytest
 </pre></div>
 </div>
 <ul class="simple">
 <li><p>Run the tests</p></li>
 </ul>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir empty
-<span class="nb">cd</span> empty
-pytest -v ../pyraysum/tests/
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>empty
+<span class="nb">cd</span><span class="w"> </span>empty
+pytest<span class="w"> </span>-v<span class="w"> </span>../pyraysum/tests/
 </pre></div>
 </div>
 </section>
@@ -245,12 +245,12 @@ by typing in a <code class="docutils literal notranslate"><span class="pre">pyth
 <p>This will also install packaged data that are necessary to run the notebooks.
 Note that to run the notebooks, you will have to further install <code class="docutils literal notranslate"><span class="pre">jupyter</span></code>.
 From the terminal, type:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install jupyter
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>install<span class="w"> </span>jupyter
 </pre></div>
 </div>
 <p>Followed by:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> Notebooks
-jupyter notebook
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>Notebooks
+jupyter<span class="w"> </span>notebook
 </pre></div>
 </div>
 <p>You can then save the notebooks as <code class="docutils literal notranslate"><span class="pre">python</span></code> scripts,
