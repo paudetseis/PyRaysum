@@ -11,7 +11,7 @@ in the layers. Incident P and S waves are supported.
 A trimmed down version of the Fortran code is supplied with `PyRaysum`. You can find the 
 original version [here](https://home.cc.umanitoba.ca/~frederik/Software/).
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6095749.svg)](https://doi.org/10.5281/zenodo.6095749)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7468301.svg)](https://doi.org/10.5281/zenodo.7468301)
 [![build](https://github.com/paudetseis/PyRaysum/workflows/Build/badge.svg)](https://github.com/paudetseis/PyRaysum/actions)
 [![codecov](https://codecov.io/gh/paudetseis/PyRaysum/branch/main/graph/badge.svg?token=59F1SWLM9Q)](https://codecov.io/gh/paudetseis/PyRaysum)
 ![GitHub](https://img.shields.io/github/license/paudetseis/pyraysum)
@@ -28,6 +28,16 @@ To avoid conflicts with other programs, it is recommended to install *PyRaysum* 
 ```
 conda create -n prs python fortran-compiler obspy -c conda-forge
 conda activate prs
+```
+If you are using an alternative *Python* interpreter (e.g., *IPython* or a *Jupyter*
+notebook), include it into your installation as well. This ensures that the interpreter
+uses the correct *Python* version.
+```
+# IPython
+conda install ipython
+
+# Jupyter notebooks
+conda install jupyter
 ```
 
 ##### Installing from PyPI
@@ -90,7 +100,7 @@ If you use `PyRaysum` in your work, please cite the following references:
 
 - Bloch, W., and Audet, P. (in press). PyRaysum: Software for modeling ray-theoretical plane body-wave propagation in dipping anisotropic media. Seismica.
 
-- Audet, P., and Bloch, W. (2022). PyRaysum: Software for modeling ray-theoretical body-wave propagation. Zenodo. https://doi.org/10.5281/zenodo.6095749
+- Audet, P., and Bloch, W. (2022). PyRaysum: Software for modeling ray-theoretical body-wave propagation. Zenodo. https://doi.org/10.5281/zenodo.7468301
 
 #### Contributing
 
