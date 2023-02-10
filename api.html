@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Classes &mdash; pyraysum 1.0.0 documentation</title>
@@ -11,10 +11,8 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
@@ -29,12 +27,16 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> pyraysum
-            <img src="_static/PyRaysum_logo.png" class="logo" alt="Logo"/>
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            pyraysum
+              <img src="_static/PyRaysum_logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -160,7 +162,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active">Classes</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/api.rst.txt" rel="nofollow"> View page source</a>
@@ -197,7 +199,7 @@ an instance of class <code class="xref py py-class docutils literal notranslate"
 <p>This object holds the infromation of the .mod file in classic Raysum</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>thickn</strong> (<em>array_like</em>) – Thickness of layers (m)</p></li>
 <li><p><strong>rho</strong> (<em>float</em><em> or </em><em>array_like</em>) – Density (kg/m^3)</p></li>
@@ -303,7 +305,7 @@ by <cite>fraysum.run_bare()</cite> and <cite>fraysum.run_full()</cite></p>
 <span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">change</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'vpvs'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyraysum/prs.html#Model.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyraysum.prs.Model.update" title="Permalink to this definition"></a></dt>
 <dd><p>Update all attributes after one of them was changed.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>change</strong> (<em>str</em>) – <p>Decide which of <code class="xref py py-attr docutils literal notranslate"><span class="pre">vp</span></code>, <code class="xref py py-attr docutils literal notranslate"><span class="pre">vs</span></code> or <code class="xref py py-attr docutils literal notranslate"><span class="pre">vpvs</span></code> should
 depend on the other two:</p>
 <blockquote>
@@ -315,7 +317,7 @@ depend on the other two:</p>
 </div></blockquote>
 </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
 </dd>
 </dl>
@@ -332,17 +334,17 @@ depend on the other two:</p>
 <span class="sig-name descname"><span class="pre">change</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyraysum/prs.html#Model.change"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyraysum.prs.Model.change" title="Permalink to this definition"></a></dt>
 <dd><p>Change layer properties using a command string.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>command</strong> (<em>str</em>) – An arbitrary number of command substrings separated by ‘;’</p></li>
 <li><p><strong>verbose</strong> (<em>bool</em>) – Print changed parameters to screen</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>List of changes applied of the form:
 (attribute, layer, new value)</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list of 3*tuple</p>
 </dd>
 </dl>
@@ -391,7 +393,7 @@ fixed</p></li>
 <dd><p>Split layer <cite>n</cite> into two with half the thickness each, but otherwise
 identical parameters.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>n</strong> – (int)
 Index of the layer to split</p>
 </dd>
@@ -403,7 +405,7 @@ Index of the layer to split</p>
 <span class="sig-name descname"><span class="pre">remove_layer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyraysum/prs.html#Model.remove_layer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyraysum.prs.Model.remove_layer" title="Permalink to this definition"></a></dt>
 <dd><p>Remove layer <cite>n</cite></p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>n</strong> (<em>int</em>) – Index of the layer to remove</p>
 </dd>
 </dl>
@@ -415,13 +417,13 @@ Index of the layer to split</p>
 <dd><p>Combine layers between top and bottom indices into one with summed
 thicknesses and averaged vp, vs, and rho.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>top</strong> (<em>int</em>) – Index before top-most layer to include in combination</p></li>
 <li><p><strong>bottom</strong> (<em>int</em>) – Index after bottom-most layer to include in combination</p></li>
 </ul>
 </dd>
-<dt class="field-even">Raises</dt>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>IndexError</strong> – if bottom is less or equal to top</p></li>
 <li><p><strong>ValueError</strong> – if any layer is anisotropic</p></li>
@@ -442,7 +444,7 @@ thicknesses and averaged vp, vs, and rho.</p>
 <span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sample.mod'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'prs'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyraysum/prs.html#Model.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyraysum.prs.Model.write" title="Permalink to this definition"></a></dt>
 <dd><p>Write seismic velocity model to disk as Raysum ASCII model file</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>fname</strong> (<em>str</em>) – Name of the output file (including extension)</p></li>
 <li><p><strong>comment</strong> (<em>str</em>) – String to write into file header</p></li>
@@ -458,7 +460,7 @@ thicknesses and averaged vp, vs, and rho.</p>
 <span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">zmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">75.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyraysum/prs.html#Model.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyraysum.prs.Model.plot" title="Permalink to this definition"></a></dt>
 <dd><p>Plot model as stair case, layers and labeled interfaces, and show it</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>zmax</strong> (<em>float</em>) – Maximum depth of model to plot (km)</p>
 </dd>
 </dl>
@@ -469,16 +471,16 @@ thicknesses and averaged vp, vs, and rho.</p>
 <span class="sig-name descname"><span class="pre">plot_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">zmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">75.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyraysum/prs.html#Model.plot_profile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyraysum.prs.Model.plot_profile" title="Permalink to this definition"></a></dt>
 <dd><p>Plot model as stair case and show it</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>zmax</strong> (<em>float</em>) – Maximum depth of model to plot (km)</p></li>
 <li><p><strong>ax</strong> (<em>plt.axis</em>) – Axis handle for plotting. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, show the plot</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Axis handle for plotting</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>plt.axis</p>
 </dd>
 </dl>
@@ -489,16 +491,16 @@ thicknesses and averaged vp, vs, and rho.</p>
 <span class="sig-name descname"><span class="pre">plot_layers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">zmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">75.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyraysum/prs.html#Model.plot_layers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyraysum.prs.Model.plot_layers" title="Permalink to this definition"></a></dt>
 <dd><p>Plot model as horizontal layers and show it</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>zmax</strong> (<em>float</em>) – Maximum depth of model to plot (km)</p></li>
 <li><p><strong>ax</strong> (<em>plt.axis</em>) – Axis handle for plotting. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, show the plot</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Axis handle for plotting</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>plt.axis</p>
 </dd>
 </dl>
@@ -509,20 +511,20 @@ thicknesses and averaged vp, vs, and rho.</p>
 <span class="sig-name descname"><span class="pre">plot_interfaces</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">zmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">75</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['vp',</span> <span class="pre">'vs',</span> <span class="pre">'vpvs',</span> <span class="pre">'rho']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyraysum/prs.html#Model.plot_interfaces"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyraysum.prs.Model.plot_interfaces" title="Permalink to this definition"></a></dt>
 <dd><p>Plot model as labeled interfaces with possibly dipping layers</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>zmax</strong> (<em>float</em>) – Maximum depth of model to plot (km)</p></li>
 <li><p><strong>info</strong> (<em>list</em><em> of </em><em>str</em>) – Which <a class="reference internal" href="#pyraysum.prs.Model" title="pyraysum.prs.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a> attributes to list for each layer</p></li>
 <li><p><strong>ax</strong> (<em>plt.axis</em>) – Axis handle for plotting. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, show the plot</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Axis handle for plotting</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>plt.axis</p>
 </dd>
-<dt class="field-even">Raises</dt>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>ValueError</strong> – If element in <code class="xref py py-const docutils literal notranslate"><span class="pre">info</span></code> is not recognized</p>
 </dd>
 </dl>
@@ -543,7 +545,7 @@ thicknesses and averaged vp, vs, and rho.</p>
 <p>This object holds the infromation of the .geom file in classic Raysum</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>baz</strong> (<em>float</em><em> or </em><em>array_like</em>) – Ray back-azimuths (deg)</p></li>
 <li><p><strong>slow</strong> (<em>float</em><em> or </em><em>array_like</em>) – Ray slownesses (s/km)</p></li>
@@ -620,7 +622,7 @@ by <cite>fraysum.run_bare()</cite> and <cite>fraysum.run_full()</cite></p>
 <span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sample.geom'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyraysum/prs.html#Geometry.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyraysum.prs.Geometry.write" title="Permalink to this definition"></a></dt>
 <dd><p>Write ray geometry to disk as ascii file</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>fname</strong> (<em>str</em>) – Name of file</p>
 </dd>
 </dl>
@@ -631,10 +633,10 @@ by <cite>fraysum.run_bare()</cite> and <cite>fraysum.run_full()</cite></p>
 <span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyraysum/prs.html#Geometry.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyraysum.prs.Geometry.plot" title="Permalink to this definition"></a></dt>
 <dd><p>Plot ray geometry in polar coordinates</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Axis handle for plotting</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>plt.axis</p>
 </dd>
 </dl>
@@ -650,7 +652,7 @@ by <cite>fraysum.run_bare()</cite> and <cite>fraysum.run_full()</cite></p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyraysum.prs.</span></span><span class="sig-name descname"><span class="pre">Control</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wvtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'P'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.025</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">align</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxseg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">45</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxtr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxph</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">40000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxsamp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyraysum/prs.html#Control"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyraysum.prs.Control" title="Permalink to this definition"></a></dt>
 <dd><p>Run Control parameters for <code class="xref py py-meth docutils literal notranslate"><span class="pre">prs.run()</span></code>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>wvtype</strong> (<em>str</em>) – Wave type of incoming wavefield (<code class="xref py py-const docutils literal notranslate"><span class="pre">'P'</span></code>, <code class="xref py py-const docutils literal notranslate"><span class="pre">'SV'</span></code>, or <code class="xref py py-const docutils literal notranslate"><span class="pre">'SH'</span></code>)</p></li>
 <li><p><strong>mults</strong> (<em>int</em>) – <p>ID for calculating free surface multiples</p>
@@ -708,7 +710,7 @@ to greater lags). If <code class="docutils literal notranslate"><span class="pre
 <dd><p>Convenience attribute that collects the attributes in the order expected
 by <code class="xref py py-meth docutils literal notranslate"><span class="pre">fraysum.run_bare()</span></code> and <code class="xref py py-meth docutils literal notranslate"><span class="pre">fraysum.run_full()</span></code></p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list</p>
 </dd>
 </dl>
@@ -726,7 +728,7 @@ coordinates (Z positive down).</p>
 <span class="sig-name descname"><span class="pre">set_phaselist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">descriptors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">equivalent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kinematic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyraysum/prs.html#Control.set_phaselist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyraysum.prs.Control.set_phaselist" title="Permalink to this definition"></a></dt>
 <dd><p>Explicitly set phases to be calculated.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>descriptors</strong> (<em>list</em><em> of </em><em>str</em>) – <p>List of phase descriptors, where each descriptor is a string of
 consecutive PHASE SEGMENT pairs, where
@@ -748,7 +750,7 @@ PHASE is:</p>
 <li><p><strong>kinematic</strong> (<em>bool</em>) – Limit equivalent phases to those with same polarity as input phases</p></li>
 </ul>
 </dd>
-<dt class="field-even">Raises</dt>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>IndexError</strong> – If resulting phaselist is longer than <code class="xref py py-const docutils literal notranslate"><span class="pre">maxph</span></code>.</p>
 </dd>
 </dl>
@@ -794,7 +796,7 @@ is the underlying half-space) the <code class="xref py py-const docutils literal
 <span class="sig-name descname"><span class="pre">null_phaselist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyraysum/prs.html#Control.null_phaselist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyraysum.prs.Control.null_phaselist" title="Permalink to this definition"></a></dt>
 <dd><p>Do not use phaselist, but compute using <code class="xref py py-const docutils literal notranslate"><span class="pre">mults</span></code> keyword.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>mults</strong> (<em>int</em>) – Set <code class="xref py py-attr docutils literal notranslate"><span class="pre">Control.mults</span></code> to this value.</p>
 </dd>
 </dl>
@@ -811,7 +813,7 @@ is the underlying half-space) the <code class="xref py py-const docutils literal
 <span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'raysum-param'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'prs'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyraysum/prs.html#Control.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyraysum.prs.Control.write" title="Permalink to this definition"></a></dt>
 <dd><p>Write parameter file to disk</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>fname</strong> – (str)
 Name of file</p></li>
@@ -835,7 +837,7 @@ are strored as a list of streams in the stream attribute. Includes methods
 to calculate receiver functions, filter and plot the results. See
 <a class="reference internal" href="#pyraysum.prs.run" title="pyraysum.prs.run"><code class="xref py py-func docutils literal notranslate"><span class="pre">run()</span></code></a> for examples.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>model</strong> (<a class="reference internal" href="#pyraysum.prs.Model" title="pyraysum.prs.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>) – Subsurface velocity model</p></li>
 <li><p><strong>geometry</strong> (<a class="reference internal" href="#pyraysum.prs.Geometry" title="pyraysum.prs.Geometry"><code class="xref py py-class docutils literal notranslate"><span class="pre">Geometry</span></code></a>) – Recording geometry</p></li>
@@ -869,7 +871,7 @@ conversion occurs. (e.g. “P1S”)</p>
 <dd><p>Generate receiver functions from spectral division of displacement traces.
 Will be stored in <code class="xref py py-attr docutils literal notranslate"><span class="pre">rflist</span></code>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Raises</dt>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>ValueError</strong> – In case <a class="reference internal" href="#pyraysum.prs.Control" title="pyraysum.prs.Control"><code class="xref py py-class docutils literal notranslate"><span class="pre">Control</span></code></a> parameters a unsuitable.</p>
 </dd>
 </dl>
@@ -879,14 +881,14 @@ Will be stored in <code class="xref py py-attr docutils literal notranslate"><sp
 <dt class="sig sig-object py" id="pyraysum.prs.Result.descriptors">
 <span class="sig-name descname"><span class="pre">descriptors</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyraysum/prs.html#Result.descriptors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyraysum.prs.Result.descriptors" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><dl class="simple">
 <dt>list</dt><dd><p>Unique list of all phase descriptors present</p>
 </dd>
 </dl>
 </p>
 </dd>
-<dt class="field-even">Raises</dt>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>AttributeError</strong> – If no descriptors are present</p>
 </dd>
 </dl>
@@ -907,7 +909,7 @@ Will be stored in <code class="xref py py-attr docutils literal notranslate"><sp
 <span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sample.tr'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyraysum/prs.html#Result.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyraysum.prs.Result.write" title="Permalink to this definition"></a></dt>
 <dd><p>Write streams to file, using legacy Raysum trace format</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>fname</strong> (<em>str</em>) – Name of the output file (including extension)</p>
 </dd>
 </dl>
@@ -919,7 +921,7 @@ Will be stored in <code class="xref py py-attr docutils literal notranslate"><sp
 <dd><p>Plot the displacement seismograms and/or receiver functions stored in
 <a class="reference internal" href="#pyraysum.prs.Result" title="pyraysum.prs.Result"><code class="xref py py-class docutils literal notranslate"><span class="pre">Result</span></code></a> streams.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>typ</strong> (<em>str</em>) – Type of plot to show. Options are <code class="xref py py-const docutils literal notranslate"><span class="pre">'streams'</span></code>, <code class="xref py py-const docutils literal notranslate"><span class="pre">'rfs'</span></code>, or
 <code class="xref py py-const docutils literal notranslate"><span class="pre">'all'</span></code> for the displacement seismograms, receiver functions, or
@@ -943,7 +945,7 @@ default <code class="xref py py-meth docutils literal notranslate"><span class="
 <dd><p>Filters the displacement seismograms and/or receiver functions stored
 in <a class="reference internal" href="#pyraysum.prs.Result" title="pyraysum.prs.Result"><code class="xref py py-class docutils literal notranslate"><span class="pre">Result</span></code></a> streams.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>typ</strong> (<em>str</em>) – Type of plot to show. Options are <code class="xref py py-const docutils literal notranslate"><span class="pre">'streams'</span></code>,
 <code class="xref py py-const docutils literal notranslate"><span class="pre">'rfs'</span></code>, or <code class="xref py py-const docutils literal notranslate"><span class="pre">'all'</span></code> for the displacement seismograms,
@@ -972,7 +974,7 @@ receiver functions, or both</p></li>
 <dd><p>Run a wave-field simulation. This function calls the compiled <code class="xref py py-mod docutils literal notranslate"><span class="pre">fraysum</span></code>
 binaries.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>model</strong> (<a class="reference internal" href="#pyraysum.prs.Model" title="pyraysum.prs.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>) – Subsurface velocity model</p></li>
 <li><p><strong>geometry</strong> (<a class="reference internal" href="#pyraysum.prs.Geometry" title="pyraysum.prs.Geometry"><code class="xref py py-class docutils literal notranslate"><span class="pre">Geometry</span></code></a>) – Recording geometry</p></li>
@@ -985,10 +987,10 @@ binaries.</p>
 <li><p><strong>rf</strong> (<em>bool</em>) – Whether or not to calculate receiver functions</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Synthetic seimograms</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#pyraysum.prs.Result" title="pyraysum.prs.Result"><code class="xref py py-class docutils literal notranslate"><span class="pre">Result</span></code></a></p>
 </dd>
 </dl>
@@ -1026,13 +1028,13 @@ binaries.</p>
 <span class="sig-prename descclassname"><span class="pre">pyraysum.prs.</span></span><span class="sig-name descname"><span class="pre">read_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">modfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'prs'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyraysum/prs.html#read_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyraysum.prs.read_model" title="Permalink to this definition"></a></dt>
 <dd><p>Reads model parameters from file</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>version</strong> (<em>&quot;prs&quot;</em><em> or </em><em>&quot;raysum&quot;</em>) – File has PyRaysum or Raysum format</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Seismic velocity model</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#pyraysum.prs.Model" title="pyraysum.prs.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a></p>
 </dd>
 </dl>
@@ -1043,10 +1045,10 @@ binaries.</p>
 <span class="sig-prename descclassname"><span class="pre">pyraysum.prs.</span></span><span class="sig-name descname"><span class="pre">read_geometry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geomfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyraysum/prs.html#read_geometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyraysum.prs.read_geometry" title="Permalink to this definition"></a></dt>
 <dd><p>Reads geometry parameters from file</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Ray geometry</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="#pyraysum.prs.Geometry" title="pyraysum.prs.Geometry"><code class="xref py py-class docutils literal notranslate"><span class="pre">Geometry</span></code></a></p>
 </dd>
 </dl>
@@ -1057,14 +1059,14 @@ binaries.</p>
 <span class="sig-prename descclassname"><span class="pre">pyraysum.prs.</span></span><span class="sig-name descname"><span class="pre">read_control</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paramfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'prs'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyraysum/prs.html#read_control"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyraysum.prs.read_control" title="Permalink to this definition"></a></dt>
 <dd><p>Read Raysum run control parameters from file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>version</strong> – (“prs” or “raysum”)
 File has PyRaysum or Raysum format</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Run control parameters</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#pyraysum.prs.Control" title="pyraysum.prs.Control"><code class="xref py py-class docutils literal notranslate"><span class="pre">Control</span></code></a></p>
 </dd>
 </dl>
@@ -1076,17 +1078,17 @@ File has PyRaysum or Raysum format</p>
 <dd><p>Return descriptors of equivalent phases, i.e. those arriving at the same time as
 the input phases</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>descriptors</strong> (<em>list</em><em> of </em><em>strings</em>) – Phase descriptors as in <a class="reference internal" href="#pyraysum.prs.Control.set_phaselist" title="pyraysum.prs.Control.set_phaselist"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Control.set_phaselist()</span></code></a></p></li>
 <li><p><strong>kinematic</strong> (<em>boolean</em>) – If True, restrict to kinematically equivalent phases, i.e. those that have
 the same polarization as input phases</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>List of unique descriptors of equivalent phases</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list of strings</p>
 </dd>
 </dl>
@@ -1107,7 +1109,7 @@ the same polarization as input phases</p></li>
 <dd><p>Create a <code class="xref py py-class docutils literal notranslate"><span class="pre">Result</span></code> from the array produced by <code class="xref py py-meth docutils literal notranslate"><span class="pre">fraysum.run_bare()</span></code>
 and <code class="xref py py-meth docutils literal notranslate"><span class="pre">fraysum.run_full()</span></code>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rc</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Control</span></code>) – Run-control parameters</p></li>
 <li><p><strong>geometry</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Geometry</span></code>) – Ray parameters</p></li>
@@ -1115,10 +1117,10 @@ and <code class="xref py py-meth docutils literal notranslate"><span class="pre"
 names</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>List of <code class="xref py py-class docutils literal notranslate"><span class="pre">obspy.Stream</span></code> objects</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list</p>
 </dd>
 </dl>
@@ -1131,7 +1133,7 @@ names</p></li>
 <code class="xref py py-meth docutils literal notranslate"><span class="pre">fraysum.run_full()</span></code> to lists of phase arrival times, amplitudes, long phase
 descriptors, short phase names, and conversion names.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ttimes</strong> (<em>np.array</em>) – Travel time array …</p></li>
 <li><p><strong>amplitudes</strong> (<em>np.array</em>) – Amplitude array …</p></li>
@@ -1139,7 +1141,7 @@ descriptors, short phase names, and conversion names.</p>
 <li><p><strong>geometry</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">prs.Geometry</span></code>) – Ray geometry</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><p>3-component phase arrival lists, where indices translate to:</p>
 <ul class="simple">
 <li><p><code class="xref py py-const docutils literal notranslate"><span class="pre">0</span></code>: phase arrival times</p></li>
@@ -1150,7 +1152,7 @@ descriptors, short phase names, and conversion names.</p>
 </ul>
 </p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list</p>
 </dd>
 </dl>
@@ -1161,17 +1163,17 @@ descriptors, short phase names, and conversion names.</p>
 <span class="sig-prename descclassname"><span class="pre">pyraysum.frs.</span></span><span class="sig-name descname"><span class="pre">make_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyraysum/frs.html#make_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyraysum.frs.make_array" title="Permalink to this definition"></a></dt>
 <dd><p>Initialize array for <cite>NumPy</cite>-based post processing</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>geometry</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">prs.Geometry</span></code>) – Recording geometry</p></li>
 <li><p><strong>rc</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">prs.Control</span></code>) – Run-control parameters</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Array in shape to be used by <a class="reference internal" href="#pyraysum.frs.filtered_rf_array" title="pyraysum.frs.filtered_rf_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">filtered_rf_array()</span></code></a> and
 <a class="reference internal" href="#pyraysum.frs.filtered_array" title="pyraysum.frs.filtered_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">filtered_array()</span></code></a>.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="xref py py-const docutils literal notranslate"><span class="pre">numpy.zeros((geometry.ntr,</span> <span class="pre">2,</span> <span class="pre">rc.npts))</span></code></p>
 </dd>
 </dl>
@@ -1186,7 +1188,7 @@ descriptors, short phase names, and conversion names.</p>
 <code class="xref py py-meth docutils literal notranslate"><span class="pre">Result.calculate_rfs()</span></code> and <code class="xref py py-meth docutils literal notranslate"><span class="pre">Result.filter()</span></code>, stripped down
 for computational efficiency, for use in inversion/probabilistic approaches.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>traces</strong> (<em>np.ndarray</em>) – Output of <code class="xref py py-meth docutils literal notranslate"><span class="pre">fraysum.run_bare()</span></code></p></li>
 <li><p><strong>rfarray</strong> (<em>np.ndarray</em>) – Initialized array of shape (ntr, 2, npts) to store output (See:
@@ -1198,10 +1200,10 @@ for computational efficiency, for use in inversion/probabilistic approaches.</p>
 <li><p><strong>fmax</strong> (<em>float</em>) – Upper bandpass frequency corner (Hz)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>None. Output is written to <code class="xref py py-const docutils literal notranslate"><span class="pre">rfarray</span></code></p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
 </dd>
 </dl>
@@ -1219,7 +1221,7 @@ for computational efficiency, for use in inversion/probabilistic approaches.</p>
 <code class="xref py py-meth docutils literal notranslate"><span class="pre">Result.filter()</span></code>, stripped down for computational efficiency,
 for use in inversion/probabilistic approaches.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>traces</strong> (<em>np.ndarray</em>) – Output of <code class="xref py py-meth docutils literal notranslate"><span class="pre">fraysum.run_bare()</span></code></p></li>
 <li><p><strong>rfarray</strong> (<em>np.ndarray</em>) – Initialized array of shape (ntr, 2, npts) to store output (See:
@@ -1231,10 +1233,10 @@ for use in inversion/probabilistic approaches.</p>
 <li><p><strong>fmax</strong> (<em>float</em>) – Upper bandpass frequency corner (Hz)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>None. Output is written to <code class="xref py py-const docutils literal notranslate"><span class="pre">rfarray</span></code></p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
 </dd>
 </dl>
@@ -1253,16 +1255,16 @@ for use in inversion/probabilistic approaches.</p>
 <span class="sig-prename descclassname"><span class="pre">pyraysum.plot.</span></span><span class="sig-name descname"><span class="pre">stack_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyraysum/plot.html#stack_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyraysum.plot.stack_all" title="Permalink to this definition"></a></dt>
 <dd><p>Stack all traces in <code class="docutils literal notranslate"><span class="pre">Stream</span></code> objects.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>stream</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Stream</span></code>) – Contains traces to stack</p></li>
 <li><p><strong>pws</strong> (<em>bool</em>) – Enables Phase-Weighted Stacking</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Stacked trace</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Trace</span></code></p>
 </dd>
 </dl>
@@ -1273,7 +1275,7 @@ for use in inversion/probabilistic approaches.</p>
 <span class="sig-prename descclassname"><span class="pre">pyraysum.plot.</span></span><span class="sig-name descname"><span class="pre">rf_wiggles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rflist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">btyp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'baz'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wvtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'P'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-5.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pcolor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'red'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ncolor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'blue'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ftitle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Figure_rf_wiggle'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'png'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'color':</span> <span class="pre">'black',</span> <span class="pre">'linewidth':</span> <span class="pre">0.1}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figure_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyraysum/plot.html#rf_wiggles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyraysum.plot.rf_wiggles" title="Permalink to this definition"></a></dt>
 <dd><p>Plot receiver function seismograms sorted by back-azimuth or slowness.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rflist</strong> (<em>list</em><em> or </em><a class="reference internal" href="#pyraysum.prs.Result" title="pyraysum.prs.Result"><em>prs.Result</em></a>) – list of <a class="reference external" href="https://tinyurl.com/3u8dv8s8">obspy.core.Stream</a> objects
 containing receiver functions</p></li>
@@ -1304,10 +1306,10 @@ containing receiver functions</p></li>
 <a class="reference external" href="https://tinyurl.com/yc3w956b">matplotlib.pyplot.figure()</a></p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Figure handle</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">matplotlib.pyplot.figure</span></code></p>
 </dd>
 </dl>
@@ -1318,7 +1320,7 @@ containing receiver functions</p></li>
 <span class="sig-prename descclassname"><span class="pre">pyraysum.plot.</span></span><span class="sig-name descname"><span class="pre">stream_wiggles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">streamlist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">btyp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'baz'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wvtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'P'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-5.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pcolor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'red'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ncolor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'blue'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ftitle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Figure_pw_wiggles'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'png'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'color':</span> <span class="pre">'black',</span> <span class="pre">'linewidth':</span> <span class="pre">0.1}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figure_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyraysum/plot.html#stream_wiggles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyraysum.plot.stream_wiggles" title="Permalink to this definition"></a></dt>
 <dd><p>Plot displacement seismograms sorted by back-azimuth or slowness.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>streamlist</strong> (<em>list</em><em> or </em><a class="reference internal" href="#pyraysum.prs.Result" title="pyraysum.prs.Result"><em>prs.Result</em></a>) – <p>list of <a class="reference external" href="https://tinyurl.com/3u8dv8s8">obspy.core.Stream</a> objects
 containing displacement seismograms</p>
@@ -1350,10 +1352,10 @@ containing displacement seismograms</p>
 </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Figure handle</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">matplotlib.pyplot.figure</span></code></p>
 </dd>
 </dl>
@@ -1364,7 +1366,7 @@ containing displacement seismograms</p>
 <span class="sig-prename descclassname"><span class="pre">pyraysum.plot.</span></span><span class="sig-name descname"><span class="pre">seis_wiggles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-5.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ftitle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Figure_pw_wiggles_3c'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'png'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figure_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyraysum/plot.html#seis_wiggles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyraysum.plot.seis_wiggles" title="Permalink to this definition"></a></dt>
 <dd><p>Plots 3-component wiggles.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>stream</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Stream</span></code>) – <p><a class="reference external" href="https://tinyurl.com/3u8dv8s8">obspy.core.Stream</a> containing 3 traces</p>
 </p></li>
@@ -1375,10 +1377,10 @@ containing displacement seismograms</p>
 <li><p><strong>fmt</strong> (<em>str</em>) – Output format (‘png’, ‘jpg’, or ‘eps’, etc.)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Figure handle</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">matplotlib.pyplot.figure</span></code></p>
 </dd>
 </dl>
@@ -1398,7 +1400,7 @@ lists of <code class="xref py py-attr docutils literal notranslate"><span class=
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">tr_ph</span> <span class="pre">=</span> <span class="pre">fraysum.run_bare(thick,</span> <span class="pre">rho,</span> <span class="pre">alpha,</span> <span class="pre">beta,</span> <span class="pre">isoflag,</span> <span class="pre">pct,</span> <span class="pre">trend,plunge,</span> <span class="pre">strike,</span> <span class="pre">dip,</span> <span class="pre">nlay,</span> <span class="pre">baz,</span> <span class="pre">slow,</span> <span class="pre">sta_dx,</span> <span class="pre">sta_dy,</span> <span class="pre">ntr,</span> <span class="pre">iphase,</span> <span class="pre">mults,</span> <span class="pre">nsamp,dt,</span> <span class="pre">align,</span> <span class="pre">shift,</span> <span class="pre">out_rot,</span> <span class="pre">verb,</span> <span class="pre">nsegin,</span> <span class="pre">numphin,</span> <span class="pre">phaselistin)</span></span></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>thick</strong> – <code class="xref py py-attr docutils literal notranslate"><span class="pre">Model.fthickn</span></code></p></li>
 <li><p><strong>rho</strong> – <code class="xref py py-attr docutils literal notranslate"><span class="pre">Model.frho</span></code></p></li>
@@ -1429,10 +1431,10 @@ lists of <code class="xref py py-attr docutils literal notranslate"><span class=
 <li><p><strong>phaselistin</strong> – <code class="xref py py-attr docutils literal notranslate"><span class="pre">Control.phaselist</span></code></p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>tr_ph</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>rank-3 array(‘f’) with bounds (3, <cite>maxsamp</cite>, <cite>maxtr</cite>)</p>
 </dd>
 </dl>
@@ -1442,7 +1444,7 @@ lists of <code class="xref py py-attr docutils literal notranslate"><span class=
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">tr_ph,</span> <span class="pre">travel_time,</span> <span class="pre">amplitudeout,</span> <span class="pre">phaselist</span> <span class="pre">=</span> <span class="pre">fraysum.run_full(thick,rho,</span> <span class="pre">alpha,</span> <span class="pre">beta,</span> <span class="pre">isoflag,</span> <span class="pre">pct,</span> <span class="pre">trend,</span> <span class="pre">plunge,</span> <span class="pre">strike,</span> <span class="pre">dip,</span> <span class="pre">nlay,</span> <span class="pre">baz,</span> <span class="pre">slow,sta_dx,</span> <span class="pre">sta_dy,</span> <span class="pre">ntr,</span> <span class="pre">iphase,</span> <span class="pre">mults,</span> <span class="pre">nsamp,</span> <span class="pre">dt,</span> <span class="pre">align,</span> <span class="pre">shift,</span> <span class="pre">out_rot,</span> <span class="pre">verb,</span> <span class="pre">nsegin,numphin,</span> <span class="pre">phaselistin)</span></span></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>thick</strong> – <code class="xref py py-attr docutils literal notranslate"><span class="pre">Model.fthickn</span></code></p></li>
 <li><p><strong>rho</strong> – <code class="xref py py-attr docutils literal notranslate"><span class="pre">Model.frho</span></code></p></li>
@@ -1473,28 +1475,28 @@ lists of <code class="xref py py-attr docutils literal notranslate"><span class=
 <li><p><strong>phaselistin</strong> – <code class="xref py py-attr docutils literal notranslate"><span class="pre">Control.phaselist</span></code></p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>tr_ph</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>rank-3 array(‘f’) with bounds (3, <cite>maxsamp</cite>, <cite>maxtr</cite>):</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>travel_time</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>rank-2 array(‘f’) with bounds (<cite>maxph</cite>, <cite>maxtr</cite>)</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>amplitudeout</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>rank-3 array(‘f’) with bounds (3, <cite>maxph</cite>,`maxtr`)</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>phaselist</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>rank-3 array(‘i’) with bounds (<cite>maxseg</cite>, 2, <cite>maxph</cite>)</p>
 </dd>
 </dl>
