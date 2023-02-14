@@ -96,9 +96,9 @@ The complete API documentation, scripts and tutorials are described at https://p
 
 If you use `PyRaysum` in your work, please cite the following references:
 
-- Frederiksen, A.W., and Bostock, M.G. (1999) Modelling teleseismic waves in dipping anisotropic structures. Geophysical Journal International 141: 401-412. https://doi.org/10.1046/j.1365-246x.2000.00090.x
+- Frederiksen, A.W., and Bostock, M.G. (2000) Modelling teleseismic waves in dipping anisotropic structures. Geophysical Journal International 141: 401-412. https://doi.org/10.1046/j.1365-246x.2000.00090.x
 
-- Bloch, W., and Audet, P. (in press). PyRaysum: Software for modeling ray-theoretical plane body-wave propagation in dipping anisotropic media. Seismica. Preprint available via EarthArXiv. https://doi.org/10.31223/X5Z953
+- Bloch, W., and Audet, P. (2023). PyRaysum: Software for modeling ray-theoretical plane body-wave propagation in dipping anisotropic media. Seismica. https://doi.org/10.26443/seismica.v2i1.220
 
 - Audet, P., and Bloch, W. (2022). PyRaysum: Software for modeling ray-theoretical body-wave propagation. Zenodo. https://doi.org/10.5281/zenodo.7468301
 
