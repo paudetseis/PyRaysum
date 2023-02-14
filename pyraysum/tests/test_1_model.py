@@ -59,6 +59,8 @@ def test_getitem_setitem_add():
     assert model1[2]["flag"] == 1
     assert model1[1]["dip"] == 20.0
     assert model1[2]["strike"] == 90
+    assert model1[2, "strike"] == 90
+    assert model1["strike", 2] == 90
 
     model2 = prs.read_model(anisofile)
     assert model2[1]["flag"] == 0

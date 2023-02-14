@@ -373,8 +373,12 @@ class Model(object):
     def __getitem__(self, ilay):
         """Get a layer or property of the model"""
         try:
-            # model[0, "thickn"]
-            return self.layers[ilay[0]][ilay[1]]
+            if isinstance(ilay[0], int) and isinstance(ilay[1], str):
+                # model[0, "thickn"]
+                return self.layers[ilay[0]][ilay[1]]
+            if isinstance(ilay[1], int) and isinstance(ilay[0], str):
+                # model["thickn", 0]
+                return self.layers[ilay[1]][ilay[0]]
         except TypeError:
             try:
                 # model[0]
