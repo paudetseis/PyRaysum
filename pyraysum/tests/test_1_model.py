@@ -95,6 +95,14 @@ def test_getitem_setitem_add():
     assert model1[0]["ani"] == 0
     assert model1[0]["flag"] == 1
 
+    # Set it the other way round
+    model1["ani", 0] = 10
+    assert model1[0]["ani"] == 10
+    assert model1[0]["flag"] == 0
+    model1["ani", 0] = 0
+    assert model1[0]["ani"] == 0
+    assert model1[0]["flag"] == 1
+
     model1.ani[0] = 10
     assert model1.ani[0] == 10
 
@@ -108,6 +116,11 @@ def test_getitem_setitem_add():
     with pytest.raises(ValueError):
         # Only can set user attributes
         model2[1, "fplunge"] = 10
+
+    with pytest.raises(ValueError):
+        # Tuples must be valid
+        model2[1, 1] = 10
+        model2["thickn", "ani"] = 10
 
     # __add__
     model3 = model1 + model2

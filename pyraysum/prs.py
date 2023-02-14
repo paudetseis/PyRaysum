@@ -162,8 +162,11 @@ class Model(object):
         15000.0
         >>> model[1, "vp"]
         8000.0
-        >>> model[1, "vp"] = 7400.  # Does not require model.update()
+        >>> model[1, "vp"] = 9000.  # Does not require model.update()
         >>> model[1, "vp"]
+        9000.0
+        >>> model["vp", 1] = 7400.  # Indices can be swapped
+        >>> model["vp", 1]
         7400.0
         >>> model[1] = {"vs": 4200., "rho": 4000.}
         >>> model[1]["vs"]
@@ -396,8 +399,15 @@ class Model(object):
         except AttributeError:
             # model[0, "plunge"] = 10 syntax
             # layatt[0] is layer, layatt[1] is attribute, value is value
-            lays = [layatt[0]]
-            atts = [layatt[1]]
+            if isinstance(layatt[1], str) and isinstance(layatt[0], int):
+                lays = [layatt[0]]
+                atts = [layatt[1]]
+            elif isinstance(layatt[0], str) and isinstance(layatt[1], int):
+                lays = [layatt[1]]
+                atts = [layatt[0]]
+            else:
+                msg = "Cannot set model layer attribute: {:}".format(layatt)
+                raise ValueError(msg)
             vals = [value]
 
         for lay, att, val in zip(lays, atts, vals):
