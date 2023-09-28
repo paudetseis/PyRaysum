@@ -11,7 +11,7 @@ in the layers. Incident P and S waves are supported.
 A trimmed down version of the Fortran code is supplied with `PyRaysum`. You can find the 
 original version [here](https://home.cc.umanitoba.ca/~frederik/Software/).
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6095749.svg)](https://doi.org/10.5281/zenodo.6095749)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7468301.svg)](https://doi.org/10.5281/zenodo.7468301)
 [![build](https://github.com/paudetseis/PyRaysum/workflows/Build/badge.svg)](https://github.com/paudetseis/PyRaysum/actions)
 [![codecov](https://codecov.io/gh/paudetseis/PyRaysum/branch/main/graph/badge.svg?token=59F1SWLM9Q)](https://codecov.io/gh/paudetseis/PyRaysum)
 ![GitHub](https://img.shields.io/github/license/paudetseis/pyraysum)
@@ -22,15 +22,33 @@ Authors: [Wasja Bloch](https://www.eoas.ubc.ca/people/wasjabloch), [Pascal Audet
 
 #### Installation
 
-*PyRaysum* can be installed from the command line.
+*PyRaysum* can be installed from PyPI or from source.
 
 To avoid conflicts with other programs, it is recommended to install *PyRaysum* inside a designated `conda` environment (called here `prs`) alongside its dependecies.
 ```
 conda create -n prs python<3.12 numpy<1.23 setuptools<60.0 fortran-compiler obspy -c conda-forge
 conda activate prs
 ```
+If you are using an alternative *Python* interpreter (e.g., *IPython* or a *Jupyter*
+notebook), include it into your installation as well. This ensures that the interpreter
+uses the correct *Python* version.
+```
+# IPython
+conda install ipython
 
-*PyRaysum* can then be downloaded from *GitHub* and installed via `pip`.
+# Jupyter notebooks
+conda install jupyter
+```
+
+##### Installing from PyPI
+
+```
+pip install pyraysum
+```
+
+##### Installing from source
+
+The source code of *PyRaysum* can also be downloaded from *GitHub* and installed via `pip`.
 
 ```
 git clone https://github.com/paudetseis/PyRaysum.git
@@ -78,11 +96,11 @@ The complete API documentation, scripts and tutorials are described at https://p
 
 If you use `PyRaysum` in your work, please cite the following references:
 
-- Frederiksen, A.W., and Bostock, M.G. (1999) Modelling teleseismic waves in dipping anisotropic structures. Geophysical Journal International 141: 401-412. https://doi.org/10.1046/j.1365-246x.2000.00090.x
+- Frederiksen, A.W., and Bostock, M.G. (2000) Modelling teleseismic waves in dipping anisotropic structures. Geophysical Journal International 141: 401-412. https://doi.org/10.1046/j.1365-246x.2000.00090.x
 
-- Bloch, W., and Audet, P. (in press). PyRaysum: Software for modeling ray-theoretical plane body-wave propagation in dipping anisotropic media. Seismica.
+- Bloch, W., and Audet, P. (2023). PyRaysum: Software for modeling ray-theoretical plane body-wave propagation in dipping anisotropic media. Seismica. https://doi.org/10.26443/seismica.v2i1.220
 
-- Audet, P., and Bloch, W. (2022). PyRaysum: Software for modeling ray-theoretical body-wave propagation. Zenodo. https://doi.org/10.5281/zenodo.6095749
+- Audet, P., and Bloch, W. (2022). PyRaysum: Software for modeling ray-theoretical body-wave propagation. Zenodo. https://doi.org/10.5281/zenodo.7468301
 
 #### Contributing
 
