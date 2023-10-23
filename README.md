@@ -26,7 +26,7 @@ Authors: [Wasja Bloch](https://www.eoas.ubc.ca/people/wasjabloch), [Pascal Audet
 
 To avoid conflicts with other programs, it is recommended to install *PyRaysum* inside a designated `conda` environment (called here `prs`) alongside its dependecies.
 ```
-conda create -n prs python<3.12 numpy<1.23 setuptools<60.0 fortran-compiler obspy -c conda-forge
+conda create -n prs "python<3.12" "numpy<1.23" "setuptools<60.0" fortran-compiler obspy -c conda-forge
 conda activate prs
 ```
 If you are using an alternative *Python* interpreter (e.g., *IPython* or a *Jupyter*
