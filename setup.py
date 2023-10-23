@@ -39,7 +39,7 @@ setup(
         'Programming Language :: Fortran',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8'],
-    install_requires=['numpy>=1.15,<1.23', 'obspy>=1.0.0', 'matplotlib', 'setuptools<60.0'],
+    install_requires=['numpy>=1.15,<1.23', 'obspy>=1.0.0', 'matplotlib', 'setuptools'],
     python_requires='>=3.7,<3.12',
     ext_modules = [ext],
     packages=setuptools.find_packages(),
