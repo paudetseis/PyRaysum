@@ -82,7 +82,6 @@ def read_traces(traces, rc, geometry, arrivals=None):
     streams = []
 
     for iitr in range(ntr):
-
         # Split by trace ID
         istr = itr == iitr
 
@@ -126,6 +125,79 @@ def read_traces(traces, rc, geometry, arrivals=None):
     return streams
 
 
+def unpack_phaselist(phaselist, isotropic=False):
+    """
+    Convert the :const:`phaselist` output of :const:`ph_direct`,
+    :const:`ph_direct_all`, :const:`ph_fsmults` to long phase
+    descriptors, short phase names, and conversion names.
+
+    Parameters:
+        phaselist (np.array):
+            Phase identifier array returned by :func:`fraysum.run_full`
+        isotropic (bool):
+            Consider S and T equivalent when composing conversion- and phase
+            names. This does not affect phase descriptors, as even in isotropic
+            media, S-wave energy is projected to both phases.
+
+    Returns:
+        np.array, np.array, np.array:
+            (long) phase descriptors, e.g. "1P0S"
+            (intermediate) conversion names, e.g. "P1S"
+            (short) phase names, e.g. "PS"
+    """
+
+    dscrs = []
+    phnms = []
+    convs = []
+    for iph in range(len(phaselist[0, 0, :])):
+        dscr = ""
+        phnm = ""
+        conv = ""
+
+        for iseg in range(len(phaselist[:, 0, 0])):
+            if phaselist[iseg, 0, iph] == 0:
+                # No more reflections / conversions
+                dscrs.append(dscr)
+                phnms.append(phnm)
+                convs.append(conv)
+                break
+
+            phid = phaselist[iseg, 1, iph]
+            layn = phaselist[iseg, 0, iph] - 1  # Python indexing
+
+            phn = _phnames[phid]
+            dscr += str(layn) + phn
+
+            if isotropic:
+                phn = phn.replace("T", "S").replace("t", "s")
+
+            if phn.isupper():
+                # Upward-conversion at top of layer below
+                con = str(layn + 1) + phn
+            else:
+                con = str(layn) + phn
+
+            # Omit not-converted segment from phase name and conversions
+            try:
+                if phnm[-1] == phn:
+                    phn = ""
+                    con = ""
+            except IndexError:
+                con = ""
+
+            # Always prefix incoming wavetype to conversions
+            if iseg == 0:
+                con = phn
+
+            phnm += phn
+            conv += con
+
+        if phaselist[0, 0, iph + 1] == 0:
+            break
+
+    return dscrs, convs, phnms
+
+
 def read_arrivals(ttimes, amplitudes, phaselist, geometry):
     """
     Convert the :const:`phaselist`, :const:`amplitude` and :const:`traveltime` output of
@@ -153,57 +225,13 @@ def read_arrivals(ttimes, amplitudes, phaselist, geometry):
             * :const:`4`: (intermediate) conversion names, e.g. "P1S"
     """
 
-    dscrs = []
-    phnms = []
-    convs = []
-    for iph in range(len(phaselist[0, 0, :])):
-        dscr = ""
-        phnm = ""
-        conv = ""
-
-        for iseg in range(len(phaselist[:, 0, 0])):
-            if phaselist[iseg, 0, iph] == 0:
-                # No more reflections / conversions
-                dscrs.append(dscr)
-                phnms.append(phnm)
-                convs.append(conv)
-                break
-
-            phid = phaselist[iseg, 1, iph]
-            layn = phaselist[iseg, 0, iph] - 1  # Python indexing
-
-            phn = _phnames[phid]
-            dscr += str(layn) + phn
-
-            if phn.isupper():
-                # Upward-conversion at top of layer below
-                con = str(layn + 1) + phn
-            else:
-                con = str(layn) + phn
-
-            # Omit not-converted segment from phase name and conversions
-            try:
-                if phnm[-1] == phn:
-                    phn = ""
-                    con = ""
-            except IndexError:
-                con = ""
-
-            # Always prefix incoming wavetype to conversions
-            if iseg == 0:
-                con = phn
-
-            phnm += phn
-            conv += con
-
-        if phaselist[0, 0, iph + 1] == 0:
-            break
-
-    nphs = len(dscrs)
+    dscrs, convs, phnms = unpack_phaselist(phaselist)
 
     dscrs = np.array(dscrs)
     phnms = np.array(phnms)
     convs = np.array(convs)
+
+    nphs = len(dscrs)
 
     tanss = []
     for itr in range(geometry.ntr):

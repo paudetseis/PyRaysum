@@ -32,14 +32,17 @@ from copy import deepcopy
 import fraysum
 
 from pyraysum import plot
-from pyraysum.frs import read_arrivals, read_traces, _phnames
+from pyraysum.frs import read_arrivals, read_traces, _phnames, unpack_phaselist
+from fraysum import ph_fsmults, ph_direct
 
 _alignn = {0: "none", 1: "P", 2: "SV", 3: "SH"}  # alignment name
-_aligni = {_alignn[k]: k for k in _alignn}  # alignment ID
+_aligni = {"none": 0, "P": 1, "SV": 2, "S": 2, "SH": 3, "T": 3}  # alignment ID
+_wvt = {"P": "P", "SV": "S", "SH": "T", "S": "S", "T": "T"}  # wvtype conventions
+_iwvt = {"P": "P", "SV": "S", "SH": "S", "S": "S", "T": "S"}  # isotropic wvtype
 _rotn = {0: "ZNE", 1: "RTZ", 2: "PVH"}  # rotation name
 _roti = {_rotn[k]: k for k in _rotn}  # rotation ID
-_iphase = {"P": 1, "SV": 2, "SH": 3}
 _phids = {_phnames[k]: k for k in _phnames}  # inverse dictionary, imported in core
+_valid_modes = ["pP", "sP", "pS", "sS"]
 _modhint = (
     "################################################\n"
     "#\n"
@@ -72,6 +75,19 @@ _modhint = (
     "#\n"
     "################################################\n"
 )
+
+
+def _retain_interfaces(descriptors, conversions, interfaces):
+    """Only return those descriptors that get converted / reflected at one of the interfaces."""
+
+    descr = []
+    for des, con in zip(descriptors, conversions):
+        for intf in interfaces:
+            if str(intf) in con:
+                descr.append(des)
+                break  # Only append once
+
+    return descr
 
 
 class Model(object):
@@ -553,6 +569,29 @@ class Model(object):
 
         return buf.strip("\n")
 
+    def _get_interfaces(self, interfaces):
+        # Get all interfaces when None
+        if interfaces is None:
+            interfaces = range(1, self.nlay)
+
+        # Convert numbers to iterables
+        if (type(interfaces) is int) or type(interfaces) is float:
+            interfaces = [interfaces]
+
+        # Else, check if iterable and in range
+        for intf in interfaces:
+            try:
+                intf = int(intf)
+            except (ValueError, TypeError):
+                raise TypeError(
+                    f"Interface number {intf} cant be converted to integer."
+                )
+
+            if intf <= 0 or intf >= self.nlay:
+                raise ValueError(f"Interface {intf} must be > 0 and < {self.nlay}")
+
+        return interfaces
+
     def update(self, change="vpvs"):
         """
         Update all attributes after one of them was changed.
@@ -801,6 +840,181 @@ class Model(object):
         self.nlay -= bottom - top - 1
         self.update()
 
+    def get_all_phaselist(self, interfaces=None, wvtype="P", maxph=40000):
+        """
+        Return the descriptors of the phases of the direct (incoming) and reflected wavefield.
+        Suitable to define phases to include in the computation using
+        :meth:`Control.set_phaselist`.
+
+        Args:
+            wvtype (str):
+                Incoming wave type as set in :class:`Control`
+            maxph (int):
+                Maximum number of phases as set in `params.h` and :class:`Control`
+
+        Returns:
+            np.array of str:
+               List of phase descriptors
+
+        .. hint::
+            See :meth:`Control.set_phaselist` for definition of phase descriptors.
+        """
+        return
+
+    def get_direct_wave(self, wvtype="P"):
+        """
+        Return the descriptor of the direct wave
+
+        Args:
+            wvtype (str):
+                Incoming wave type as set in :class:`Control`
+
+        Returns:
+            np.array of str:
+               List of the one phase descriptor
+        """
+
+        if wvtype not in _aligni:
+            raise ValueError("wvtype must be one of " + ", ".join(_aligni))
+
+        return [
+            "".join([str(lay) + _wvt[wvtype] for lay in range(self.nlay - 1, -1, -1)])
+        ]
+
+    def get_conversions(
+        self, interfaces=None, direct=True, isotropic=True, wvtype="P", maxph=40000
+    ):
+        """
+        Return the descriptors of the phases of the direct (incoming) conversions.
+        Suitable to define phases to include in the computation using
+        :meth:`Control.set_phaselist`.
+
+        Args:
+            interfaces (list of int):
+                Return only conversions which appear at these interfaces
+                (0 = surface; 0 < interface < number of model layers)
+            direct (bool):
+                Include direct (unconverted) phase (required to compute receiver functions)
+            isotropic (bool):
+                When using :const:`interfaces`, do not include S->T or T->S conversions
+            wvtype (str):
+                Incoming wave type as set in :class:`Control`
+            maxph (int):
+                Maximum number of phases as set in `params.h` and :class:`Control`
+
+        Returns:
+            list of str:
+               List of phase descriptors
+
+        Raises:
+            TypeError: if any interface is not convertible to integer
+            ValueError: if interface is not in range
+
+        .. hint::
+            See :meth:`Control.set_phaselist` for definition of phase descriptors.
+        """
+
+        cntl = Control(maxph=maxph, wvtype=wvtype)
+        numph = 0
+
+        ph_direct(cntl._phaselist, cntl._nseg, numph, self.nlay, cntl._iphase)
+
+        descr, conv, _ = unpack_phaselist(cntl._phaselist, isotropic=isotropic)
+
+        # Always remove direct phase first
+        descr = descr[1:]
+        conv = conv[1:]
+
+        # Only retain conversions that occurr at interface
+        if interfaces is not None:
+            interfaces = self._get_interfaces(interfaces)
+            descr = _retain_interfaces(descr, conv, interfaces)
+
+        if direct:
+            descr = self.get_direct_wave(wvtype=wvtype) + descr
+
+        return descr
+
+    def get_reflections(
+        self,
+        interfaces=None,
+        modes=_valid_modes,
+        direct=True,
+        equivalent=False,
+        wvtype="P",
+        maxph=40000,
+    ):
+        """
+        Return the descriptors of the phases of the reflected wavefield.
+        Suitable to define phases to include in the computation using
+        :meth:`Control.set_phaselist`.
+
+        Args:
+            interfaces (list of int):
+                Interfaces at which reflections occurr (0 < interface <= number of model layers)
+            modes (list of str):
+                Reflected modes to consider. Fast and slow S waves are treated
+                equally (S = T)
+            direct (bool):
+                Include direct (unconverted) phase (required to compute receiver functions)
+            equivalent (bool):
+                Augment phaselist by equivalent phases (e.g., `'1P0P0s0P'`;
+                `'1P0S0p0P'`)
+            wvtype (str):
+                Incoming wave type as set in :class:`Control`
+            maxph (int):
+                Maximum number of phases as set in `params.h` and :class:`Control`
+
+        Returns:
+            np.array of str:
+               List of phase descriptors
+
+        .. hint::
+            See :meth:`Control.set_phaselist` for definition of phase descriptors.
+        """
+
+        def _get_phl(intf):
+            cntl = Control(maxph=maxph, wvtype=wvtype)
+            numph = 0
+
+            ph_fsmults(
+                cntl._phaselist, cntl._nseg, numph, self.nlay, intf, cntl._iphase
+            )
+            descrs, _, phns = unpack_phaselist(cntl._phaselist, isotropic=True)
+
+            if equivalent:
+                # Set phase list and read it again to get phase names.
+                cntl.set_phaselist(descrs, equivalent=True)
+                descrs, _, phns = unpack_phaselist(cntl._phaselist, isotropic=True)
+
+            # Only append seleted modes
+            descr_out = []
+            for descr, phn in zip(descrs, phns):
+                for mode in modes:
+                    print(mode)
+                    if phn.endswith(_iwvt[cntl.wvtype] + mode):
+                        descr_out.append(descr)
+                        break  # Only append once
+
+            return descr_out
+
+        for mode in modes:
+            if mode not in _valid_modes:
+                raise ValueError(
+                    "Mode must be one of: " + ", ".join(_valid_modes) + f", not {mode}"
+                )
+
+        interfaces = self._get_interfaces(interfaces)
+
+        descr = []
+        for intf in interfaces:
+            descr += _get_phl(intf)
+
+        if direct:
+            descr = self.get_direct_wave(wvtype=wvtype) + descr
+
+        return descr
+
     def save(self, fname="sample.mod", comment="", hint=False, version="prs"):
         """
         Alias for :class:`write()`
@@ -975,7 +1189,6 @@ class Model(object):
 
         # Cycle through layers
         for i in range(len(depths) - 1):
-
             # If anisotropic, add texture - still broken hatch
             if not self._flag[i] == 1:
                 cax = ax.axhspan(depths[i], depths[i + 1], color=colors[i])
@@ -1175,7 +1388,6 @@ class Geometry(object):
     """
 
     def __init__(self, baz, slow, dn=0, de=0, maxtr=500):
-
         self.maxtr = maxtr
         self.properties = {"baz": 0, "slow": 1, "dn": 2, "de": 3}
 
@@ -1233,7 +1445,6 @@ class Geometry(object):
                 return self.rays[iray]
 
     def __setitem__(self, iray, value):
-
         if not isinstance(value, tuple) or len(value) != 4:
             msg = "Can only set tuple(baz, slow, dn, de)"
             raise TypeError(msg)
@@ -1441,7 +1652,6 @@ class Control(object):
         maxph=40000,
         maxsamp=100000,
     ):
-
         self.parameters = [0] * 11
         self.verbose = verbose
         self.wvtype = wvtype
@@ -1455,7 +1665,7 @@ class Control(object):
         else:
             self.shift = shift
 
-        self._iphase = _iphase[self.wvtype]
+        self._iphase = _aligni[self.wvtype]
         self._numph = np.int32(0)
         self._maxseg = maxseg
         self._maxph = maxph
@@ -1485,11 +1695,11 @@ class Control(object):
 
     @wvtype.setter
     def wvtype(self, value):
-        if value not in ["P", "SV", "SH"]:
-            msg = "wvtype must be 'P', 'SV', or 'SH', not: " + str(value)
+        if value not in _aligni:
+            msg = "wvtype must be " + ", ".join(_aligni) + f", not: {value}"
             raise ValueError(msg)
         self._wvtype = value
-        self._iphase = _iphase[self.wvtype]
+        self._iphase = _aligni[self.wvtype]
         self.parameters[0] = self._iphase
 
     @property
@@ -1751,7 +1961,7 @@ class Control(object):
 
     def save(self, fname="raysum-param", version="prs"):
         """
-        Alias for :class:`~pyraysum.prs.Control.write()`
+        Alias for :meth:`~pyraysum.prs.Control.write()`
         """
 
         self.write(fname=fname, version=version)
@@ -1816,7 +2026,6 @@ class Result(object):
     """
 
     def __init__(self, model=None, geometry=None, rc=[], streams=[]):
-
         self.model = model
         self.geometry = geometry
         self.streams = streams
@@ -1895,7 +2104,6 @@ class Result(object):
 
         # Cycle through list of displacement streams
         for stream in self.streams:
-
             # Calculate time axis
             npts = stream[0].stats.npts
             taxis = np.arange(-npts / 2.0, npts / 2.0) * stream[0].stats.delta
@@ -2271,7 +2479,6 @@ def equivalent_phases(descriptors, kinematic=False):
     ndscrs = []
 
     for dscr in descriptors:
-
         lays = np.array([match.group(0) for match in re.finditer(r"\d+", dscr)])
 
         starts = np.array(
@@ -2281,12 +2488,10 @@ def equivalent_phases(descriptors, kinematic=False):
         nsegs = {lay: len(lays[lays == lay]) for lay in set(lays)}
 
         for lay in lays:
-
             if nsegs[lay] <= 1:
                 continue
 
-            for iseg, i0 in enumerate(starts[:-1]):
-
+            for iseg in range(len(starts[:-1])):
                 # phase is last char before next segment
                 iph = starts[iseg + 1] - 1
 
@@ -2296,8 +2501,7 @@ def equivalent_phases(descriptors, kinematic=False):
                 # layer is the chars before that
                 ilay = dscr[starts[iseg] : iph]
 
-                for jseg, j0 in enumerate(starts[:-1]):
-
+                for jseg in range(len(starts[:-1])):
                     # See above comments
                     jph = starts[jseg + 1] - 1
                     jpha = dscr[jph]
