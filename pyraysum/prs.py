@@ -840,26 +840,31 @@ class Model(object):
         self.nlay -= bottom - top - 1
         self.update()
 
-    def get_all_phaselist(self, interfaces=None, wvtype="P", maxph=40000):
+    def get_phaselist(self, equivalent=False, wvtype="P", maxph=40000):
         """
         Return the descriptors of the phases of the direct (incoming) and reflected wavefield.
         Suitable to define phases to include in the computation using
         :meth:`Control.set_phaselist`.
 
         Args:
+            equivalent (bool):
+                Augment phaselist by equivalent phases (e.g., `'1P0P0s0P'`;
+                `'1P0S0p0P'`)
             wvtype (str):
                 Incoming wave type as set in :class:`Control`
             maxph (int):
                 Maximum number of phases as set in `params.h` and :class:`Control`
 
         Returns:
-            np.array of str:
+            list of str:
                List of phase descriptors
 
         .. hint::
             See :meth:`Control.set_phaselist` for definition of phase descriptors.
         """
-        return
+        descr = self.get_conversions(wvtype=wvtype, maxph=maxph)
+        descr += self.get_reflections(direct=False, equivalent=equivalent, wvtype=wvtype, maxph=maxph)
+        return descr
 
     def get_direct_wave(self, wvtype="P"):
         """
@@ -870,7 +875,7 @@ class Model(object):
                 Incoming wave type as set in :class:`Control`
 
         Returns:
-            np.array of str:
+            list of str:
                List of the one phase descriptor
         """
 
@@ -966,7 +971,7 @@ class Model(object):
                 Maximum number of phases as set in `params.h` and :class:`Control`
 
         Returns:
-            np.array of str:
+            list of str:
                List of phase descriptors
 
         .. hint::
