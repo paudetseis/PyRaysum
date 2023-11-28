@@ -840,13 +840,25 @@ class Model(object):
         self.nlay -= bottom - top - 1
         self.update()
 
-    def get_phaselist(self, equivalent=False, wvtype="P", maxph=40000):
+    def get_phaselist(
+        self,
+        interfaces=None,
+        reflections=True,
+        equivalent=False,
+        wvtype="P",
+        maxph=40000,
+    ):
         """
         Return the descriptors of the phases of the direct (incoming) and reflected wavefield.
         Suitable to define phases to include in the computation using
         :meth:`Control.set_phaselist`.
 
         Args:
+            interfaces (list of int):
+                Return only conversions which appear at these interfaces
+                (0 = surface; 0 < interface < number of model layers)
+            reflections (bool or list of str):
+                Consider reflected modes. To constrain mode, give list of mode strings (:const:`[pP, sP, pS, sS]`)
             equivalent (bool):
                 Augment phaselist by equivalent phases (e.g., `'1P0P0s0P'`;
                 `'1P0S0p0P'`)
@@ -861,9 +873,23 @@ class Model(object):
 
         .. hint::
             See :meth:`Control.set_phaselist` for definition of phase descriptors.
+
+        .. hint::
+            See :meth:`Model.get_direct_wave` :meth:`Model.get_conversions` and
+            :meth:`Model.get_reflection` for more fine-grained control on phases
+            to include.
         """
-        descr = self.get_conversions(wvtype=wvtype, maxph=maxph)
-        descr += self.get_reflections(direct=False, equivalent=equivalent, wvtype=wvtype, maxph=maxph)
+
+        descr = self.get_conversions(interfaces, wvtype=wvtype, maxph=maxph)
+
+        if reflections:
+            modes = reflections
+            if reflections == True:
+                modes = _valid_modes
+            descr += self.get_reflections(
+                interfaces, modes, False, equivalent, wvtype, maxph
+            )
+
         return descr
 
     def get_direct_wave(self, wvtype="P"):
@@ -996,7 +1022,6 @@ class Model(object):
             descr_out = []
             for descr, phn in zip(descrs, phns):
                 for mode in modes:
-                    print(mode)
                     if phn.endswith(_iwvt[cntl.wvtype] + mode):
                         descr_out.append(descr)
                         break  # Only append once

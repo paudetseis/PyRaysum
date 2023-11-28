@@ -203,6 +203,16 @@ def test_get_conversions():
     phl = MODEL.get_conversions(direct=False)
     assert_phaselist(phl, phl1 + phl2 + phl3)
 
+    phl = MODEL.get_phaselist(reflections=False)
+    assert_phaselist(phl, pph + phl1 + phl2 + phl3)
+
+    phl = MODEL.get_phaselist(interfaces=1, reflections=False)
+    assert_phaselist(phl, pph + phl1)
+
+    phl = MODEL.get_phaselist(interfaces=2, reflections=False)
+    assert_phaselist(phl, pph + phl2 + phl3)
+
+
 
 def test_get_reflections():
     pph = ["2P1P0P"]
@@ -318,3 +328,15 @@ def test_get_reflections():
 
     phl = MODEL.get_reflections()
     assert_phaselist(phl, pph + Pp2P + Pp1P + Pp1S + Pp2S + Ps2S + Ps1S)
+
+    phl = MODEL.get_phaselist()
+    assert_phaselist(phl, MODEL.get_conversions() + Pp2P + Pp1P + Pp1S + Pp2S + Ps2S + Ps1S)
+
+    phl = MODEL.get_phaselist(interfaces=1)
+    assert_phaselist(phl, MODEL.get_conversions(interfaces=1) + Pp1P + Pp1S + Ps1S)
+
+    phl = MODEL.get_phaselist(interfaces=2)
+    assert_phaselist(phl, MODEL.get_conversions(interfaces=2) + Pp2P + Pp2S + Ps2S)
+
+    phl = MODEL.get_phaselist(reflections=["pP"])
+    assert_phaselist(phl, MODEL.get_conversions() + Pp2P + Pp1P)
