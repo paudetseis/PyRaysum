@@ -54,7 +54,7 @@ all layers can be given as floats.
 
 .. image:: output_5_0.png
 
-
+Please note that, in the image above, ">180" indicates dip direction NOT strike.
 .. parsed-literal::
 
     #  thickn     rho      vp      vs  flag aniso   trend plunge strike   dip

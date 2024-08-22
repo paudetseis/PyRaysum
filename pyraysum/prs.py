@@ -846,9 +846,9 @@ class Model(object):
         with open(fname, "w") as fil:
             fil.write(buf)
 
-    def plot(self, zmax=75.0):
+    def plot(self, zmax=75.0, show=True):
         """
-        Plot model as stair case, layers and labeled interfaces, and show it
+        Plot model as a staircase, layers and labelled interfaces, and show it
 
         Args:
             zmax (float): Maximum depth of model to plot (km)
@@ -873,7 +873,12 @@ class Model(object):
         # TODO: tight layout does not work with colorbar.
         # Do this manually.
         # plt.tight_layout()
-        plt.show()
+        if show:
+            plt.show()
+        else:
+            plt.close(fig)
+        return fig
+        
 
     def plot_profile(self, zmax=75.0, ax=None):
         """
