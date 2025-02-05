@@ -5,7 +5,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "pyraysum"
-version = "1.1"
+version = "1.2"
 description = "Package to compute synthetic seismograms, based on Raysum"
 authors = [
     { name = "Pascal Audet", email = "pascal.audet@uottawa.ca" },
