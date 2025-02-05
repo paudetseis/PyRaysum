@@ -1,0 +1,38 @@
+[build-system]
+requires = ["scikit-build-core", "numpy"]
+build-backend = "scikit_build_core.build"
+
+
+[project]
+name = "pyraysum"
+version = "1.1"
+description = "Package to compute synthetic seismograms, based on Raysum"
+authors = [
+    { name = "Pascal Audet", email = "pascal.audet@uottawa.ca" },
+    { name = "Wasja Bloch", email = "wasja@norsar.no" },
+    { name = "Andrew Fredriksen" },
+]
+maintainers = [
+    { name = "Wasja Bloch", email = "wasja@norsar.no" },
+    { name = "Pascal Audet", email = "pascal.audet@uottawa.ca" },
+]
+
+readme = "README.md"
+dependencies = ["numpy>=1.15", "obspy>=1.0.0", "matplotlib", "obspy"]
+classifiers = [
+    "Development Status :: 5 - Stable",
+    "Environment :: Console",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+
+[project.urls]
+Homepage = "https://github.com/paudetseis/PyRaysum"
+Documentation = "https://paudetseis.github.io/PyRaysum"
+"Bug Tracker" = "https://github.com/paudetseis/PyRaysum/issues"
+
+[tool.scikit-build]
+ninja.version = ">=1.10"
+cmake.version = ">=3.17.2"
+
