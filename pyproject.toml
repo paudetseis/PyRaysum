@@ -1,0 +1,32 @@
+[build-system]
+requires = ["meson-python", "numpy>=1.26", "ninja"]
+build-backend = "mesonpy"
+
+[project]
+name = "pyraysum"
+version = "1.1.1"
+description = "Python wrapper around Fortran code Raysum"
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [
+  {name = "Andrew Frederiksen"},
+  {name = "Pascal Audet", email = "pascal.audet@uottawa.ca"},
+  {name = "Mijian Xu", email = "mijian.xu@utoronto.ca"},
+]
+maintainers = [
+  {name = "Pascal Audet", email = "pascal.audet@uottawa.ca"}
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Fortran",
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    "numpy>=1.26",
+    "obspy>=1.0.0",
+    "matplotlib",
+]
+
+[tool.meson-python.args]
+setup = ["-Dfortran_std=legacy"]
