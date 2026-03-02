@@ -26,15 +26,15 @@ incdir_f2py = run_command(py,
 
 # Sources
 fraysum_srcs = [
-  'pyraysum/src/buildmodel.f',
-  'pyraysum/src/eigenvec.f',
-  'pyraysum/src/eispack-cg.f',
-  'pyraysum/src/matrixops.f',
-  'pyraysum/src/phaselist.f',
-  'pyraysum/src/raysum.f',
-  'pyraysum/src/readwrite.f',
-  'pyraysum/src/seis-spread.f',
-  'pyraysum/src/trace.f'
+  'src/pyraysum/buildmodel.f',
+  'src/pyraysum/eigenvec.f',
+  'src/pyraysum/eispack-cg.f',
+  'src/pyraysum/matrixops.f',
+  'src/pyraysum/phaselist.f',
+  'src/pyraysum/raysum.f',
+  'src/pyraysum/readwrite.f',
+  'src/pyraysum/seis-spread.f',
+  'src/pyraysum/trace.f'
 ]
 
 # f2py generation
