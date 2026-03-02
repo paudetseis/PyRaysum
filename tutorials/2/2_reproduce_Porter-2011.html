@@ -1,21 +1,22 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Example 2: Reproducing Receiver Functions for Dipping and Anisotropic Subsurface Structure &mdash; pyraysum 1.0.0 documentation</title>
-      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>Example 2: Reproducing Receiver Functions for Dipping and Anisotropic Subsurface Structure &mdash; pyraysum 1.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+
   
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
-        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=fc837d61"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -33,7 +34,6 @@
           
           <a href="../../index.html" class="icon icon-home">
             pyraysum
-              <img src="../../_static/PyRaysum_logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -105,18 +105,18 @@
            <div itemprop="articleBody">
              
   <section id="example-2-reproducing-receiver-functions-for-dipping-and-anisotropic-subsurface-structure">
-<h1>Example 2: Reproducing Receiver Functions for Dipping and Anisotropic Subsurface Structure<a class="headerlink" href="#example-2-reproducing-receiver-functions-for-dipping-and-anisotropic-subsurface-structure" title="Permalink to this heading"></a></h1>
+<h1>Example 2: Reproducing Receiver Functions for Dipping and Anisotropic Subsurface Structure<a class="headerlink" href="#example-2-reproducing-receiver-functions-for-dipping-and-anisotropic-subsurface-structure" title="Link to this heading"></a></h1>
 <p>In this example we generate <em>P</em> receiver functions for a model that
 includes either a dipping lower crustal layer or a lower-crustal
 anisotropic layer. These example reproduce the results of Figure 3 in
 <a class="reference external" href="#references">Porter et al. (2011)</a>.</p>
 <p>Start by importing the necessary packages:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyraysum</span> <span class="kn">import</span> <span class="n">prs</span><span class="p">,</span> <span class="n">Geometry</span><span class="p">,</span> <span class="n">Model</span><span class="p">,</span> <span class="n">Control</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyraysum</span><span class="w"> </span><span class="kn">import</span> <span class="n">prs</span><span class="p">,</span> <span class="n">Geometry</span><span class="p">,</span> <span class="n">Model</span><span class="p">,</span> <span class="n">Control</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 </pre></div>
 </div>
 <section id="dipping-layers">
-<h2>Dipping Layers<a class="headerlink" href="#dipping-layers" title="Permalink to this heading"></a></h2>
+<h2>Dipping Layers<a class="headerlink" href="#dipping-layers" title="Link to this heading"></a></h2>
 <p>First we define the arrays of slowness and back-azimuth values of the
 incident <code class="docutils literal notranslate"><span class="pre">P</span></code> wave to use as input in the simulation</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">baz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">360.</span><span class="p">,</span> <span class="mf">10.</span><span class="p">)</span>
@@ -199,7 +199,7 @@ work on the receiver functions only.</p>
 <img alt="../../_images/output_17_01.png" src="../../_images/output_17_01.png" />
 </section>
 <section id="anisotropic-layers">
-<h2>Anisotropic Layers<a class="headerlink" href="#anisotropic-layers" title="Permalink to this heading"></a></h2>
+<h2>Anisotropic Layers<a class="headerlink" href="#anisotropic-layers" title="Link to this heading"></a></h2>
 <p>Now let’s reproduce the second case with the anisotropic lower crustal
 layer. Here, the second layer (<code class="docutils literal notranslate"><span class="pre">1</span></code> in python indexing) is not dipping,
 but has a strong anisotropy of -20% (a negative value means a slow axis
@@ -245,7 +245,7 @@ and use the <code class="docutils literal notranslate"><span class="pre">rf</spa
 <img alt="../../_images/output_21_0.png" src="../../_images/output_21_0.png" />
 </section>
 <section id="understanding-fast-and-slow-s-waves">
-<h2>Understanding Fast and Slow S-Waves<a class="headerlink" href="#understanding-fast-and-slow-s-waves" title="Permalink to this heading"></a></h2>
+<h2>Understanding Fast and Slow S-Waves<a class="headerlink" href="#understanding-fast-and-slow-s-waves" title="Link to this heading"></a></h2>
 <p>To understand the different phases displayed, we can look at, e.g., the
 receiver function at back-azimuth 150°. With a back-azimuthal spacing of
 10°, the ray-index is 15. Let look into <code class="docutils literal notranslate"><span class="pre">Geometry</span></code>:</p>
@@ -319,14 +319,14 @@ amplitude, while the P-to-S2 conversion has a larger, positive one.</p>
 <img alt="../../_images/output_32_1.png" src="../../_images/output_32_1.png" />
 </section>
 <section id="validation-against-telewavesim-data">
-<h2>Validation against Telewavesim Data<a class="headerlink" href="#validation-against-telewavesim-data" title="Permalink to this heading"></a></h2>
+<h2>Validation against Telewavesim Data<a class="headerlink" href="#validation-against-telewavesim-data" title="Link to this heading"></a></h2>
 <p>As in the previous example, we would now like to compare these results
 with independently obtained results from <em>Telewavesim</em>. We’ll need
 <em>NumPy</em> to conveniently load our Telewavesim data from file, <em>obspy</em> to
 store them in a <em>Stream</em> object, and <em>Matplotlib</em> to make the comparison
 plot.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">obspy</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">mp</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">obspy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mp</span>
 </pre></div>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load telewavesim data</span>
@@ -378,7 +378,7 @@ and scale them to its amplitude on the vertical component.</p>
 </div>
 <p>For a good comparison, we use the plot function from the previous
 example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">plot</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
 
     <span class="n">lws</span> <span class="o">=</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>  <span class="c1"># linewidths ...</span>
     <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;darkgray&quot;</span><span class="p">,</span> <span class="s2">&quot;crimson&quot;</span><span class="p">]</span>  <span class="c1"># colors for data and model</span>
@@ -445,7 +445,7 @@ layer. This reflections has explicitly not been computed
 (<code class="docutils literal notranslate"><span class="pre">RC.mults</span> <span class="pre">=</span> <span class="pre">0</span></code>), but this could be done using <code class="docutils literal notranslate"><span class="pre">RC.set_phaselist()</span></code>.</p>
 </section>
 <section id="conclusion">
-<h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this heading"></a></h2>
+<h2>Conclusion<a class="headerlink" href="#conclusion" title="Link to this heading"></a></h2>
 <p>In this example we have explored the capabilities of <em>Pyraysum</em> to
 compute synthetic seismograms and receiver functions for dipping or
 anisotropic layers. We have compared the outcome of our simulations with
@@ -454,7 +454,7 @@ data from another numerical method. Both comparisons showed that
 <em>Pyraysum</em> delivers comparable results.</p>
 </section>
 <section id="references">
-<h2>References<a class="headerlink" href="#references" title="Permalink to this heading"></a></h2>
+<h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Audet, P., Thomson, C.J., Bostock, M.G., and Eulenfeld, T. (2019).
 Telewavesim: Python software for teleseismic body wave modeling.

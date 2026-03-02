@@ -1,20 +1,21 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Example 1: Compare PyRaysum with other synthetic and real data &mdash; pyraysum 1.0.0 documentation</title>
-      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>Example 1: Compare PyRaysum with other synthetic and real data &mdash; pyraysum 1.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+
   
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=fc837d61"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -32,7 +33,6 @@
           
           <a href="../../index.html" class="icon icon-home">
             pyraysum
-              <img src="../../_static/PyRaysum_logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -109,7 +109,7 @@
            <div itemprop="articleBody">
              
   <section id="example-1-compare-pyraysum-with-other-synthetic-and-real-data">
-<h1>Example 1: Compare PyRaysum with other synthetic and real data<a class="headerlink" href="#example-1-compare-pyraysum-with-other-synthetic-and-real-data" title="Permalink to this heading"></a></h1>
+<h1>Example 1: Compare PyRaysum with other synthetic and real data<a class="headerlink" href="#example-1-compare-pyraysum-with-other-synthetic-and-real-data" title="Link to this heading"></a></h1>
 <p>In this example we are going to compare arrival times and amplitudes
 from <code class="docutils literal notranslate"><span class="pre">PyRaysum</span></code> with synthetic data from <code class="docutils literal notranslate"><span class="pre">Telewavesim</span></code>
 (<a class="reference external" href="https://paudetseis.github.io/Telewavesim/">https://paudetseis.github.io/Telewavesim/</a>) and a real data example from
@@ -124,15 +124,15 @@ described
 <a class="reference external" href="https://paudetseis.github.io/PyRaysum/init.html#usage">here</a>, and
 execute the notebook from the Examples/notebooks/ directory.</p>
 </div></blockquote>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">obspy</span>
-<span class="kn">from</span> <span class="nn">obspy.clients.fdsn</span> <span class="kn">import</span> <span class="n">Client</span>
-<span class="kn">from</span> <span class="nn">pyraysum</span> <span class="kn">import</span> <span class="n">prs</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">mp</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">obspy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">obspy.clients.fdsn</span><span class="w"> </span><span class="kn">import</span> <span class="n">Client</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyraysum</span><span class="w"> </span><span class="kn">import</span> <span class="n">prs</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 </pre></div>
 </div>
 <section id="loading-earthquake-data">
-<h2>Loading earthquake data<a class="headerlink" href="#loading-earthquake-data" title="Permalink to this heading"></a></h2>
+<h2>Loading earthquake data<a class="headerlink" href="#loading-earthquake-data" title="Link to this heading"></a></h2>
 <p>The event we will be looking at is an intermediate depth, magnitude 6.3
 earthquake that occurred in the Philippines in 2002. The recording comes
 from station <code class="docutils literal notranslate"><span class="pre">HYB</span></code> in Hyderabad, India, which is located on a
@@ -197,7 +197,7 @@ only be interested in the short time interval between P and pP.</p>
 <img alt="../../_images/output_5_1.png" src="../../_images/output_5_1.png" />
 </section>
 <section id="loading-synthetic-telewavesim-data">
-<h2>Loading synthetic Telewavesim data<a class="headerlink" href="#loading-synthetic-telewavesim-data" title="Permalink to this heading"></a></h2>
+<h2>Loading synthetic Telewavesim data<a class="headerlink" href="#loading-synthetic-telewavesim-data" title="Link to this heading"></a></h2>
 <p>The Telewavesim data have been created with the same subsurface
 structure with <code class="docutils literal notranslate"><span class="pre">Telewavesim</span></code> (Audet et al. 2019), that computes
 reverberations in a stratified medium using the matrix propagator method
@@ -233,7 +233,7 @@ only looking at a much shorter time interval, i.e. 35 seconds of data.</p>
 <img alt="../../_images/output_7_1.png" src="../../_images/output_7_1.png" />
 </section>
 <section id="creating-synthetic-data-with-pyraysum">
-<h2>Creating synthetic data with PyRaysum<a class="headerlink" href="#creating-synthetic-data-with-pyraysum" title="Permalink to this heading"></a></h2>
+<h2>Creating synthetic data with PyRaysum<a class="headerlink" href="#creating-synthetic-data-with-pyraysum" title="Link to this heading"></a></h2>
 <p>We will be using the subsurface model of the Indian craton of Saul et.
 al (2000), which suggests a 32 km thick cratonic crust with P- and
 S-wave velocities of 6.55 and 3.50 km/s, repectively. In <code class="docutils literal notranslate"><span class="pre">pyraysum</span></code>,
@@ -336,13 +336,13 @@ the measured seismogram.</p>
 </div>
 </section>
 <section id="comparison-plots">
-<h2>Comparison plots<a class="headerlink" href="#comparison-plots" title="Permalink to this heading"></a></h2>
+<h2>Comparison plots<a class="headerlink" href="#comparison-plots" title="Link to this heading"></a></h2>
 <p>We define a function to plot the PyRaysum data against the real
 Hyderabad and the synthetic Telewavesim data. Note how the book-keeping
 infrastructure of <code class="docutils literal notranslate"><span class="pre">obspy.Trace</span></code> is used to store phase names, arrival
 times and amplitudes. These are used here to better interpret the
 seismograms.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">plot</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
 
     <span class="n">lws</span> <span class="o">=</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>  <span class="c1"># linewidths ...</span>
     <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;darkgray&quot;</span><span class="p">,</span> <span class="s2">&quot;crimson&quot;</span><span class="p">]</span>  <span class="c1"># colors for data and model</span>
@@ -406,7 +406,7 @@ seismograms.</p>
 </pre></div>
 </div>
 <section id="comparison-with-real-data">
-<h3>Comparison with real data<a class="headerlink" href="#comparison-with-real-data" title="Permalink to this heading"></a></h3>
+<h3>Comparison with real data<a class="headerlink" href="#comparison-with-real-data" title="Link to this heading"></a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">plot</span><span class="p">(</span><span class="n">hybd</span><span class="p">,</span> <span class="n">prsd</span><span class="p">)</span>
 <span class="n">_</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Comparison between Pyraysum and seismogram recored at G.HYB&quot;</span><span class="p">)</span>
 </pre></div>
@@ -427,7 +427,7 @@ for subsurface properties instead of assuming them, as we did here.</p>
 </div></blockquote>
 </section>
 <section id="comparison-with-synthetic-data">
-<h3>Comparison with synthetic data<a class="headerlink" href="#comparison-with-synthetic-data" title="Permalink to this heading"></a></h3>
+<h3>Comparison with synthetic data<a class="headerlink" href="#comparison-with-synthetic-data" title="Link to this heading"></a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">plot</span><span class="p">(</span><span class="n">twsd</span><span class="p">,</span> <span class="n">prsd</span><span class="p">)</span>
 <span class="n">_</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Comparison between PyRaysum and Telewavesim synthetics&quot;</span><span class="p">)</span>
 </pre></div>
@@ -439,7 +439,7 @@ telewavesim data suffer from aliasing at infinite frequencies.</p>
 </section>
 </section>
 <section id="computing-equivalent-phases">
-<h2>Computing equivalent phases<a class="headerlink" href="#computing-equivalent-phases" title="Permalink to this heading"></a></h2>
+<h2>Computing equivalent phases<a class="headerlink" href="#computing-equivalent-phases" title="Link to this heading"></a></h2>
 <p>The amplitude of the <em>PpS</em> phase is apparently overestimated on the E
 component and underestimated on the Z component. This is the case,
 because the RC parameter <code class="docutils literal notranslate"><span class="pre">mults=2</span></code> only computes first-order
@@ -517,7 +517,7 @@ look them up in the metadata of the synthetic seismic trace:</p>
 </div>
 </section>
 <section id="conclusion">
-<h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this heading"></a></h2>
+<h2>Conclusion<a class="headerlink" href="#conclusion" title="Link to this heading"></a></h2>
 <p>This example demonstrated how <code class="docutils literal notranslate"><span class="pre">PyRaysum</span></code> can be used to compute the
 timing and amplitude of P-wave energy converted and reflected at the
 base of a cratonic crust. We compared the modelling results with a real
@@ -525,7 +525,7 @@ data example from the Indian craton and a synthetic example that has
 been generated with an independent waveform simulation method.</p>
 </section>
 <section id="references">
-<h2>References<a class="headerlink" href="#references" title="Permalink to this heading"></a></h2>
+<h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Audet, P., Thomson, C.J., Bostock, M.G., and Eulenfeld, T. (2019).
 Telewavesim: Python software for teleseismic body wave modeling.

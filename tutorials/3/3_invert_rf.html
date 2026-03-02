@@ -1,21 +1,22 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Example 3: Invert a Receiver Function &mdash; pyraysum 1.0.0 documentation</title>
-      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>Example 3: Invert a Receiver Function &mdash; pyraysum 1.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+
   
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
-        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=fc837d61"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -32,7 +33,6 @@
           
           <a href="../../index.html" class="icon icon-home">
             pyraysum
-              <img src="../../_static/PyRaysum_logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -114,7 +114,7 @@
            <div itemprop="articleBody">
              
   <section id="example-3-invert-a-receiver-function">
-<h1>Example 3: Invert a Receiver Function<a class="headerlink" href="#example-3-invert-a-receiver-function" title="Permalink to this heading"></a></h1>
+<h1>Example 3: Invert a Receiver Function<a class="headerlink" href="#example-3-invert-a-receiver-function" title="Link to this heading"></a></h1>
 <p>In this example we are going to load receiver functions that have been
 created from seismograms recorded at station Hyderabad, India, from 3
 earthquakes that occurred in the Philippines. The source station
@@ -128,15 +128,15 @@ the <code class="docutils literal notranslate"><span class="pre">dual_annealing(
 and spectral division that is required to create receiver functions from
 the synthetic seismograms is carried out using <code class="docutils literal notranslate"><span class="pre">numpy</span></code> array methods.
 finally, we will plot the results with <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyraysum</span> <span class="kn">import</span> <span class="n">prs</span><span class="p">,</span> <span class="n">frs</span>
-<span class="kn">from</span> <span class="nn">fraysum</span> <span class="kn">import</span> <span class="n">run_bare</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">scipy.optimize</span> <span class="k">as</span> <span class="nn">spo</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">mp</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyraysum</span><span class="w"> </span><span class="kn">import</span> <span class="n">prs</span><span class="p">,</span> <span class="n">frs</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fraysum</span><span class="w"> </span><span class="kn">import</span> <span class="n">run_bare</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.optimize</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">spo</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mp</span>
 </pre></div>
 </div>
 <section id="definition-of-the-forward-computation">
-<h2>Definition of the Forward Computation<a class="headerlink" href="#definition-of-the-forward-computation" title="Permalink to this heading"></a></h2>
+<h2>Definition of the Forward Computation<a class="headerlink" href="#definition-of-the-forward-computation" title="Link to this heading"></a></h2>
 <p>We predict waveforms inside a function <code class="docutils literal notranslate"><span class="pre">predictRF()</span></code> that accepts
 <code class="docutils literal notranslate"><span class="pre">Model</span></code>, <code class="docutils literal notranslate"><span class="pre">Geometry</span></code>, and <code class="docutils literal notranslate"><span class="pre">RC</span></code> objects, which completely define the
 synthetic seismograms to be computed. Only the <code class="docutils literal notranslate"><span class="pre">fthickn</span></code> and <code class="docutils literal notranslate"><span class="pre">fvs</span></code>
@@ -148,7 +148,7 @@ mask <code class="docutils literal notranslate"><span class="pre">ist</span></co
 are provided. <code class="docutils literal notranslate"><span class="pre">filtered_rf_array</span></code> divides the SV- and SH-spectra by
 the P-spectra (i.e., computes a receiver function) and filters the data,
 whereas <code class="docutils literal notranslate"><span class="pre">filtered_array</span></code> returns the filtered SV and SH data.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">predictRF</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">geometry</span><span class="p">,</span> <span class="n">rc</span><span class="p">,</span> <span class="n">freqs</span><span class="p">,</span> <span class="n">rfarray</span><span class="p">,</span> <span class="n">ist</span><span class="p">,</span> <span class="n">rf</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">predictRF</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">geometry</span><span class="p">,</span> <span class="n">rc</span><span class="p">,</span> <span class="n">freqs</span><span class="p">,</span> <span class="n">rfarray</span><span class="p">,</span> <span class="n">ist</span><span class="p">,</span> <span class="n">rf</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 
     <span class="c1"># Compute synthetic seismograms</span>
     <span class="n">traces</span> <span class="o">=</span> <span class="n">run_bare</span><span class="p">(</span>
@@ -188,7 +188,7 @@ whereas <code class="docutils literal notranslate"><span class="pre">filtered_ar
 </div>
 </section>
 <section id="definition-of-the-misfit-function">
-<h2>Definition of the Misfit Function<a class="headerlink" href="#definition-of-the-misfit-function" title="Permalink to this heading"></a></h2>
+<h2>Definition of the Misfit Function<a class="headerlink" href="#definition-of-the-misfit-function" title="Link to this heading"></a></h2>
 <p>Here, we define the misfit function that <code class="docutils literal notranslate"><span class="pre">dual_annealing</span></code> will
 minimize. The misfit function requires a model vector <code class="docutils literal notranslate"><span class="pre">theta</span></code> as first
 argument. We define the first element of the model vector to be the
@@ -198,7 +198,7 @@ constant P-wave velocity. After that, we define the misfit <code class="docutils
 between the predicted and observed receiver functions (<code class="docutils literal notranslate"><span class="pre">pred</span></code> and
 <code class="docutils literal notranslate"><span class="pre">obs</span></code>, respectively) as 1. minus the cross correlation coefficient. A
 status message is printed so the user can follow the inversion process.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">misfit</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">geometry</span><span class="p">,</span> <span class="n">rc</span><span class="p">,</span> <span class="n">freqs</span><span class="p">,</span> <span class="n">rfarray</span><span class="p">,</span> <span class="n">ist</span><span class="p">,</span> <span class="n">obs</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">misfit</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">geometry</span><span class="p">,</span> <span class="n">rc</span><span class="p">,</span> <span class="n">freqs</span><span class="p">,</span> <span class="n">rfarray</span><span class="p">,</span> <span class="n">ist</span><span class="p">,</span> <span class="n">obs</span><span class="p">):</span>
 
     <span class="c1"># Set parameters to model object</span>
     <span class="n">model</span><span class="o">.</span><span class="n">fthickn</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">theta</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -221,10 +221,10 @@ status message is printed so the user can follow the inversion process.</p>
 </div>
 </section>
 <section id="plotting-function-for-data-vs-model-prediction">
-<h2>Plotting Function for Data vs. Model Prediction<a class="headerlink" href="#plotting-function-for-data-vs-model-prediction" title="Permalink to this heading"></a></h2>
+<h2>Plotting Function for Data vs. Model Prediction<a class="headerlink" href="#plotting-function-for-data-vs-model-prediction" title="Link to this heading"></a></h2>
 <p>This plot function allows us to compare the observed and predicted data
 vectors:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">pred</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">plot</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">pred</span><span class="p">):</span>
     <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Observed and modeled data vector&quot;</span><span class="p">)</span>
 
@@ -245,9 +245,9 @@ vectors:</p>
 </div>
 </section>
 <section id="inversion-workflow">
-<h2>Inversion Workflow<a class="headerlink" href="#inversion-workflow" title="Permalink to this heading"></a></h2>
+<h2>Inversion Workflow<a class="headerlink" href="#inversion-workflow" title="Link to this heading"></a></h2>
 <section id="recording-geometry">
-<h3>Recording Geometry<a class="headerlink" href="#recording-geometry" title="Permalink to this heading"></a></h3>
+<h3>Recording Geometry<a class="headerlink" href="#recording-geometry" title="Link to this heading"></a></h3>
 <p>Now it is time to run the workflow. We define the back-azimuth and
 slowness of seismic rays arriving at Hyderabad from the Philippines. The
 time window should span the interval between 0 and 25 seconds after the
@@ -263,7 +263,7 @@ periods of 20 and 2 seconds.</p>
 </div>
 </section>
 <section id="loading-a-receiver-function">
-<h3>Loading a Receiver Function<a class="headerlink" href="#loading-a-receiver-function" title="Permalink to this heading"></a></h3>
+<h3>Loading a Receiver Function<a class="headerlink" href="#loading-a-receiver-function" title="Link to this heading"></a></h3>
 <p>We load the radial and transverse receiver functions from file. The
 receiver function has been created from 3 high-quality earthquake
 recordings from the Philippines. Note that <code class="docutils literal notranslate"><span class="pre">rfr</span></code> and <code class="docutils literal notranslate"><span class="pre">rft</span></code> here need
@@ -283,7 +283,7 @@ data vector.</p>
 </div>
 </section>
 <section id="setup-of-starting-model-and-run-control-parameters">
-<h3>Setup of Starting Model and Run Control Parameters<a class="headerlink" href="#setup-of-starting-model-and-run-control-parameters" title="Permalink to this heading"></a></h3>
+<h3>Setup of Starting Model and Run Control Parameters<a class="headerlink" href="#setup-of-starting-model-and-run-control-parameters" title="Link to this heading"></a></h3>
 <p>We set up the starting subsurface velocity model using Saul et
 al. (2000), as well as the recording geometry.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">thickn</span> <span class="o">=</span> <span class="p">[</span><span class="mi">30000</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
@@ -317,7 +317,7 @@ might not be used at all.</p>
 </div>
 </section>
 <section id="definition-of-a-custom-phaselist">
-<h3>Definition of a Custom Phaselist<a class="headerlink" href="#definition-of-a-custom-phaselist" title="Permalink to this heading"></a></h3>
+<h3>Definition of a Custom Phaselist<a class="headerlink" href="#definition-of-a-custom-phaselist" title="Link to this heading"></a></h3>
 <p>The phaselist is defined as a list of phase descriptors, which can be
 read from a previous forward calculation (e.g. example 1). Each ray
 segment is described by a number-letter pair, where the number is the
@@ -350,7 +350,7 @@ division when computing the receiver function.)</p>
 </div>
 </section>
 <section id="faster-array-based-postprocessing">
-<h3>Faster Array-Based Postprocessing<a class="headerlink" href="#faster-array-based-postprocessing" title="Permalink to this heading"></a></h3>
+<h3>Faster Array-Based Postprocessing<a class="headerlink" href="#faster-array-based-postprocessing" title="Link to this heading"></a></h3>
 <p>Swift post processing of the synthetic receiver function is done on the
 <code class="docutils literal notranslate"><span class="pre">rfarray</span></code> using numpy array methods, which is initialized here. It has
 shape <code class="docutils literal notranslate"><span class="pre">(geometry.ntr,</span> <span class="pre">2,</span> <span class="pre">rc.npts)</span></code>.</p>
@@ -360,7 +360,7 @@ shape <code class="docutils literal notranslate"><span class="pre">(geometry.ntr
 </section>
 </section>
 <section id="a-first-look-at-the-observed-and-predicted-data-vectors">
-<h2>A First Look at the Observed and Predicted Data Vectors<a class="headerlink" href="#a-first-look-at-the-observed-and-predicted-data-vectors" title="Permalink to this heading"></a></h2>
+<h2>A First Look at the Observed and Predicted Data Vectors<a class="headerlink" href="#a-first-look-at-the-observed-and-predicted-data-vectors" title="Link to this heading"></a></h2>
 <p>Let’s see how well the starting model predicts the data. See what
 changes if you set <code class="docutils literal notranslate"><span class="pre">rf=False</span></code>, in which case no spectral division is
 performed and the model prediction is the synthetic seismogram. This
@@ -379,7 +379,7 @@ the second one <em>PpS</em>. Note the slight mis-alignment between observation
 result from the deconvolution of <em>PpP</em>.</p>
 </section>
 <section id="inverse-modeling-with-scipys-optimize-module">
-<h2>Inverse Modeling with Scipy’s Optimize Module<a class="headerlink" href="#inverse-modeling-with-scipys-optimize-module" title="Permalink to this heading"></a></h2>
+<h2>Inverse Modeling with Scipy’s Optimize Module<a class="headerlink" href="#inverse-modeling-with-scipys-optimize-module" title="Link to this heading"></a></h2>
 <p>We now define the search bounds for dual annealing. This definition
 prescribes that the first element of the model vector is the <em>thickness
 of layer 0</em> and is searched in an interval of
@@ -497,7 +497,7 @@ module</a>.</p>
 </div>
 </section>
 <section id="results">
-<h2>Results<a class="headerlink" href="#results" title="Permalink to this heading"></a></h2>
+<h2>Results<a class="headerlink" href="#results" title="Link to this heading"></a></h2>
 <p>Let’s have a look at the result</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
 </pre></div>
@@ -541,7 +541,7 @@ the solution.</p>
 <img alt="../../_images/output_32_0.png" src="../../_images/output_32_0.png" />
 </section>
 <section id="conclusion">
-<h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this heading"></a></h2>
+<h2>Conclusion<a class="headerlink" href="#conclusion" title="Link to this heading"></a></h2>
 <p>In this example we looked into some basic functions that can be helpful
 when using <em>PyRaysum</em> in parameter estimation problems. We defined a
 function <code class="docutils literal notranslate"><span class="pre">predictRF</span></code> to predict a receiver function from a given input
@@ -551,7 +551,7 @@ minimized through inverse modeling. We then plugged these functions into
 velocity of the cratonic crust in Hyderabad, India.</p>
 </section>
 <section id="references">
-<h2>References<a class="headerlink" href="#references" title="Permalink to this heading"></a></h2>
+<h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Saul, J., Kumar, M. R., &amp; Sarkar, D. (2000). Lithospheric and upper
 mantle structure of the Indian Shield, from teleseismic receiver

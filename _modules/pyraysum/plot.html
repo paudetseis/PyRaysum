@@ -1,19 +1,20 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyraysum.plot &mdash; pyraysum 1.0.0 documentation</title>
-      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>pyraysum.plot &mdash; pyraysum 1.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+
   
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=fc837d61"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -29,7 +30,6 @@
           
           <a href="../../index.html" class="icon icon-home">
             pyraysum
-              <img src="../../_static/PyRaysum_logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -121,13 +121,15 @@
 
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">hilbert</span>
-<span class="kn">from</span> <span class="nn">obspy</span> <span class="kn">import</span> <span class="n">Stream</span><span class="p">,</span> <span class="n">Trace</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.signal</span><span class="w"> </span><span class="kn">import</span> <span class="n">hilbert</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">obspy</span><span class="w"> </span><span class="kn">import</span> <span class="n">Stream</span><span class="p">,</span> <span class="n">Trace</span>
 
 
-<div class="viewcode-block" id="stack_all"><a class="viewcode-back" href="../../api.html#pyraysum.plot.stack_all">[docs]</a><span class="k">def</span> <span class="nf">stack_all</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">pws</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="stack_all">
+<a class="viewcode-back" href="../../api.html#pyraysum.plot.stack_all">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">stack_all</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">pws</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Stack all traces in ``Stream`` objects.</span>
 
@@ -173,7 +175,10 @@
     <span class="k">return</span> <span class="n">stack</span></div>
 
 
-<div class="viewcode-block" id="rf_wiggles"><a class="viewcode-back" href="../../api.html#pyraysum.plot.rf_wiggles">[docs]</a><span class="k">def</span> <span class="nf">rf_wiggles</span><span class="p">(</span>
+
+<div class="viewcode-block" id="rf_wiggles">
+<a class="viewcode-back" href="../../api.html#pyraysum.plot.rf_wiggles">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">rf_wiggles</span><span class="p">(</span>
     <span class="n">rflist</span><span class="p">,</span>
     <span class="n">btyp</span><span class="o">=</span><span class="s2">&quot;baz&quot;</span><span class="p">,</span>
     <span class="n">wvtype</span><span class="o">=</span><span class="s2">&quot;P&quot;</span><span class="p">,</span>
@@ -410,7 +415,10 @@
     <span class="k">return</span> <span class="n">fig</span></div>
 
 
-<div class="viewcode-block" id="stream_wiggles"><a class="viewcode-back" href="../../api.html#pyraysum.plot.stream_wiggles">[docs]</a><span class="k">def</span> <span class="nf">stream_wiggles</span><span class="p">(</span>
+
+<div class="viewcode-block" id="stream_wiggles">
+<a class="viewcode-back" href="../../api.html#pyraysum.plot.stream_wiggles">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">stream_wiggles</span><span class="p">(</span>
     <span class="n">streamlist</span><span class="p">,</span>
     <span class="n">btyp</span><span class="o">=</span><span class="s2">&quot;baz&quot;</span><span class="p">,</span>
     <span class="n">wvtype</span><span class="o">=</span><span class="s2">&quot;P&quot;</span><span class="p">,</span>
@@ -586,7 +594,10 @@
     <span class="k">return</span> <span class="n">fig</span></div>
 
 
-<div class="viewcode-block" id="seis_wiggles"><a class="viewcode-back" href="../../api.html#pyraysum.plot.seis_wiggles">[docs]</a><span class="k">def</span> <span class="nf">seis_wiggles</span><span class="p">(</span>
+
+<div class="viewcode-block" id="seis_wiggles">
+<a class="viewcode-back" href="../../api.html#pyraysum.plot.seis_wiggles">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">seis_wiggles</span><span class="p">(</span>
     <span class="n">stream</span><span class="p">,</span>
     <span class="n">tmin</span><span class="o">=-</span><span class="mf">5.0</span><span class="p">,</span>
     <span class="n">tmax</span><span class="o">=</span><span class="mf">20.0</span><span class="p">,</span>
@@ -664,6 +675,7 @@
         <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">fig</span></div>
+
 </pre></div>
 
            </div>
