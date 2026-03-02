@@ -22,7 +22,8 @@ Authors: [Wasja Bloch](https://www.eoas.ubc.ca/people/wasjabloch), [Pascal Audet
 
 #### Installation
 
-*PyRaysum* can be installed from PyPI or from source.
+*PyRaysum* can be installed from PyPI or from source. It is currently tested with Python
+version 3.8, 3.9 and 3.10.
 
 ##### Installing from PyPI
 To avoid conflicts with other programs, it is recommended to install *PyRaysum* inside a designated `conda` environment (called here `prs`). We recommend to have dependencies managed by `pip`
