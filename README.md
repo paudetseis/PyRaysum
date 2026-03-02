@@ -24,11 +24,20 @@ Authors: [Wasja Bloch](https://www.eoas.ubc.ca/people/wasjabloch), [Pascal Audet
 
 *PyRaysum* can be installed from PyPI or from source.
 
-To avoid conflicts with other programs, it is recommended to install *PyRaysum* inside a designated `conda` environment (called here `prs`) alongside its dependecies.
+##### Installing from PyPI
+To avoid conflicts with other programs, it is recommended to install *PyRaysum* inside a designated `conda` environment (called here `prs`). We recommend to have dependencies managed by `pip`
+
 ```
-conda create -n prs "python<3.12" "numpy<1.23" setuptools fortran-compiler obspy -c conda-forge
-conda activate prs
+conda create -n prs python
+pip install pyraysum
 ```
+
+You may alternativley wish to manage dependencies in `conda`
+```
+conda create -n prs python numpy matplotlib obspy -c conda-forge
+pip install pyraysum
+```
+
 If you are using an alternative *Python* interpreter (e.g., *IPython* or a *Jupyter*
 notebook), include it into your installation as well. This ensures that the interpreter
 uses the correct *Python* version.
@@ -40,16 +49,9 @@ conda install ipython
 conda install jupyter
 ```
 
-##### Installing from PyPI
-
-```
-pip install pyraysum
-```
-
 ##### Installing from source
 
 The source code of *PyRaysum* can also be downloaded from *GitHub* and installed via `pip`.
-
 ```
 git clone https://github.com/paudetseis/PyRaysum.git
 cd PyRaysum
@@ -57,6 +59,10 @@ pip install .
 ```
 
 #### Getting Started
+After installation, activate the environment
+```
+conda activate prs
+```
 
 To compute receiver functions for a range of back-azimuths considering a simple 1-layer 
 over a half-space subsurface seismic velocity model, in a *Python* or *iPython* console, execute:
