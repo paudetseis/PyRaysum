@@ -1,38 +1,32 @@
 [build-system]
-requires = ["scikit-build-core", "numpy"]
-build-backend = "scikit_build_core.build"
-
+requires = ["meson-python", "numpy>=1.26", "ninja"]
+build-backend = "mesonpy"
 
 [project]
 name = "pyraysum"
-version = "1.3"
-description = "Package to compute synthetic seismograms, based on Raysum"
+version = "1.1.1"
+description = "Python wrapper around Fortran code Raysum"
+readme = "README.md"
+requires-python = ">=3.9"
 authors = [
-    { name = "Pascal Audet", email = "pascal.audet@uottawa.ca" },
-    { name = "Wasja Bloch", email = "wasja@norsar.no" },
-    { name = "Andrew Fredriksen" },
+  {name = "Andrew Frederiksen"},
+  {name = "Pascal Audet", email = "pascal.audet@uottawa.ca"},
+  {name = "Mijian Xu", email = "mijian.xu@utoronto.ca"},
 ]
 maintainers = [
-    { name = "Wasja Bloch", email = "wasja@norsar.no" },
-    { name = "Pascal Audet", email = "pascal.audet@uottawa.ca" },
+  {name = "Pascal Audet", email = "pascal.audet@uottawa.ca"}
 ]
-
-readme = "README.md"
-dependencies = ["numpy>=1.15", "obspy>=1.0.0", "matplotlib", "obspy"]
 classifiers = [
-    "Development Status :: 5 - Stable",
-    "Environment :: Console",
-    "Intended Audience :: Science/Research",
-    "Programming Language :: Python :: 3 :: Only",
-    "Topic :: Scientific/Engineering :: Physics",
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Fortran",
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    "numpy>=1.26",
+    "obspy>=1.0.0",
+    "matplotlib",
 ]
 
-[project.urls]
-Homepage = "https://github.com/paudetseis/PyRaysum"
-Documentation = "https://paudetseis.github.io/PyRaysum"
-"Bug Tracker" = "https://github.com/paudetseis/PyRaysum/issues"
-
-[tool.scikit-build]
-ninja.version = ">=1.10"
-cmake.version = ">=3.17.2"
-
+[tool.meson-python.args]
+setup = ["-Dfortran_std=legacy"]
