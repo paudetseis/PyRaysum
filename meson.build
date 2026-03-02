@@ -30,7 +30,6 @@ fraysum_srcs = [
   'src/pyraysum/eigenvec.f',
   'src/pyraysum/eispack-cg.f',
   'src/pyraysum/matrixops.f',
-  'src/pyraysum/phaselist.f',
   'src/pyraysum/raysum.f',
   'src/pyraysum/readwrite.f',
   'src/pyraysum/seis-spread.f',
