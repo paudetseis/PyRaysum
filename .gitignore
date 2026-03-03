@@ -26,3 +26,5 @@ sample.*
 raysum-params
 empty
 fraysum.*
+.vscode/
+.pytest_cache/

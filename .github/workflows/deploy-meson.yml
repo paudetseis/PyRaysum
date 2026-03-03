@@ -1,0 +1,77 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Build
+
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ meson ]
+  pull_request:
+    branches: [ meson ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    name: Python ${{ matrix.python-version }}
+    # The type of runner that the job will run on
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python: ['3.10']  # Failing possibly due to numpy obspy conflict '3.11', '3.13'
+
+    defaults:
+      run:
+        shell: bash -l {0}
+    
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      - name: Setup Conda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          auto-update-conda: true
+          environment-file: .github/test_conda_env.yml
+          auto-activate-base: false
+          python-version: ${{ matrix.python }}
+
+      - name: Conda info 
+        run: |
+          conda info
+          conda list
+          conda config --add channels conda-forge
+
+      - name: Install
+        run: |
+          pip install -v --no-deps .
+
+      # - name: Tests
+      #   run: |
+      #     mkdir empty
+      #     cd empty
+      #     pytest -v --cov=pyraysum ../pyraysum/tests/
+      #     bash <(curl -s https://codecov.io/bash)
+
+      - name: Make docs
+        if: matrix.python == '3.9' 
+        run: |
+          cd docs
+          pip install sphinx_rtd_theme
+          make html
+          touch _build/html/.nojekyll
+          cd ..
+
+      - name: Deploy 🚀
+        if: matrix.python == '3.9' 
+        uses: JamesIves/github-pages-deploy-action@3.7.1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: gh-pages # The branch the action should deploy to.
+          FOLDER: docs/_build/html # The folder the action should deploy.
+          CLEAN: true # Automatically remove deleted files from the deploy branch

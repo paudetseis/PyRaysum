@@ -28,9 +28,12 @@ version 3.8, 3.9 and 3.10.
 ##### Installing from PyPI
 To avoid conflicts with other programs, it is recommended to install *PyRaysum* inside a designated `conda` environment (called here `prs`). We recommend to have dependencies managed by `pip`
 
-```
-conda create -n prs python
-pip install pyraysum
+**Note:** *PyRaysum* now uses `meson-python` for building the extension, which supports modern Python versions (including 3.13) and NumPy 2.x.
+
+```bash
+# Create environment with compilers and build tools
+conda create -n prs python=3.13 numpy compilers meson-python ninja obspy -c conda-forge
+conda activate prs
 ```
 
 You may alternativley wish to manage dependencies in `conda`
@@ -42,7 +45,7 @@ pip install pyraysum
 If you are using an alternative *Python* interpreter (e.g., *IPython* or a *Jupyter*
 notebook), include it into your installation as well. This ensures that the interpreter
 uses the correct *Python* version.
-```
+```bash
 # IPython
 conda install ipython
 
