@@ -59,14 +59,14 @@ jobs:
       #     pytest -v --cov=pyraysum ../pyraysum/tests/
       #     bash <(curl -s https://codecov.io/bash)
 
-      # - name: Make docs
-      #   if: matrix.python == '3.10' 
-      #   run: |
-      #     cd docs
-      #     pip install sphinx_rtd_theme
-      #     make html
-      #     touch _build/html/.nojekyll
-      #     cd ..
+      - name: Make docs
+        if: matrix.python == '3.10' 
+        run: |
+          cd docs
+          pip install sphinx_rtd_theme
+          make html
+          touch _build/html/.nojekyll
+          cd ..
 
       - name: Deploy 🚀
         if: matrix.python == '3.10' 

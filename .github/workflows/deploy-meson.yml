@@ -60,7 +60,7 @@ jobs:
       #     bash <(curl -s https://codecov.io/bash)
 
       - name: Make docs
-        if: matrix.python == '3.9' 
+        if: matrix.python == '3.10' 
         run: |
           cd docs
           pip install sphinx_rtd_theme
@@ -69,7 +69,7 @@ jobs:
           cd ..
 
       - name: Deploy 🚀
-        if: matrix.python == '3.9' 
+        if: matrix.python == '3.10' 
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
