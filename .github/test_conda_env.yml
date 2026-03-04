@@ -8,4 +8,7 @@ dependencies:
   - pytest-cov
   - fortran-compiler
   - sphinx
+  - sphinx_rtd_theme
+  - meson-python
+  - ninja
 

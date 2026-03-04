@@ -54,4 +54,4 @@ py.extension_module('fraysum',
 )
 
 # Install python sources
-install_subdir('pyraysum', install_dir : py.get_install_dir())
+install_subdir('src/pyraysum', install_dir : py.get_install_dir())
