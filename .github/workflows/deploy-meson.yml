@@ -17,7 +17,7 @@ on:
 jobs:
   # This workflow contains a single job called "build"
   build:
-    name: Python ${{ matrix.python-version }}
+    name: Python ${{ matrix.python }}
     # The type of runner that the job will run on
     runs-on: ${{ matrix.os }}
     strategy:
@@ -32,11 +32,13 @@ jobs:
     
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Setup Conda
         uses: conda-incubator/setup-miniconda@v2
         with:
           auto-update-conda: true
+          channels: conda-forge
+          channel-priority: strict
           environment-file: .github/test_conda_env.yml
           auto-activate-base: false
           python-version: ${{ matrix.python }}
@@ -45,7 +47,6 @@ jobs:
         run: |
           conda info
           conda list
-          conda config --add channels conda-forge
 
       - name: Install
         run: |
@@ -59,16 +60,15 @@ jobs:
       #     bash <(curl -s https://codecov.io/bash)
 
       - name: Make docs
-        if: matrix.python == '3.9' 
+        if: matrix.python == '3.10' 
         run: |
           cd docs
-          pip install sphinx_rtd_theme
           make html
           touch _build/html/.nojekyll
           cd ..
 
       - name: Deploy 🚀
-        if: matrix.python == '3.9' 
+        if: matrix.python == '3.10' 
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

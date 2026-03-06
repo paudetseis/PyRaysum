@@ -2,10 +2,13 @@ name: test
 channels:
   - conda-forge
 dependencies:
-  - numpy=1.21.5
+  - numpy>=1.26
   - obspy
   - pandas
   - pytest-cov
   - fortran-compiler
   - sphinx
+  - sphinx_rtd_theme
+  - meson-python
+  - ninja
 
